@@ -225,22 +225,22 @@ jobs:
     - name: Setup MSYS2 with Qt6
       uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
+        msystem: UCRT64
         update: true
         cache: true
         install: >-
           git
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-make
-          mingw-w64-x86_64-freetype
-          mingw-w64-x86_64-pkg-config
-          mingw-w64-x86_64-libsystre
-          mingw-w64-x86_64-qt6-base
-          mingw-w64-x86_64-qt6-declarative
-          mingw-w64-x86_64-qt6-multimedia
-          mingw-w64-x86_64-qt6-translations
-          mingw-w64-x86_64-qt6-tools
-          mingw-w64-x86_64-libgfortran
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-make
+          mingw-w64-ucrt-x86_64-freetype
+          mingw-w64-ucrt-x86_64-pkg-config
+          mingw-w64-ucrt-x86_64-libsystre
+          mingw-w64-ucrt-x86_64-qt6-base
+          mingw-w64-ucrt-x86_64-qt6-declarative
+          mingw-w64-ucrt-x86_64-qt6-multimedia
+          mingw-w64-ucrt-x86_64-qt6-translations
+          mingw-w64-ucrt-x86_64-qt6-tools
+          mingw-w64-ucrt-x86_64-libgfortran
 
     - name: Build simulator
       shell: msys2 {0}
@@ -275,33 +275,33 @@ jobs:
       shell: msys2 {0}
       run: |
         windeployqt6 db48x.exe
-        # Copy MinGW runtime and MSYS2 dependencies
-        cp /mingw64/bin/libgcc_s_seh-1.dll .
-        cp /mingw64/bin/libstdc++-6.dll .
-        cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libsystre-0.dll .
-        cp /mingw64/bin/libtre-5.dll .
-        cp /mingw64/bin/libintl-8.dll .
-        cp /mingw64/bin/libiconv-2.dll .
+        # Copy UCRT64 runtime and MSYS2 dependencies
+        cp /ucrt64/bin/libgcc_s_seh-1.dll .
+        cp /ucrt64/bin/libstdc++-6.dll .
+        cp /ucrt64/bin/libwinpthread-1.dll .
+        cp /ucrt64/bin/libsystre-0.dll .
+        cp /ucrt64/bin/libtre-5.dll .
+        cp /ucrt64/bin/libintl-8.dll .
+        cp /ucrt64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
-        cp /mingw64/bin/libb2-1.dll .
-        cp /mingw64/bin/libdouble-conversion.dll .
-        cp /mingw64/bin/libicuin*.dll .
-        cp /mingw64/bin/libicuuc*.dll .
-        cp /mingw64/bin/libicudt*.dll .
-        cp /mingw64/bin/libpcre2-16-0.dll .
-        cp /mingw64/bin/zlib1.dll .
-        cp /mingw64/bin/libzstd.dll .
-        cp /mingw64/bin/libfreetype-6.dll .
-        cp /mingw64/bin/libharfbuzz-0.dll .
-        cp /mingw64/bin/libmd4c.dll .
-        cp /mingw64/bin/libpng16-16.dll .
-        cp /mingw64/bin/libbrotlidec.dll .
-        cp /mingw64/bin/libbrotlicommon.dll .
-        cp /mingw64/bin/libbz2-1.dll .
-        cp /mingw64/bin/libglib-2.0-0.dll .
-        cp /mingw64/bin/libgraphite2.dll .
-        cp /mingw64/bin/libpcre2-8-0.dll .
+        cp /ucrt64/bin/libb2-1.dll .
+        cp /ucrt64/bin/libdouble-conversion.dll .
+        cp /ucrt64/bin/libicuin*.dll .
+        cp /ucrt64/bin/libicuuc*.dll .
+        cp /ucrt64/bin/libicudt*.dll .
+        cp /ucrt64/bin/libpcre2-16-0.dll .
+        cp /ucrt64/bin/zlib1.dll .
+        cp /ucrt64/bin/libzstd.dll .
+        cp /ucrt64/bin/libfreetype-6.dll .
+        cp /ucrt64/bin/libharfbuzz-0.dll .
+        cp /ucrt64/bin/libmd4c.dll .
+        cp /ucrt64/bin/libpng16-16.dll .
+        cp /ucrt64/bin/libbrotlidec.dll .
+        cp /ucrt64/bin/libbrotlicommon.dll .
+        cp /ucrt64/bin/libbz2-1.dll .
+        cp /ucrt64/bin/libglib-2.0-0.dll .
+        cp /ucrt64/bin/libgraphite2.dll .
+        cp /ucrt64/bin/libpcre2-8-0.dll .
 
     - name: Code sign Windows executable
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
@@ -535,22 +535,22 @@ jobs:
     - name: Setup MSYS2 with Qt6
       uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
+        msystem: UCRT64
         update: true
         cache: true
         install: >-
           git
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-make
-          mingw-w64-x86_64-freetype
-          mingw-w64-x86_64-pkg-config
-          mingw-w64-x86_64-libsystre
-          mingw-w64-x86_64-qt6-base
-          mingw-w64-x86_64-qt6-declarative
-          mingw-w64-x86_64-qt6-multimedia
-          mingw-w64-x86_64-qt6-translations
-          mingw-w64-x86_64-qt6-tools
-          mingw-w64-x86_64-libgfortran
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-make
+          mingw-w64-ucrt-x86_64-freetype
+          mingw-w64-ucrt-x86_64-pkg-config
+          mingw-w64-ucrt-x86_64-libsystre
+          mingw-w64-ucrt-x86_64-qt6-base
+          mingw-w64-ucrt-x86_64-qt6-declarative
+          mingw-w64-ucrt-x86_64-qt6-multimedia
+          mingw-w64-ucrt-x86_64-qt6-translations
+          mingw-w64-ucrt-x86_64-qt6-tools
+          mingw-w64-ucrt-x86_64-libgfortran
 
     - name: Build color DM32 simulator
       shell: msys2 {0}
@@ -585,33 +585,33 @@ jobs:
       shell: msys2 {0}
       run: |
         windeployqt6 db50x.exe
-        # Copy MinGW runtime and MSYS2 dependencies
-        cp /mingw64/bin/libgcc_s_seh-1.dll .
-        cp /mingw64/bin/libstdc++-6.dll .
-        cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libsystre-0.dll .
-        cp /mingw64/bin/libtre-5.dll .
-        cp /mingw64/bin/libintl-8.dll .
-        cp /mingw64/bin/libiconv-2.dll .
+        # Copy UCRT64 runtime and MSYS2 dependencies
+        cp /ucrt64/bin/libgcc_s_seh-1.dll .
+        cp /ucrt64/bin/libstdc++-6.dll .
+        cp /ucrt64/bin/libwinpthread-1.dll .
+        cp /ucrt64/bin/libsystre-0.dll .
+        cp /ucrt64/bin/libtre-5.dll .
+        cp /ucrt64/bin/libintl-8.dll .
+        cp /ucrt64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
-        cp /mingw64/bin/libb2-1.dll .
-        cp /mingw64/bin/libdouble-conversion.dll .
-        cp /mingw64/bin/libicuin*.dll .
-        cp /mingw64/bin/libicuuc*.dll .
-        cp /mingw64/bin/libicudt*.dll .
-        cp /mingw64/bin/libpcre2-16-0.dll .
-        cp /mingw64/bin/zlib1.dll .
-        cp /mingw64/bin/libzstd.dll .
-        cp /mingw64/bin/libfreetype-6.dll .
-        cp /mingw64/bin/libharfbuzz-0.dll .
-        cp /mingw64/bin/libmd4c.dll .
-        cp /mingw64/bin/libpng16-16.dll .
-        cp /mingw64/bin/libbrotlidec.dll .
-        cp /mingw64/bin/libbrotlicommon.dll .
-        cp /mingw64/bin/libbz2-1.dll .
-        cp /mingw64/bin/libglib-2.0-0.dll .
-        cp /mingw64/bin/libgraphite2.dll .
-        cp /mingw64/bin/libpcre2-8-0.dll .
+        cp /ucrt64/bin/libb2-1.dll .
+        cp /ucrt64/bin/libdouble-conversion.dll .
+        cp /ucrt64/bin/libicuin*.dll .
+        cp /ucrt64/bin/libicuuc*.dll .
+        cp /ucrt64/bin/libicudt*.dll .
+        cp /ucrt64/bin/libpcre2-16-0.dll .
+        cp /ucrt64/bin/zlib1.dll .
+        cp /ucrt64/bin/libzstd.dll .
+        cp /ucrt64/bin/libfreetype-6.dll .
+        cp /ucrt64/bin/libharfbuzz-0.dll .
+        cp /ucrt64/bin/libmd4c.dll .
+        cp /ucrt64/bin/libpng16-16.dll .
+        cp /ucrt64/bin/libbrotlidec.dll .
+        cp /ucrt64/bin/libbrotlicommon.dll .
+        cp /ucrt64/bin/libbz2-1.dll .
+        cp /ucrt64/bin/libglib-2.0-0.dll .
+        cp /ucrt64/bin/libgraphite2.dll .
+        cp /ucrt64/bin/libpcre2-8-0.dll .
 
     - name: Code sign Windows executable
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
