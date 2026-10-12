@@ -4240,11 +4240,14 @@ restart:
                        shown, int(y), line, helpfile.position());
             }
             else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H &&
-                     style == NORMAL && !in_table)
+                     style == NORMAL && !in_table && !hadTitle)
             {
                 // Resume later drawings from here, but only outside of code
                 // blocks and tables: restarting inside a ``` block would
-                // swap code and text until the next fence
+                // swap code and text until the next fence. Not right after
+                // a title either: the space below the title is only added
+                // with the next word, and a restart would lose it, so that
+                // the next drawing would shift the text up
                 uint oldHelp = help;
                 uint oldLine = line;
                 help = helpfile.position();
