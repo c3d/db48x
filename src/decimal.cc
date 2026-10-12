@@ -2220,7 +2220,7 @@ decimal_p decimal::pow(decimal_r x, decimal_r y)
     {
         if (y->is_negative())
         {
-            rt.zero_divide_error();
+            rt.domain_error();
             return nullptr;
         }
         return x;
@@ -2921,9 +2921,17 @@ decimal_p decimal::atanh(decimal_r x)
     // atanh(x) = ln1p(2x / (1 - x)) / 2, accurate for small x
     precision_adjust prec;
     decimal_g one  = make(1);
+    decimal_g d    = one - x;
+    if (!d)
+        return nullptr;
+    if (d->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     decimal_g half = make(5, -1);
     decimal_g r    = x + x;
-    r = r / decimal_g(one - x);
+    r = r / d;
     r = ln1p(r);
     return prec(half * r);
 }
@@ -2935,7 +2943,14 @@ decimal_p decimal::csch(decimal_r x)
 // ----------------------------------------------------------------------------
 {
     precision_adjust prec;
-    decimal_g s = sinh(x);
+    decimal_g        s = sinh(x);
+    if (!s)
+        return nullptr;
+    if (s->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return prec(inv(s));
 }
 
@@ -2947,6 +2962,13 @@ decimal_p decimal::sech(decimal_r x)
 {
     precision_adjust prec;
     decimal_g c = cosh(x);
+    if (!c)
+        return nullptr;
+    if (c->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return prec(inv(c));
 }
 
@@ -2957,7 +2979,14 @@ decimal_p decimal::coth(decimal_r x)
 // ----------------------------------------------------------------------------
 {
     precision_adjust prec;
-    decimal_g t = tanh(x);
+    decimal_g        t = tanh(x);
+    if (!t)
+        return nullptr;
+    if (t->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return prec(inv(t));
 }
 
@@ -2971,8 +3000,7 @@ decimal_p decimal::acsch(decimal_r x)
         return nullptr;
     if (x->is_zero())
     {
-        // Pole at 0
-        rt.zero_divide_error();
+        rt.domain_error();
         return nullptr;
     }
     precision_adjust prec;

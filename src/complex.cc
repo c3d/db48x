@@ -1447,12 +1447,19 @@ COMPLEX_BODY(atan)
     // atan(z) = -i/2 ln((i-z) / (i + z))
     complex_g i = complex::make(0,1);
     complex_g d = i + z;
-    complex_g q = (i - z) / d;
-    if (!d || !q)
+    if (!d)
         return nullptr;
-    if (d->is_zero() || q->is_zero())
+    if (d->is_zero())
     {
-        rt.domain_error();      // atan(-ⅈ), like atan(ⅈ)
+        rt.domain_error();
+        return nullptr;
+    }
+    complex_g q = (i - z) / d;
+    if (!q)
+        return nullptr;
+    if (q->is_zero())
+    {
+        rt.domain_error();
         return nullptr;
     }
     return complex::ln(q) / complex_g(complex::make(0,2));
@@ -1464,6 +1471,11 @@ COMPLEX_BODY(asec)
 //   Complex implementation of asec
 // ----------------------------------------------------------------------------
 {
+    if (z->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return complex::acos(complex::make(1, 0) / z);
 }
 
@@ -1473,6 +1485,11 @@ COMPLEX_BODY(acsc)
 //   Complex implementation of acsc
 // ----------------------------------------------------------------------------
 {
+    if (z->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return complex::asin(complex::make(1, 0) / z);
 }
 
@@ -1482,6 +1499,11 @@ COMPLEX_BODY(acot)
 //   Complex implementation of acot
 // ----------------------------------------------------------------------------
 {
+    if (z->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     return complex::atan(complex::make(1, 0) / z);
 }
 
@@ -1549,7 +1571,15 @@ COMPLEX_BODY(atanh)
     // atanh(z) = 1/2 ln((1+z) / (1-z))
     complex_g one = complex::make(1, 0);
     complex_g two = complex::make(2, 0);
-    return complex::ln((one + z) / (one - z)) / two;
+    complex_g d = one - z;
+    if (!d)
+        return nullptr;
+    if (d->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+    return complex::ln((one + z) / d) / two;
 }
 
 
@@ -1593,6 +1623,11 @@ COMPLEX_BODY(acsch)
 // ----------------------------------------------------------------------------
 {
     // acsch(z) = ln(1/z + sqrt(1/z^2 + 1))
+    if (z->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     complex_g one = complex::make(1, 0);
     complex_g inv_z = one / z;
     return complex::ln(inv_z + complex::sqrt(inv_z*inv_z + one));
@@ -1605,6 +1640,11 @@ COMPLEX_BODY(asech)
 // ----------------------------------------------------------------------------
 {
     // asech(z) = ln(1/z + sqrt(1/z^2 - 1))
+    if (z->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
     complex_g one = complex::make(1, 0);
     complex_g inv_z = one / z;
     return complex::ln(inv_z + complex::sqrt(inv_z*inv_z - one));
@@ -1619,7 +1659,15 @@ COMPLEX_BODY(acoth)
     // acoth(z) = 1/2 ln((z+1) / (z-1))
     complex_g one = complex::make(1, 0);
     complex_g two = complex::make(2, 0);
-    return complex::ln((z + one) / (z - one)) / two;
+    complex_g d = z - one;
+    if (!d)
+        return nullptr;
+    if (d->is_zero())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+    return complex::ln((z + one) / d) / two;
 }
 
 
@@ -1641,7 +1689,7 @@ COMPLEX_BODY(ln1p)
         return nullptr;
     if (opa->is_zero(false) && b->is_zero(false))
     {
-        rt.zero_divide_error();
+        rt.domain_error();
         return nullptr;
     }
 
@@ -1699,7 +1747,7 @@ COMPLEX_BODY(ln)
     {
         // Pole at 0: do not hand ln(0) back to the real code, which would
         // promote to complex again with ComplexResults and recurse forever
-        rt.zero_divide_error();
+        rt.domain_error();
         return nullptr;
     }
     algebraic_g arg = z->arg(ID_Rad);

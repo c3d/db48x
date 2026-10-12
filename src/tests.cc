@@ -5408,10 +5408,10 @@ void tests::hyperbolic_reciprocals()
         .test(CLEAR, "-1E30 TANH", ENTER).expect("-1.")
         .test(CLEAR, "1E-15 TANH", ENTER).expect("1.⁳⁻¹⁵");
     step("Hyperbolic functions at singular points")
-        .test(CLEAR, "0 CSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 COTH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "1. ATANH", ENTER).error("Divide by zero");
+        .test(CLEAR, "0 CSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 COTH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "1. ATANH", ENTER).error("Argument outside domain");
     step("Hyperbolic functions keep 24-digit accuracy")
         .test(CLEAR, "24 SIG", ENTER).noerror()
         .test(CLEAR, "1 SINH", ENTER).expect("1.17520 11936 43801 45688 238")
@@ -6514,36 +6514,36 @@ void tests::complex_promotion()
         .test(CLEAR, "'X' PURGE", ENTER).noerror();
 
     step("ln(0) is a pole, not an infinite recursion")
-        .test(CLEAR, "0 LN", ENTER).error("Divide by zero")
-        .test(CLEAR, "0. LN", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 LOG", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ LOG", ENTER).error("Divide by zero");
+        .test(CLEAR, "0 LN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0. LN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 LOG", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ LOG", ENTER).error("Argument outside domain");
     step("Complex powers of zero")
-        .test(CLEAR, "0 ⅈ ^", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ 0.5 ^", ENTER).error("Divide by zero");
+        .test(CLEAR, "0 ⅈ ^", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ 0.5 ^", ENTER).error("Argument outside domain");
     step("lnp1(-1) is a pole")
-        .test(CLEAR, "-1 LNP1", ENTER).error("Divide by zero")
-        .test(CLEAR, "-1+0ⅈ LNP1", ENTER).error("Divide by zero");
+        .test(CLEAR, "-1 LNP1", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-1+0ⅈ LNP1", ENTER).error("Argument outside domain");
     step("atanh(-1) and acoth(-1) are poles")
-        .test(CLEAR, "-1 ATANH", ENTER).error("Divide by zero")
-        .test(CLEAR, "-1 ACOTH", ENTER).error("Divide by zero")
-        .test(CLEAR, "-1+0ⅈ ATANH", ENTER).error("Divide by zero")
-        .test(CLEAR, "-1+0ⅈ ACOTH", ENTER).error("Divide by zero");
+        .test(CLEAR, "-1 ATANH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-1 ACOTH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-1+0ⅈ ATANH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-1+0ⅈ ACOTH", ENTER).error("Argument outside domain");
     step("atanh(1) and acoth(1) are poles")
-        .test(CLEAR, "1 ATANH", ENTER).error("Divide by zero")
-        .test(CLEAR, "1 ACOTH", ENTER).error("Divide by zero");
+        .test(CLEAR, "1 ATANH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "1 ACOTH", ENTER).error("Argument outside domain");
     step("atan(i) and acot(-i) are poles")
-        .test(CLEAR, "0+1ⅈ ATAN", ENTER).error("Divide by zero")
-        .test(CLEAR, "0-1ⅈ ACOT", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ ACOT", ENTER).error("Divide by zero");
+        .test(CLEAR, "0+1ⅈ ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0-1ⅈ ACOT", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ ACOT", ENTER).error("Argument outside domain");
     step("Inverse trig functions at 0 with complex results")
-        .test(CLEAR, "0 ASEC", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 ACSC", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 ASECH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero");
+        .test(CLEAR, "0 ASEC", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 ACSC", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 ASECH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Argument outside domain");
     step("ln(0) in expression")
-        .test(CLEAR, "0 'X' STO 'LN(X)' →NUM", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 'X' STO 'LN(X)' →NUM", ENTER).error("Argument outside domain")
         .test(CLEAR, "'X' PURGE", ENTER).noerror();
 
     step("Restore complex mode")
@@ -6551,20 +6551,20 @@ void tests::complex_promotion()
         .test("-103 FS?", ENTER).expect("False");
 
     step("acsch(0) is a pole")
-        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0. ACSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "'ACSCH(0)' →NUM", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 1 →σRange ACSCH", ENTER).error("Divide by zero")
-        .test(CLEAR, "0…1 ACSCH", ENTER).error("Divide by zero");
+        .test(CLEAR, "0 ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0. ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "'ACSCH(0)' →NUM", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 1 →σRange ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0…1 ACSCH", ENTER).error("Argument outside domain");
     step("Complex inverse functions at their poles")
-        .test(CLEAR, "0+0ⅈ ASECH", ENTER).error("Divide by zero")
-        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Divide by zero")
-        .test(CLEAR, "1+0ⅈ ACOTH", ENTER).error("Divide by zero")
-        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Divide by zero")
-        .test(CLEAR, "ⅈ ACOT", ENTER).error("Divide by zero")
-        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Divide by zero")
-        .test(CLEAR, "0 ⅈ ^", ENTER).error("Divide by zero");
+        .test(CLEAR, "0+0ⅈ ASECH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "1+0ⅈ ACOTH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "ⅈ ACOT", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0 ⅈ ^", ENTER).error("Argument outside domain");
     step("Real powers of negative and zero bases")
         .test(CLEAR, "-8 0.5 ^", ENTER).error("Argument outside domain")
         .test(CLEAR, "-4 2 XROOT", ENTER).error("Argument outside domain")
@@ -6574,9 +6574,9 @@ void tests::complex_promotion()
         .test(CLEAR, "0 -0.5 ^", ENTER).error("Divide by zero");
     step("Complex poles do not crash when infinities are values")
         .test(CLEAR, "InfinityValue", ENTER).noerror()
-        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Undefined operation")
-        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Undefined operation")
-        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Undefined operation")
+        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Argument outside domain")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Argument outside domain")
         .test(CLEAR, "'InfinityValue' PURGE", ENTER).noerror();
 }
 
@@ -17054,7 +17054,7 @@ void tests::plotting_all_functions()
     FUNCTION(csch);
     FUNCTION(coth);
     FUNCTION(asech);
-    FUNCTION(accsh);
+    FUNCTION(acsch);
     FUNCTION(acoth);
 
     FUNCTION(ln1p);

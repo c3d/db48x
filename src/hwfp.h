@@ -420,7 +420,7 @@ struct hwfp : hwfp_base
         hw s = std::sinh(x->value());
         if (s == hw(0.0))
         {
-            rt.zero_divide_error();
+            rt.domain_error();
             return nullptr;
         }
         return make(hw(1.0) / s);
@@ -437,7 +437,7 @@ struct hwfp : hwfp_base
         hw s = std::sinh(x->value());
         if (s == hw(0.0))
         {
-            rt.zero_divide_error();
+            rt.domain_error();
             return nullptr;
         }
         hw c = std::cosh(x->value());
