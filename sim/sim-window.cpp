@@ -65,6 +65,15 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtMath>
+
+
+
+// ============================================================================
+//
+//   Java native interface for Android
+//
+// ============================================================================
+
 #ifdef ANDROID
 #include <QDir>
 #include <QDirIterator>
@@ -77,18 +86,21 @@ void extract_android_assets();
 static void android_haptic_tap();
 
 extern "C"
+// ----------------------------------------------------------------------------
+//   Push a key from Java code
+// ----------------------------------------------------------------------------
 {
-JNIEXPORT void JNICALL
-Java_org_db48x_DB48xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
-{
-    key_push(key);
-}
+    JNIEXPORT void JNICALL
+    Java_org_db48x_DB48xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+    {
+        key_push(key);
+    }
 
-JNIEXPORT void JNICALL
-Java_org_db50x_DB50xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
-{
-    key_push(key);
-}
+    JNIEXPORT void JNICALL
+    Java_org_db50x_DB50xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+    {
+        key_push(key);
+    }
 } // extern "C"
 
 #endif // ANDROID

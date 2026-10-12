@@ -122,17 +122,26 @@ sys_sdb_t sdb =
 };
 
 void LCD_power_off(int UNUSED clear)
+// ----------------------------------------------------------------------------
+//   Turn off the LCD display
+// ----------------------------------------------------------------------------
 {
     record(dmcp, "LCD_power_off");
 }
 
 
 void LCD_power_on()
+// ----------------------------------------------------------------------------
+//   Turn on the LCD display
+// ----------------------------------------------------------------------------
 {
     record(dmcp, "LCD_power_on");
 }
 
 uint32_t read_power_voltage()
+// ----------------------------------------------------------------------------
+//   Return the current battery voltage in millivolts
+// ----------------------------------------------------------------------------
 {
     const uint vmax = 3000;
     const uint vmin = 2600;
@@ -142,22 +151,34 @@ uint32_t read_power_voltage()
 }
 
 int get_vbat()
+// ----------------------------------------------------------------------------
+//   Return the battery voltage (DMCP compatibility wrapper)
+// ----------------------------------------------------------------------------
 {
     return read_power_voltage();
 }
 
 int get_lowbat_state()
+// ----------------------------------------------------------------------------
+//   Return true if the battery voltage is critically low
+// ----------------------------------------------------------------------------
 {
     const uint vlow = 2450;
     return read_power_voltage() < vlow;
 }
 
 int usb_powered()
+// ----------------------------------------------------------------------------
+//   Return true if the calculator is powered via USB
+// ----------------------------------------------------------------------------
 {
     return ui_charging();
 }
 
 int create_screenshot(int report_error)
+// ----------------------------------------------------------------------------
+//   Save a screenshot of the current display to a file
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet,
            "create_screenshot(%d) not implemented", report_error);
@@ -167,6 +188,9 @@ int create_screenshot(int report_error)
 
 
 void draw_power_off_image(int allow_errors)
+// ----------------------------------------------------------------------------
+//   Draw the power-off screen image
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet,
            "draw_power_off_image(%d) not implemented", allow_errors);
@@ -174,6 +198,9 @@ void draw_power_off_image(int allow_errors)
 
 
 int handle_menu(const smenu_t * menu_id, int action, int cur_line)
+// ----------------------------------------------------------------------------
+//   Display and handle a DMCP system menu
+// ----------------------------------------------------------------------------
 {
     uint menu_line = 0;
     bool done = false;
@@ -296,6 +323,9 @@ volatile bool android_timer0_force_timeout  = false;
 #endif // ANDROID
 
 int key_empty()
+// ----------------------------------------------------------------------------
+//   Return true if the key buffer is empty
+// ----------------------------------------------------------------------------
 {
     static bool empty = true;
     if ((keyrd == keywr) != empty)
@@ -311,11 +341,17 @@ int key_empty()
 }
 
 int key_remaining()
+// ----------------------------------------------------------------------------
+//   Return the number of free slots in the key buffer
+// ----------------------------------------------------------------------------
 {
     return nkeys - (keywr - keyrd);
 }
 
 int key_pop()
+// ----------------------------------------------------------------------------
+//   Pop and return the oldest key from the buffer
+// ----------------------------------------------------------------------------
 {
     if (keyrd != keywr)
     {
@@ -339,6 +375,9 @@ int key_pop()
 }
 
 int key_tail()
+// ----------------------------------------------------------------------------
+//   Peek at the most recent key without removing it
+// ----------------------------------------------------------------------------
 {
     if (keyrd != keywr)
     {
@@ -349,6 +388,9 @@ int key_tail()
 }
 
 int key_pop_last()
+// ----------------------------------------------------------------------------
+//   Discard all but the last key and return it
+// ----------------------------------------------------------------------------
 {
     if (keywr - keyrd > 1)
         keyrd = keywr - 1;
@@ -361,11 +403,17 @@ int key_pop_last()
 }
 
 void key_pop_all()
+// ----------------------------------------------------------------------------
+//   Discard all keys in the buffer
+// ----------------------------------------------------------------------------
 {
     keyrd = 0;
     keywr = 0;
 }
 int key_push(int k)
+// ----------------------------------------------------------------------------
+//   Push a key code into the key buffer
+// ----------------------------------------------------------------------------
 {
     record(keys, "Push key %d (wr %u rd %u) shifts=%+s",
            k, keywr, keyrd,
@@ -381,6 +429,9 @@ int key_push(int k)
 }
 
 int read_key(int *k1, int *k2)
+// ----------------------------------------------------------------------------
+//   Read up to two keys including shift state
+// ----------------------------------------------------------------------------
 {
     uint count = keywr - keyrd;
     if (shift_held || alt_held)
@@ -411,16 +462,25 @@ int read_key(int *k1, int *k2)
 }
 
 int sys_last_key()
+// ----------------------------------------------------------------------------
+//   Return the most recently pushed key code
+// ----------------------------------------------------------------------------
 {
     return keys[(keywr - 1) % nkeys];
 }
 
 int runner_get_key(int *repeat)
+// ----------------------------------------------------------------------------
+//   Get a key for the program runner, optionally handling repeats
+// ----------------------------------------------------------------------------
 {
     return repeat ? key_pop_last() :  key_pop();
 }
 
 void lcd_clear_buf()
+// ----------------------------------------------------------------------------
+//   Clear the LCD frame buffer to white
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Clearing buffer");
     for (unsigned i = 0; i < sizeof(lcd_buffer) / sizeof(*lcd_buffer); i++)
@@ -430,6 +490,9 @@ void lcd_clear_buf()
 static uint32_t last_warning = 0;
 
 inline void lcd_set_pixel(int x, int y)
+// ----------------------------------------------------------------------------
+//   Set a pixel to black at the given coordinates
+// ----------------------------------------------------------------------------
 {
     if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
     {
@@ -446,6 +509,9 @@ inline void lcd_set_pixel(int x, int y)
 }
 
 inline void lcd_clear_pixel(int x, int y)
+// ----------------------------------------------------------------------------
+//   Clear a pixel to white at the given coordinates
+// ----------------------------------------------------------------------------
 {
 
     if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
@@ -463,6 +529,9 @@ inline void lcd_clear_pixel(int x, int y)
 }
 
 inline void lcd_pixel(int x, int y, int val)
+// ----------------------------------------------------------------------------
+//   Set or clear a pixel depending on the value
+// ----------------------------------------------------------------------------
 {
     if (!val)
         lcd_set_pixel(x, y);
@@ -471,6 +540,9 @@ inline void lcd_pixel(int x, int y, int val)
 }
 
 void lcd_draw_menu_keys(const char *keys[])
+// ----------------------------------------------------------------------------
+//   Draw the six softkey labels at the bottom of the screen
+// ----------------------------------------------------------------------------
 {
     int my = LCD_H - t20->f->height - 4;
     int mh = t20->f->height + 2;
@@ -518,6 +590,9 @@ void lcd_draw_menu_keys(const char *keys[])
 }
 
 void lcd_fill_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, int val)
+// ----------------------------------------------------------------------------
+//   Fill or clear a rectangle in the frame buffer
+// ----------------------------------------------------------------------------
 {
     if (val)
         record(lcd, "Fill  rectangle (%u,%u) + (%u, %u)", x, y, w, h);
@@ -549,10 +624,16 @@ void lcd_fill_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, int val)
 }
 
 int lcd_fontWidth(disp_stat_t * ds)
+// ----------------------------------------------------------------------------
+//   Return the width of the current font in the display state
+// ----------------------------------------------------------------------------
 {
     return ds->f->width;
 }
 int lcd_for_calc(int what)
+// ----------------------------------------------------------------------------
+//   Display the calculator about screen
+// ----------------------------------------------------------------------------
 {
     font_p font = LibMonoFont14x22;
     coord x = 0;
@@ -566,15 +647,24 @@ int lcd_for_calc(int what)
     return 0;
 }
 int lcd_get_buf_cleared()
+// ----------------------------------------------------------------------------
+//   Return whether the LCD buffer has been cleared
+// ----------------------------------------------------------------------------
 {
     record(lcd, "get_buf_cleared returns %d", lcd_buf_cleared_result);
     return lcd_buf_cleared_result;
 }
 int lcd_lineHeight(disp_stat_t * ds)
+// ----------------------------------------------------------------------------
+//   Return the line height for the current font
+// ----------------------------------------------------------------------------
 {
     return ds->f->height;
 }
 uint8_t * lcd_line_addr(int y)
+// ----------------------------------------------------------------------------
+//   Return a pointer to the frame buffer data for a given scanline
+// ----------------------------------------------------------------------------
 {
     if (y < 0 || y > LCD_H)
     {
@@ -585,10 +675,16 @@ uint8_t * lcd_line_addr(int y)
     return (uint8_t *) (lcd_buffer + offset);
 }
 int lcd_toggleFontT(int nr)
+// ----------------------------------------------------------------------------
+//   Toggle the font type (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
     return nr;
 }
 int lcd_nextFontNr(int nr)
+// ----------------------------------------------------------------------------
+//   Return the next font number, clamped to the available range
+// ----------------------------------------------------------------------------
 {
     if (nr < (int) dmcp_fonts_count - 1)
         nr++;
@@ -597,6 +693,9 @@ int lcd_nextFontNr(int nr)
     return nr;
 }
 int lcd_prevFontNr(int nr)
+// ----------------------------------------------------------------------------
+//   Return the previous font number, clamped to zero
+// ----------------------------------------------------------------------------
 {
     if (nr > 0)
         nr--;
@@ -605,11 +704,17 @@ int lcd_prevFontNr(int nr)
     return nr;
 }
 void lcd_prevLn(disp_stat_t * ds)
+// ----------------------------------------------------------------------------
+//   Move the display state cursor up one line
+// ----------------------------------------------------------------------------
 {
     ds->y -= lcd_lineHeight(ds);
     ds->x = ds->xoffs;
 }
 void lcd_print(disp_stat_t * ds, const char* fmt, ...)
+// ----------------------------------------------------------------------------
+//   Print formatted text to the display at the current position
+// ----------------------------------------------------------------------------
 {
     static char buffer[256];
     va_list args;
@@ -620,6 +725,9 @@ void lcd_print(disp_stat_t * ds, const char* fmt, ...)
 }
 
 void lcd_forced_refresh()
+// ----------------------------------------------------------------------------
+//   Force an immediate screen refresh
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Forced refresh requested %u drawn %u",
            lcd_refresh_requested, ui_refresh_count());
@@ -627,6 +735,9 @@ void lcd_forced_refresh()
     ui_refresh();
 }
 void lcd_refresh()
+// ----------------------------------------------------------------------------
+//   Request a normal screen refresh
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Normal refresh requested %u drawn %u",
            lcd_refresh_requested, ui_refresh_count());
@@ -634,6 +745,9 @@ void lcd_refresh()
     ui_refresh();
 }
 void lcd_refresh_dma()
+// ----------------------------------------------------------------------------
+//   Request a DMA-based screen refresh
+// ----------------------------------------------------------------------------
 {
     record(lcd, "DMA refresh requested %u drawn %u",
            lcd_refresh_requested, ui_refresh_count());
@@ -642,6 +756,9 @@ void lcd_refresh_dma()
     ui_refresh();
 }
 void lcd_refresh_wait()
+// ----------------------------------------------------------------------------
+//   Request a screen refresh and wait for completion
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Wait refresh requested %u drawn %u",
            lcd_refresh_requested, ui_refresh_count());
@@ -649,6 +766,9 @@ void lcd_refresh_wait()
     ui_refresh();
 }
 void lcd_refresh_lines(int ln, int cnt)
+// ----------------------------------------------------------------------------
+//   Refresh a range of scanlines on the display
+// ----------------------------------------------------------------------------
 {
     record(lcd_refresh, "Refresh lines (%d-%d) count %d, requested %u drawn %u",
            ln, ln+cnt-1, cnt,
@@ -660,6 +780,9 @@ void lcd_refresh_lines(int ln, int cnt)
     }
 }
 void lcd_setLine(disp_stat_t * ds, int ln_nr)
+// ----------------------------------------------------------------------------
+//   Set the display state cursor to a given text line number
+// ----------------------------------------------------------------------------
 {
     ds->x = ds->xoffs;;
     ds->y = ln_nr * lcd_lineHeight(ds);
@@ -667,17 +790,26 @@ void lcd_setLine(disp_stat_t * ds, int ln_nr)
 }
 
 void lcd_setXY(disp_stat_t * ds, int x, int y)
+// ----------------------------------------------------------------------------
+//   Set the display state cursor to pixel coordinates
+// ----------------------------------------------------------------------------
 {
     record(lcd, "set XY (%d, %d)", x, y);
     ds->x = x;
     ds->y = y;
 }
 void lcd_set_buf_cleared(int val)
+// ----------------------------------------------------------------------------
+//   Set the buffer-cleared flag
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Set buffer cleared %d", val);
     lcd_buf_cleared_result = val;
 }
 void lcd_switchFont(disp_stat_t * ds, int nr)
+// ----------------------------------------------------------------------------
+//   Switch the display state to use a different font by index
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Selected font %d", nr);
     if (nr >= 0 && nr <= (int) dmcp_fonts_count)
@@ -685,6 +817,9 @@ void lcd_switchFont(disp_stat_t * ds, int nr)
 }
 
 int lcd_charWidth(disp_stat_t * ds, int c)
+// ----------------------------------------------------------------------------
+//   Return the pixel width of a single character in the current font
+// ----------------------------------------------------------------------------
 {
     int                width = 0;
     const line_font_t *f     = ds->f;
@@ -712,6 +847,9 @@ int lcd_charWidth(disp_stat_t * ds, int c)
 }
 
 int lcd_textWidth(disp_stat_t * ds, const char* text)
+// ----------------------------------------------------------------------------
+//   Return the total pixel width of a text string in the current font
+// ----------------------------------------------------------------------------
 {
     int                width = 0;
     byte               c;
@@ -742,6 +880,9 @@ int lcd_textWidth(disp_stat_t * ds, const char* text)
 }
 
 void lcd_writeClr(disp_stat_t *ds)
+// ----------------------------------------------------------------------------
+//   Reset the display state to default values
+// ----------------------------------------------------------------------------
 {
     record(lcd, "Clearing display state"); // Not sure this is what it does
     ds->x      = 0; // ds->xoffs;
@@ -754,6 +895,9 @@ void lcd_writeClr(disp_stat_t *ds)
 }
 
 void lcd_writeNl(disp_stat_t *ds)
+// ----------------------------------------------------------------------------
+//   Advance the display state cursor to the next line
+// ----------------------------------------------------------------------------
 {
     ds->x = ds->xoffs;
     ds->y += lcd_lineHeight(ds);
@@ -761,6 +905,9 @@ void lcd_writeNl(disp_stat_t *ds)
 }
 
 inline void lcd_writeTextInternal(disp_stat_t *ds, const char *text, int write)
+// ----------------------------------------------------------------------------
+//   Render text using the DMCP bitmap font, optionally measuring only
+// ----------------------------------------------------------------------------
 {
     uint               c;
     const line_font_t *f        = ds->f;
@@ -846,36 +993,60 @@ inline void lcd_writeTextInternal(disp_stat_t *ds, const char *text, int write)
 }
 
 void lcd_writeText(disp_stat_t * ds, const char* text)
+// ----------------------------------------------------------------------------
+//   Write text to the display at the current position
+// ----------------------------------------------------------------------------
 {
     lcd_writeTextInternal(ds, text, 1);
 }
 void lcd_writeTextWidth(disp_stat_t * ds, const char* text)
+// ----------------------------------------------------------------------------
+//   Measure text width without drawing it
+// ----------------------------------------------------------------------------
 {
     lcd_writeTextInternal(ds, text, 0);
 }
 void reset_auto_off()
+// ----------------------------------------------------------------------------
+//   Reset the auto-off timer (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
     // No effect
 }
 void rtc_wakeup_delay()
+// ----------------------------------------------------------------------------
+//   Delay after RTC wakeup (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "rtc_wakeup_delay not implemented");
 }
 void run_help_file(const char * help_file)
+// ----------------------------------------------------------------------------
+//   Display a help file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "run_help_file not implemented");
 }
 void run_help_file_style(const char * help_file, user_style_fn_t *user_style_fn)
+// ----------------------------------------------------------------------------
+//   Display a styled help file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "run_help_file_style not implemented");
 }
 void start_buzzer_freq(uint32_t freq)
+// ----------------------------------------------------------------------------
+//   Start the buzzer at the given frequency in millihertz
+// ----------------------------------------------------------------------------
 {
     record(dmcp, "start_buzzer %u.%03uHz", freq / 1000, freq % 1000);
     if (!no_beep)
         ui_start_buzzer(freq);
 }
 void stop_buzzer()
+// ----------------------------------------------------------------------------
+//   Stop the buzzer
+// ----------------------------------------------------------------------------
 {
     record(dmcp, "stop_buzzer");
     if (!no_beep)
@@ -883,12 +1054,18 @@ void stop_buzzer()
 }
 
 int sys_free_mem()
+// ----------------------------------------------------------------------------
+//   Return the amount of free system memory
+// ----------------------------------------------------------------------------
 {
     // On the simulator, we have real memory
     return 1024 * 1024;
 }
 
 void sys_delay(uint32_t ms_delay)
+// ----------------------------------------------------------------------------
+//   Sleep for the given number of milliseconds
+// ----------------------------------------------------------------------------
 {
     ui_ms_sleep(ms_delay);
 }
@@ -900,6 +1077,9 @@ static struct timer
 } timers[4];
 
 void sys_sleep()
+// ----------------------------------------------------------------------------
+//   Sleep until a key arrives, a timer expires, or a clock wakeup occurs
+// ----------------------------------------------------------------------------
 {
     uint32_t entry = sys_current_ms();
     uint32_t max = ST(STAT_CLK_WKUP_SECONDS) ? 1000 : 60000;
@@ -922,19 +1102,31 @@ done:
 }
 
 void sys_critical_start()
+// ----------------------------------------------------------------------------
+//   Enter a critical section (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
 }
 
 void sys_critical_end()
+// ----------------------------------------------------------------------------
+//   Leave a critical section (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
 }
 
 void sys_timer_disable(int timer_ix)
+// ----------------------------------------------------------------------------
+//   Disable a system timer
+// ----------------------------------------------------------------------------
 {
     timers[timer_ix].enabled = false;
 }
 
 void sys_timer_start(int timer_ix, uint32_t ms_value)
+// ----------------------------------------------------------------------------
+//   Start a system timer with the given timeout in milliseconds
+// ----------------------------------------------------------------------------
 {
     uint32_t now = sys_current_ms();
     uint32_t then = now + ms_value;
@@ -942,11 +1134,17 @@ void sys_timer_start(int timer_ix, uint32_t ms_value)
     timers[timer_ix].enabled = true;
 }
 int sys_timer_active(int timer_ix)
+// ----------------------------------------------------------------------------
+//   Return true if the given timer is currently enabled
+// ----------------------------------------------------------------------------
 {
     return timers[timer_ix].enabled;
 }
 
 int sys_timer_timeout(int timer_ix)
+// ----------------------------------------------------------------------------
+//   Return true if the given timer has expired
+// ----------------------------------------------------------------------------
 {
     if (timers[timer_ix].enabled)
     {
@@ -964,6 +1162,9 @@ int sys_timer_timeout(int timer_ix)
 }
 
 void wait_for_key_press()
+// ----------------------------------------------------------------------------
+//   Block until a key is pressed
+// ----------------------------------------------------------------------------
 {
     wait_for_key_release(-1);
     while (key_empty() || !key_pop())
@@ -985,6 +1186,9 @@ void wait_for_key_press()
 }
 
 void wait_for_key_release(int tout)
+// ----------------------------------------------------------------------------
+//   Wait until all pending keys are released
+// ----------------------------------------------------------------------------
 {
     while (!key_empty() && key_pop())
        sys_sleep();
@@ -997,6 +1201,9 @@ int file_selection_screen(const char   *title,
                           int           disp_new,
                           int           overwrite_check,
                           void         *data)
+// ----------------------------------------------------------------------------
+//   Display a file selection dialog and return the user's choice
+// ----------------------------------------------------------------------------
 {
     int ret = 0;
 
@@ -1012,22 +1219,34 @@ int file_selection_screen(const char   *title,
 }
 
 int power_check_screen()
+// ----------------------------------------------------------------------------
+//   Display the power check screen (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp, "file_selection_screen not imlemented");
     return 0;
 }
 
 int sys_disk_ok()
+// ----------------------------------------------------------------------------
+//   Return true if the disk subsystem is operational
+// ----------------------------------------------------------------------------
 {
     return 1;
 }
 
 int sys_disk_write_enable(int val)
+// ----------------------------------------------------------------------------
+//   Enable or disable disk writes (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
     return 0;
 }
 
 uint32_t sys_current_ms()
+// ----------------------------------------------------------------------------
+//   Return the current time in milliseconds since epoch
+// ----------------------------------------------------------------------------
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -1036,52 +1255,79 @@ uint32_t sys_current_ms()
 
 
 FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode)
+// ----------------------------------------------------------------------------
+//   Open a file on the FAT filesystem (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_open not implemented");
     return FR_NOT_ENABLED;
 }
 FRESULT f_close(FIL *fp)
+// ----------------------------------------------------------------------------
+//   Close a file on the FAT filesystem (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_close not implemented");
     return FR_NOT_ENABLED;
 }
 
 FRESULT f_read(FIL *fp, void *buff, UINT btr, UINT *br)
+// ----------------------------------------------------------------------------
+//   Read from a FAT file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_read not implemented");
     return FR_NOT_ENABLED;
 }
 
 FRESULT f_write(FIL *fp, const void *buff, UINT btw, UINT *bw)
+// ----------------------------------------------------------------------------
+//   Write to a FAT file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_write not implemented");
     return FR_NOT_ENABLED;
 }
 
 FRESULT f_lseek(FIL *fp, FSIZE_t ofs)
+// ----------------------------------------------------------------------------
+//   Seek in a FAT file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_lseek not implemented");
     return FR_NOT_ENABLED;
 }
 
 FRESULT f_rename(const TCHAR *path_old, const TCHAR *path_new)
+// ----------------------------------------------------------------------------
+//   Rename a FAT file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_rename not implemented");
     return FR_NOT_ENABLED;
 }
 
 FRESULT f_unlink(const TCHAR *path)
+// ----------------------------------------------------------------------------
+//   Delete a FAT file (not implemented in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_notyet, "f_unlink not implemented");
     return FR_NOT_ENABLED;
 }
 
 void disp_disk_info(const char *hdr)
+// ----------------------------------------------------------------------------
+//   Display disk information with the given header
+// ----------------------------------------------------------------------------
 {
     ui_draw_message(hdr);
 }
 
 void set_reset_state_file(const char * str)
+// ----------------------------------------------------------------------------
+//   Save the name of the state file to restore on reset
+// ----------------------------------------------------------------------------
 {
     ui_save_setting("state", str);
     record(dmcp, "Setting saved state: %s", str);
@@ -1089,6 +1335,9 @@ void set_reset_state_file(const char * str)
 
 
 char *get_reset_state_file()
+// ----------------------------------------------------------------------------
+//   Return the name of the state file to restore on reset
+// ----------------------------------------------------------------------------
 {
     static char result[256];
     result[0] = 0;
@@ -1100,21 +1349,33 @@ char *get_reset_state_file()
 
 uint32_t reset_magic = 0;
 void set_reset_magic(uint32_t value)
+// ----------------------------------------------------------------------------
+//   Set the reset magic value for warm/cold boot detection
+// ----------------------------------------------------------------------------
 {
     reset_magic = value;
 }
 
 void sys_reset()
+// ----------------------------------------------------------------------------
+//   Perform a system reset (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
 }
 
 int is_menu_auto_off()
+// ----------------------------------------------------------------------------
+//   Return whether the menu auto-off timer is active
+// ----------------------------------------------------------------------------
 {
     return false;
 }
 
 
 void rtc_read(tm_t * tm, dt_t *dt)
+// ----------------------------------------------------------------------------
+//   Read the current date and time from the system clock
+// ----------------------------------------------------------------------------
 {
     time_t now;
     time(&now);
@@ -1142,6 +1403,9 @@ void rtc_read(tm_t * tm, dt_t *dt)
 }
 
 void rtc_write(tm_t * tm, dt_t *dt)
+// ----------------------------------------------------------------------------
+//   Write the date and time to the RTC (ignored in simulator)
+// ----------------------------------------------------------------------------
 {
     record(dmcp_error, "Writing RTC %u/%u/%u %u:%u:%u (ignored)",
            dt->day, dt->month, dt->year,
@@ -1150,18 +1414,27 @@ void rtc_write(tm_t * tm, dt_t *dt)
 
 
 int julian_day(dt_t *dt)
+// ----------------------------------------------------------------------------
+//   Compute the Julian day number from a DMCP date structure
+// ----------------------------------------------------------------------------
 {
     return julian_day_number(dt->day, dt->month, dt->year);
 }
 
 
 cstring get_wday_shortcut(int day)
+// ----------------------------------------------------------------------------
+//   Return the three-letter abbreviation for a weekday
+// ----------------------------------------------------------------------------
 {
     static cstring dow[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
     return dow[day];
 }
 
 cstring get_month_shortcut(int month)
+// ----------------------------------------------------------------------------
+//   Return the three-letter abbreviation for a month
+// ----------------------------------------------------------------------------
 {
     static cstring name[] =
     {
@@ -1173,6 +1446,9 @@ cstring get_month_shortcut(int month)
 
 
 int check_create_dir(const char * dir)
+// ----------------------------------------------------------------------------
+//   Create a directory if it does not already exist
+// ----------------------------------------------------------------------------
 {
     struct stat st;
     if (stat(dir, &st) == 0)
@@ -1192,6 +1468,9 @@ void bitblt24(uint32_t x,
               uint32_t val,
               int      blt_op,
               int      fill)
+// ----------------------------------------------------------------------------
+//   Perform a 24-bit blit operation (no-op in simulator)
+// ----------------------------------------------------------------------------
 {
 }
 
