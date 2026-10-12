@@ -276,7 +276,7 @@ object::result grob::command(grob::blitop op)
 //   The shared code for GXor, GOr and GAnd
 // ----------------------------------------------------------------------------
 {
-    if (object_p coords = rt.stack(1))
+    if (object_g coords = rt.stack(1))
     {
         PlotParametersAccess ppar;
         coord x = ppar.pair_pixel_x(coords);
