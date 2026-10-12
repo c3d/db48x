@@ -847,6 +847,7 @@ Additional contributors to the project include (in order of appearance):
 * Pasquale Pigazzini (pasquale.pigazzini@gmail.com)
 * Wolf (wolfwings@wolfwings.us)
 - Alex Sergeev (alexander.sergeev@live.com)
+- George Campbell (geocolumbus@gmail.com)
 
 The authors would like to acknowledge
 
