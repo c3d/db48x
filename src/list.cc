@@ -2764,8 +2764,9 @@ list_p list::substitute(symbol_r name, object_p repl, size_t replsz) const
                     return nullptr;
                 }
 
+                algebraic_g uexpr = uobj->uexpr();
                 algebraic_g one = integer::make(1);
-                unit_g fromu = unit::make(one, uobj->uexpr());
+                unit_g fromu = unit::make(one, uexpr);
                 if (!fromu->convert(arepl))
                 {
                     rt.inconsistent_units_error();
