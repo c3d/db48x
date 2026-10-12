@@ -1,0 +1,17 @@
+«
+  IF
+    B 0 >
+  THEN
+    -1 'B' STO+ PRDEPTH DUP B -
+    FOR X
+      X ROLL PRANAG X ROLLD -1
+    STEP
+    1 'B' STO+
+  ELSE
+    PRDEPTH DUPN PRDEPTH 2 / 1 - 1
+    START
+      + -1
+    STEP
+    4 DISP
+  END
+»

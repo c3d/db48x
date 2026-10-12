@@ -1,0 +1,93 @@
+«
+	@ Helper program to generate the coordinates
+	«
+			→ i
+			«
+					16#1111111111111111 i 16 mod * Foreground
+					{ }
+					i 2.51 * sin 9.5 * +
+					i 3.21 * cos 4.5 * 2.0 + +
+					{ }
+					i 1.03 * sin 9.5 * +
+					i 5.17 * cos 4.5 * 2.0 + +
+			»
+	»
+
+	→ Coords
+	«
+		ClearLCD
+		#0 Foreground
+		" Rectangles "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+				i Coords Rect
+				0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+				i 7 mod 1 + LineWidth
+				i Coords Rect
+				0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Ellipse "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+				i Coords Ellipse
+				0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+			i 7 mod 1 + LineWidth
+			i Coords Ellipse
+			0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Rounded Rect " { 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+			i Coords #0 i 75 mod + RRect
+			0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		0 300
+		for i
+			i 7 mod 1 + LineWidth
+			i Coords #0 i 75 mod + RRect
+			0.01 Wait
+		next
+
+		ClearLCD
+		#0 Foreground
+		" Clipping "	{ 10#200 10#180 3 true true 0 1 } Disp
+		0 LineWidth
+		{ 30 30 370 150 } Clip
+		0 300
+		for i
+			i Coords #0 i 75 mod + RRect
+			0.01 Wait
+		next
+		{ } Clip
+	»
+»

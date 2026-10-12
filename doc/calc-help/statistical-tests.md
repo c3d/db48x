@@ -592,16 +592,16 @@ Demonstrations of a test on random samples: each press draws a new sample of
 ten values from a normal law of standard deviation 1, and tests its mean with
 TTest1 against μ₀ = 10. Seed the generator with RDZ to replay a sample.
 
-* DMOTTest1: the true mean is 10, so H₀ is true; the test still rejects it
+* DemoTTest1: the true mean is 10, so H₀ is true; the test still rejects it
   about one time in twenty — the risk α of a false alarm.
-* DMOTPower: the true mean is 10.5, so H₀ is false; the test detects it only
+* DemoTPower: the true mean is 10.5, so H₀ is false; the test detects it only
   about three times in ten — its power, with ten values and a shift of half a
   standard deviation.
 
 With the same seed, both draw the same ten values, shifted by 0.5.
 
 
-## DMOTTest1
+## DemoTTest1
 
 Ten values from a normal law of mean 10 and standard deviation 1, tested by
 TTest1 against μ₀ = 10. Returns the mean, the standard deviation s, the results
@@ -610,14 +610,14 @@ of TTest1 and a verdict at α = 5 %.
 **1)** Usually H₀ is kept:
 
 ```rpl
-1 RDZ ⓁDMOTTest1
+1 RDZ ⓁDemoTTest1
 @ Expecting verdict:"H₀ kept"
 ```
 
 **2)** Sometimes it is rejected, although it is true:
 
 ```rpl
-11 RDZ ⓁDMOTTest1
+11 RDZ ⓁDemoTTest1
 @ Expecting verdict:"H₀ rejected at 5 %, wrongly"
 ```
 
@@ -626,7 +626,7 @@ threshold itself. This is what α means: the rate of false alarms when nothing
 has changed, chosen before looking at the data.
 
 
-## DMOTPower
+## DemoTPower
 
 Ten values from a normal law of mean 10.5 and standard deviation 1, tested by
 TTest1 against μ₀ = 10: H₀ is false, the mean has shifted by half a standard
@@ -635,14 +635,14 @@ deviation.
 **1)** Here the shift is detected:
 
 ```rpl
-1 RDZ ⓁDMOTPower
+1 RDZ ⓁDemoTPower
 @ Expecting verdict:"H₀ rejected: the shift is detected"
 ```
 
 **2)** Here it is missed:
 
 ```rpl
-2 RDZ ⓁDMOTPower
+2 RDZ ⓁDemoTPower
 @ Expecting verdict:"H₀ kept: the shift is missed"
 ```
 

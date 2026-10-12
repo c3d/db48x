@@ -7,51 +7,7 @@ Directory {
 @@ ===========================================================================
 
 Physics directory {
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	Comparing relativistic and classical kinetic energy
-@@
-@@ ---------------------------------------------------------------------------
-
-KineticEnergy
-«
-	@ Select drawing range
-	-0.2 1.2 XRNG
-	-0.22 1.8 YRNG
-
-	@ Draw the C limit on the right
-	5 LineWidth
-	0.7 0.7 0.9 RGB Foreground
-	1-5ⅈ 1+5ⅈ Line
-
-	@ Draw axes
-	0 0 0 RGB Foreground
-	1 LineWidth
-	DrawAxes
-
-	@ Draw the classical case (red)
-	0.7 0 0 RGB Foreground
-	3 LineWidth
-	'1/2*sq(max(x;0))' Function
-	"Classical" { 0.7 0.2 0 } Disp
-
-	@ Draw the relativistic case (green)
-	2 LineWidth
-	0 0.7 0 RGB Foreground
-	'1/sqrt(1-sq(min(max(x;0);0.999)))-1' Function
-	"Relativistic" { 0.55 1.0 0 } Disp
-
-	@ Axes labels
-	0 0 0.5 RGB Foreground
-	"Kinetic Energy" { -.15 1.35 0 } Disp
-	"Speed" { 1.03 -0.03 0 } Disp
-	"c" { 0.95 -0.025 1 } Disp
-	"0.1·c ↑" { 0.095 -0.025 1 } Disp
-
-	1 LineWidth
-	#0 Foreground
-»
+KineticEnergy ⓁKineticEnergy
 }
 
 
@@ -62,162 +18,13 @@ KineticEnergy
 @@ ===========================================================================
 
 Math directory {
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Collatz conjecture check - Check tail recursion in a test
-@@
-@@ ---------------------------------------------------------------------------
-@@	  Interesting values to start with:
-@@	  - Long stopping time: 1161, 2223, 2463, 2919, 3711, 6171
-@@	  - High trajectory value: 138367, 159487, 270271, 665215, 704511
-@@	  See https://en.wikipedia.org/wiki/Collatz_conjecture for more info
-
-Collatz
-«
-	DUP "	  " + 1 DISP
-	IF USBPowered THEN
-	   MEM 2 DISP
-	END
-
-	IF DUP 1 ≠ THEN
-		IF DUP 2 MOD THEN
-			3 * 1 +
-		ELSE
-			2 /
-		END
-		Collatz
-	END
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Collatz conjecture benchmark
-@@
-@@ ---------------------------------------------------------------------------
-@@	  This is a case where the DM42 and DM32 will do much better than HP's
-@@	  because of the tail recursion optimizations shown above.
-
-CollatzBenchmark
-«
-	 « 989345275647 Collatz »
-	 TEVAL
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Count prime numbers under a given value
-@@
-@@ ---------------------------------------------------------------------------
-@@	 This is inspired by https://www.youtube.com/watch?v=vwI5xbqIM7g
-
-CountPrimes
-«
-	if Depth 1 < then 1000 end
-	«
-		3 Over Duplicate 2 ≤
-		Swap 2 mod or
-		→ n d r
-		«
-			while
-				r d x² n ≤ and
-			repeat
-				n d mod 'r' Store
-				d 2 + 'd' Store
-			end
-			r not not
-		»
-	»
-
-	1
-	→ MaxNumber CheckIfPrime Count
-	«
-		3 MaxNumber
-		for i
-			if
-				i CheckIfPrime
-			then
-				'Count' Increment Drop
-			end
-			2
-		step
-		Count
-	»
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Multiple equations solver
-@@
-@@ ---------------------------------------------------------------------------
-
-EquationSolving
-«
-	{
-		'SQ(AA)+SQ(BB)=SQ(CC)'
-
-		'sin(α)/a=sin(β)/b'
-		'sin(β)/b=sin(γ)/c'
-		'sin(α)/b=sin(γ)/c'
-		'α+β+γ=180'
-		's=(a+b+c)/2'
-		'A=sqrt(s*(s-a)*(s-b)*(s-c))'
-		'sq(c)=sq(a)+sq(b)-2*a*b*cos(γ)'
-		'sq(b)=sq(a)+sq(c)-2*a*c*cos(β)'
-		'sq(a)=sq(b)+sq(c)-2*b*c*cos(α)'
-	} STEQ
-
-	10_m 'AA' STO
-	85_ft 'BB' STO
-	1_cm 'CC' STO
-
-	SolvingMenu
-»
-
-
-MultiSolver
-«
-	[ 'sin(X)=0.5*cos(Y)' 'sin(X)=0.3*cos(X)' ] [ 'X' 'Y' ] [ 1 1 ]
-	SolverMenu
-	ROOT
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Illustrate how the Romberg integration algorithm operates
-@@
-@@ ---------------------------------------------------------------------------
-
-RombergPlot
-«
-	-0.6 20 PlotXRange
-	-0.2 2 PlotYRange
-	DrawAxes
-
-	1E-10 100
-	«
-		→ x
-		«
-			'x↑3÷expm1 x' Evaluate
-			→ y
-			«
-				TICKS FOREGROUND
-				x 0 ℝ→ℂ x y ℝ→ℂ DrawLine
-				#0 FOREGROUND
-				y
-			»
-		»
-	»
-	'x' ∫
-        "I=" SWAP +
-        { 12 1.5 0 } DISP
-»
+Collatz ⓁCollatzConjecture
+CollatzBenchmark ⓁCollatzBenchmark
+CountPrimes ⓁCountPrimes
+EquationSolving ⓁEquationSolving
+MultiSolver ⓁMultiSolver
+RombergPlot ⓁRombergPlot
 }
-
 
 
 
@@ -228,525 +35,15 @@ RombergPlot
 @@ ===========================================================================
 
 Graphics directory {
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Curve plotting examples
-@@
-@@ ---------------------------------------------------------------------------
-
-Plotting
-«
-	Degrees
-	#0 Foreground
-
-	1 LineWidth
-	'sin(325*X)*lgamma(X)' Function
-
-	2 LineWidth
-	'X' Polar
-
-	3 LineWidth
-	16#AAAAAAAAAAAAAAAA Foreground
-	« '9.5*sin(31.27*X)' Eval '5.5*cos(42.42*X)' Eval RealToComplex » Parametric
-
-	#0 Foreground
-
-	0 WAIT DROP
-
-	[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 ]
-	25 * sin BarPlot
-
-	0 WAIT DROP
-
-	CLLCD
-	16#CCCCCCCCCCCCCCCC Foreground
-	[ [ 1 -1 ] [2 -2] [3 -3] [4 -4] [5 -6] [7 -8] [9 -10] ]
-	33 * cos 2 * BarPlot
-
-	0 WAIT DROP
-
-	CLLCD
-
-	[ [ -5 -5 ] [ -3 0 ] [ -5 5] [ 0 3 ] [ 5 5 ] [ 3 0 ] [ 5 -5 ] [ 0 -3 ] [-5 -5] ]
-	DUP
-	NoCurveFilling
-	16#1111111111111111 Foreground
-	12 LineWidth
-	ScatterPlot
-
-	CurveFilling
-	16#0 Foreground
-	1 LineWidth
-	ScatterPlot
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Walking man graphic test from HP50G advanced reference
-@@
-@@ ---------------------------------------------------------------------------
-
-WalkMan
-«
-	@ A little character, from p 2-39 of HP50G advanced reference
-	@ This tests the compatibility for GROB format
-	GROB 9 15 E300140015001C001400E3008000C110AA00940090004100220014102800
-	→ Walk
-	«
-		CLLCD
-		{ #0 #40 } PICT OVER Walk GXOR
-		1 99999 FOR i
-			i 420 MOD R->B
-			#40 2 →List
-			PICT OVER Walk GXOR
-			PICT ROT Walk GXOR
-
-			@ Set flag 48 for HP-48-style slow walk
-			IF 48 FS?
-			THEN
-				0.2 WAIT 5
-			ELSE
-				0.01 WAIT 1
-			END
-		STEP
-	»
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Line drawing example
-@@
-@@ ---------------------------------------------------------------------------
-
-Lines
-«
-	@ Helper program to draw a line at index i
-	«
-		10 6 → i XSize YSize
-		«
-			@ Build starting point
-			{}
-			@ X coordinate
-			i sin XSize × +
-			@ Y coordinate
-			i 2.17 × cos YSize × +
-			@ Build end point
-			{}
-			@ X coordinate
-			i 2.3 × sin XSize × +
-			@ Y coordinate
-			i 2.615 × cos YSize × +
-			@ Draw the line and wait for 1ms
-			DrawLine
-		»
-	»
-	→ MyLine
-	«
-		Degrees ClearLCD 0 360000
-		for i
-			@ Erase old line
-			1 10 for g
-				g 10 / Gray Foreground
-				i 100 g + - MyLine
-			next
-
-			@ Set random foreground and draw new line
-			if
-				Ticks 1000 ÷ 10 mod 7 <
-			then
-				#0 Foreground
-			else
-				#1111111111111111 i 16 mod × Foreground
-			end
-			i MyLine
-
-			@ Wait 1ms
-			0.001 Wait
-		next
-	»
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Text drawing example
-@@
-@@ ---------------------------------------------------------------------------
-
-Texts
-«
-	@ Restore foreground and background in case we interrupted another program
-	0 Gray Foreground
-	64 STWS
-	1 Gray Background
-
-	0 300
-	for i
-		"Text line i=" i + " " + i 9 mod Disp
-		0.01 Wait
-	next
-
-	0 300
-	for i
-		"Fractional line i=" i + " " + i 16 / 9 mod Disp
-		0.01 Wait
-	next
-
-	«
-		Dup2
-		Disp
-		0.01 Wait
-		'Foreground' RCL
-		→ fg
-		«
-			1 gray Foreground
-			Disp
-			fg Foreground
-		»
-	»
-	→ DispThenErase
-	«
-		ClearLCD
-		0 300
-		for i
-			" Pixel positioning "
-			{ 10#200 10#120 2 true true 0 0 } Disp
-			"Pos " { } #0 i + 223 mod + #0 i 45 mod + 25 + +
-			dup Rot Swap ToText + " " +
-			Swap
-			DispThenErase
-		next
-
-		ClearLCD
-		Degrees
-		1 360
-		for i
-			" Complex positioning "
-			{ 10#200 10#120 2 true true 0 0 } Disp
-			" Angle " i +
-			4.5 i R->P 2.9 -
-			DispThenErase
-		next
-
-		ClearLCD
-		1 360
-		for i
-			" Scaled positioning "
-			{ 10#200 10#120 2 true true 0 0 } Disp
-			" Angle " i +
-			{ } i cos 7 * 2.9 - + i 3 * sin 3 * +
-			DispThenErase
-		next
-	»
-
-
-	ClearLCD
-	" Fonts "	 { 10#200 10#180 2 true true 0 1 } Disp
-	0 11 for f
-			"Font " f +
-			{
-				{ 10#10	 10#0	 }
-				{ 10#10	 10#48 }
-				{ 10#10	 10#80 }
-				{ 10#10	 10#98 }
-				{ 10#10	 10#130 }
-				{ 10#240 10#0 }
-				{ 10#240 10#25 }
-				{ 10#240 10#45 }
-				{ 10#240 10#64 }
-				{ 10#240 10#84 }
-				{ 10#240 10#120 }
-				{ 10#240 10#150 }
-			}
-			f 1 + Get
-			f +
-			Disp
-	next
-	1.5 Wait
-
-	ClearLCD
-	" Patterns "	{ 10#200 10#180 2 true true 0 1 } Disp
-	0 15 for p
-		16#1111111111111111 p * Foreground
-		0 11 for f
-				"Font " f +
-				{
-					{ 10#10	 10#0	 }
-					{ 10#10	 10#48 }
-					{ 10#10	 10#80 }
-					{ 10#10	 10#98 }
-					{ 10#10	 10#130 }
-					{ 10#240 10#0 }
-					{ 10#240 10#25 }
-					{ 10#240 10#45 }
-					{ 10#240 10#64 }
-					{ 10#240 10#84 }
-					{ 10#240 10#120 }
-					{ 10#240 10#150 }
-				}
-				f 1 + Get
-				f +
-				Disp
-		next
-		0.2 Wait
-	next
-
-	ClearLCD
-	#0 Foreground
-	" Background "	{ 10#200 10#180 2 true true 0 1 } Disp
-	16#FFFFFFFFFFFFFFFF Foreground
-	0 15 for p
-		16#1111111111111111 p * Background
-		0 11 for f
-				"Font " f +
-				{
-					{ 10#10	 10#0	 }
-					{ 10#10	 10#48 }
-					{ 10#10	 10#80 }
-					{ 10#10	 10#98 }
-					{ 10#10	 10#130 }
-					{ 10#240 10#0 }
-					{ 10#240 10#25 }
-					{ 10#240 10#45 }
-					{ 10#240 10#64 }
-					{ 10#240 10#84 }
-					{ 10#240 10#120 }
-					{ 10#240 10#150 }
-				}
-				f 1 + Get
-				f +
-				Disp
-		next
-		0.2 Wait
-	next
-
-	ClearLCD
-	0 GRAY Foreground 1 GRAY Background
-	" Align left "	 { 10#000 10#120 2 true true  1  0 } Disp
-	" Align Right "	 { 10#400 10#120 2 true true -1  0 } Disp
-	" Center "	 { 10#200 10#120 2 true true  0  0 } Disp
-	" Align Top "	 { 10#200 10#000 2 true true  0  1 } Disp
-	" Align Bottom " { 10#200 10#240 2 true true  0 -1 } Disp
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Shape drawing examples
-@@
-@@ ---------------------------------------------------------------------------
-
-Shapes
-«
-	@ Helper program to generate the coordinates
-	«
-			→ i
-			«
-					16#1111111111111111 i 16 mod * Foreground
-					{ }
-					i 2.51 * sin 9.5 * +
-					i 3.21 * cos 4.5 * 2.0 + +
-					{ }
-					i 1.03 * sin 9.5 * +
-					i 5.17 * cos 4.5 * 2.0 + +
-			»
-	»
-
-	→ Coords
-	«
-		ClearLCD
-		#0 Foreground
-		" Rectangles "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-				i Coords Rect
-				0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-				i 7 mod 1 + LineWidth
-				i Coords Rect
-				0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Ellipse "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-				i Coords Ellipse
-				0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-			i 7 mod 1 + LineWidth
-			i Coords Ellipse
-			0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Rounded Rect " { 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-			i Coords #0 i 75 mod + RRect
-			0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		0 300
-		for i
-			i 7 mod 1 + LineWidth
-			i Coords #0 i 75 mod + RRect
-			0.01 Wait
-		next
-
-		ClearLCD
-		#0 Foreground
-		" Clipping "	{ 10#200 10#180 3 true true 0 1 } Disp
-		0 LineWidth
-		{ 30 30 370 150 } Clip
-		0 300
-		for i
-			i Coords #0 i 75 mod + RRect
-			0.01 Wait
-		next
-		{ } Clip
-	»
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Grayscale and color
-@@
-@@ ---------------------------------------------------------------------------
-
-Patterns
-«
-	Ticks
-
-	0 LineWidth
-	0 255 for i
-		i 255 / Gray Foreground
-		{ } 10#25 i 16 mod *	 1 + + 10#15 #0 i + 16 / *	 1 + +
-		{ } 10#25 i 16 mod * 24 + + 10#15 #0 i + 16 / *	 14 + +
-		#10 RRect
-		0.01 Wait
-	next
-	#0 Foreground
-	Ticks Swap - 0.001 * "Finished in " Swap + " s" +
-	{ 10#150 10#100 2 1 1 } Disp
-	"Press a key to continue"
-	{ 10#140 10#150 2 1 1 } Disp
-	0 Wait DROP
-
-	Ticks
-	0 255 for r
-		0 255 for g
-			0 255 for b
-				r 255 /
-				g 255 /
-				b 255 /
-				RGB Foreground
-
-				{ } 10#1 g * 400 * 255 / 0 + +	10#1 b * 240 * 255 / 0 + +
-				{ } 10#1 g * 400 * 255 / 2 + +	10#1 b * 240 * 255 / 1 + +
-				Rect
-			next
-		next
-	25 step
-	#0 Foreground
-	Ticks	 Swap - 0.001 * "Finished in " Swap + " s" +
-	{ 10#150 10#100 2 1 1 } Disp
-	"Press a key to continue"
-	{ 10#140 10#150 2 1 1 } Disp
-	0 Wait DROP
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Real and complex Truth plot
-@@
-@@ ---------------------------------------------------------------------------
-
-XYPlots
-«
-    1 3 for i
-        { 32 128 64 } i Get XYPlotBins
-
-        « 'sin(100*(sq(x)+sq(y)+sin(20*(x-y))))<0.5' Truth » TEval
-        "Truth: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
-        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
-
-        « '0.5*(sin(25*(x*y+x+2*y))+1)' Truth » TEval
-        "Real: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
-        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
-
-        « « x y ℝ→ℂ 0.1∡31 × » Truth » TEval
-        "Complex: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
-        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
-    next
-    9 →List
-    1000 0.1 BEEP
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Random number test
-@@
-@@ ---------------------------------------------------------------------------
-
-RandomPlot
-«
-	0 399 for x
-		{} x R->B + 0 239 random R->B + pixon
-	next
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Random number test
-@@
-@@ ---------------------------------------------------------------------------
-
-RandomXYPlot
-«
-	0 25000 start
-		{} 0 399 random R->B + 0 239 random R->B + pixon
-	next
-»
+Plotting ⓁCurvePlottingExamples
+WalkMan ⓁWalkMan
+Lines ⓁDrawingLines
+Texts ⓁDrawingText
+Shapes ⓁDrawingShapes
+Patterns ⓁDrawingPatterns
+RandomPlot ⓁRandomPlot
+RandomXYPlot ⓁRandomXYPlot
+XYPlots ⓁXYPlots
 }
 
 
@@ -757,19 +54,7 @@ RandomXYPlot
 @@ ===========================================================================
 
 Sound directory {
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Beep
-@@
-@@ ---------------------------------------------------------------------------
-
-Beeps
-«
-	0 50 for n
-		 2 n 12 / 1 + ^ 55 * 1/10 BEEP
-	next
-»
+Beeps ⓁBeeps
 }
 
 
@@ -781,208 +66,25 @@ Beeps
 @@ ===========================================================================
 
 RPL directory {
-
-InteractiveMenu
-«
-   'C=SQRT(A^2+B^2)' STEQ SOLVINGMENU
-   HALT
-   @Hit RUN key (=) to resume when done
-   "A=" A + 1 DISP
-   "B=" B + 2 DISP
-   "C=" C + 3 DISP
-   { A B C } PURGE
-   "Variables purged" 5 DISP
-   "Press a key to continue" 6 DISP
-   -1 WAIT
-»
-
-PathHeader
-«
-	« TIME " " PATH TAIL TOTEXT + + "
-" + DATE + " Mem: " + MEM + »
-	HEADER
-	10000 CustomHeaderRefresh
-»
-
-BatteryLevelHeader
-«
-	10000 CustomHeaderRefresh
-
-	«
-		BatteryVoltage " " + LowBattery +
-	»
-	HEADER
-»
-
-RuntimeStatsHeader
-«
-	10000 CustomHeaderRefresh
-	«
-		RuntimeStatistics Array→
-		→ running sleeping runs dims
-		« "" runs + ":" + running UVAL + "/" + sleeping UVAL + »
-	»
-	HEADER
-»
-
-BatteryStatsHeader
-«
-	10000 CustomHeaderRefresh
-
-	@ We want statistics to persist even in case of low-bat crash
-	"BATTERY.CSV" 'ΣData' STO
-
-	«
-		TIME UVAL →Num BatteryVoltage DUP2 2 →Arry Σ+
-		ΣSize " " + Swap + " " + Swap 5 Round + " " + LowBattery +
-	»
-	HEADER
-»
-
-
-
-@@ ===========================================================================
-@@
-@@	Anagrams
-@@
-@@ ===========================================================================
+InteractiveMenu ⓁInteractiveMenu
+PathHeader ⓁPathHeader
+BatteryLevelHeader ⓁBatteryLevelHeader
+RuntimeStatsHeader ⓁRuntimeStatsHeader
+BatteryStatsHeader ⓁBatteryStatsHeader
 
 Anagram directory {
-PRANAG
-«
-  IF
-    B 0 >
-  THEN
-    -1 'B' STO+ PRDEPTH DUP B -
-    FOR X
-      X ROLL PRANAG X ROLLD -1
-    STEP
-    1 'B' STO+
-  ELSE
-    PRDEPTH DUPN PRDEPTH 2 / 1 - 1
-    START
-      + -1
-    STEP
-    4 DISP
-  END
-»
-
-PRDEPTH
-« DEPTH C - »
-
-ANAG
-« → A
-  «
-    CLLCD A SIZE 'B' STO DEPTH 'C' STO
-    1 B
-    FOR X
-      A X DUP SUB
-    NEXT
-    PRANAG PRDEPTH DROPN { B C } PURGE
-  »
-»
+PRANAG ⓁPRANAG
+PRDEPTH ⓁPRDEPTH
+ANAG ⓁANAG
 }
 
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 IFTE evaluation test
-@@
-@@ ---------------------------------------------------------------------------
-
-IfTETest
-«
-	Duplicate 1 =
-	« Drop "One" »
-	« 1 < "Less" "More" IFTE »
-	IFTE
-
-	'1=1' '1+1' '1*3' IFTE
-»
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 If Then Else expression evaluation
-@@
-@@ ---------------------------------------------------------------------------
-
-IfThenElseEval
-«
-  -> x << IF 'x<1' THEN "less" ELSE "more" END >>
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Case statement test
-@@
-@@ ---------------------------------------------------------------------------
-
-CaseTest
-«
-	CASE
-		DUP "A" == THEN "Alpha" END
-		DUP "B" == THEN "Beta"	END
-		DUP "C" == THEN "Gamma" END
-		"D"		  WHEN "Delta" END
-	END
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 RPL recursion test - Demonstrate we don't consume memory in that case
-@@
-@@ ---------------------------------------------------------------------------
-@@	 In such a case, the HP48 or HP50 will slowly consume memory
-
-Recurse
-«
-	1 + DUP 1 DISP MEM 2 DISP Recurse
-»
-
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Use of the Prompt command
-@@
-@@ ---------------------------------------------------------------------------
-
-Prompting
-«
-	"Enter value then hit Run key" PROMPT
-	1 +
-	"Next value" →Tag
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Use of the Input command
-@@
-@@ ---------------------------------------------------------------------------
-
-Inputting
-«
-	"Enter value then hit Run key" "What?" INPUT
-	1 +
-	"Next value" →Tag
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Custom menu organized in rows
-@@
-@@ ---------------------------------------------------------------------------
-
-CustomMenu
-[ [ D E F ]
-  [ G H I ] ]
-
+IfTETest ⓁIfTETest
+IfThenElseEval ⓁIfThenElseEval
+CaseTest ⓁCaseTest
+Recurse ⓁRecursion
+Prompting ⓁPrompting
+Inputting ⓁInputting
+CustomMenu ⓁCustomMenu
 }
 
 
@@ -994,135 +96,64 @@ CustomMenu
 @@ ===========================================================================
 
 Perf directory {
+SumTestWithLoop ⓁSumTestWithLoop
+SumTestWithFunction ⓁSumTestWithFunction
+NQueens ⓁNQueens
+UnitBenchmark ⓁUnitsBenchmark
+MatrixMultiplyBenchmark ⓁMatrixMultiplyBenchmark
+}
 
-@@ ---------------------------------------------------------------------------
+
+@@ ===========================================================================
 @@
-@@	 Summation loop (FP performance test)
+@@	Probability demos
 @@
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 
-SumTestWithLoop
-«
-	@ Summation loop
-	@ See https://www.hpmuseum.org/forum/thread-9750.html
-	Radians
-	«
-		0 1 1000
-		for x
-			x tan⁻¹ sin exp ∛ +
-		next
-	»
-	TEval
-»
+Probability directory {
+DemoHisto ⓁDemoHisto
+DemoWalk ⓁDemoWalk
+DemoMarkov ⓁDemoMarkov
+}
 
 
-
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 @@
-@@	 Summation loop (FP performance test, using sum command)
+@@	Statistical tests demos
 @@
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 
-SumTestWithFunction
-«
-	@ Summation loop
-	@ See https://www.hpmuseum.org/forum/thread-9750.html
-	Radians
-	« x 1 1000 'cbrt(exp(sin(atan(x))))' sum »
-	TEval
-»
+StatTests directory {
+DemoTTest1 ⓁDemoTTest1
+DemoTPower ⓁDemoTPower
+}
 
 
-
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 @@
-@@	 NQueens benchmark
-@@	 https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi
+@@	Uncertainty demos
 @@
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 
-NQueens
-«
-	«
-		@ User RPL program lifted straight from
-		@ https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=700
-		0
-		do
-			8 Swap 1 +
-			while
-				Duplicate2
-				do
-					1 -
-				until
-					Duplicate2 5 + Pick - norm Duplicate2 - × not
-				end
-			repeat
-				Drop
-				while
-					Swap Duplicate 1 same
-				repeat
-					-
-				end
-				1 - Swap
-			end
-			Drop
-		until
-			Duplicate 8 same
-		end
-		→List
-	»
-	@ Compute execution duration of that code
-	TEval
-»
+Uncertainty directory {
+DemoΔConcord ⓁDemoΔConcord
+DemoσConcord ⓁDemoσConcord
+DemoExmnF2D ⓁDemoExmnF2D
+DemoPendulum ⓁDemoPendulum
+}
 
 
-
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 @@
-@@	 Evaluate performance of unit conversions
+@@	Astronomy demos
 @@
-@@ ---------------------------------------------------------------------------
+@@ ===========================================================================
 
-UnitBenchmark
-«
-	«
-		0 25 for i
-			i 1_m/s * 1_km/yr convert drop
-		next
-	»
-	TEVAL
-»
-
-
-@@ ---------------------------------------------------------------------------
-@@
-@@	 Evaluate performance of matrix multiplication
-@@
-@@ ---------------------------------------------------------------------------
-
-MatrixMultiplyBenchmark
-«
-	if Depth 0 = then 20 end
-	→ N
-	«
-		«
-			N N 2 →List RanM sin
-		»
-		TimedEval 2 DrawText GarbageCollect 1 DrawText
-		«
-			N N 2 →List RanM sin
-		»
-		TimedEval 4 DrawText GarbageCollect 3 DrawText
-		GarbageCollectorStatistics 'PreGC' Store
-		«
-			×
-		»
-		TimedEval
-		Duplicate 6 DrawText
-                GarbageCollectorStatistics 'PostGC' ▶
-	»
-»
-
+Astronomy directory {
+LightTime ⓁLightTime
+Elongation ⓁElongation
+ApparentSize ⓁApparentSize
+SkyCoords ⓁSkyCoords
 }
 
 

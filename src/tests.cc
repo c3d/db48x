@@ -16047,7 +16047,7 @@ void tests::library()
         .expect("{ LibraryHelp }");
 
     step("Physics: Relativistic and classical kinetic energy")
-        .test(CLEAR, RSHIFT, H, F2, F1)
+        .test(CLEAR, RSHIFT, H, F5, F2, F1)
         .image("lib-kinetic", 2000);
 
     step("Check that libraries were attached")
@@ -16062,21 +16062,21 @@ void tests::library()
               ID_FilesMenu, ID_Attach, ID_Libs)
         .expect("{ LibraryHelp KineticEnergy }");
     step("Attach library by library ID")
-        .test(CLEAR, "{ 0 5 }",
+        .test(CLEAR, "{ 0 4 }",
               ID_FilesMenu, ID_Attach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel }");
+        .expect("{ Dedicace LibraryHelp PeriSel KineticEnergy }");
     step("Detach library by library name")
         .test(CLEAR, "\"LibraryHelp\"",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ Dedicace KineticEnergy PeriSel }");
+        .expect("{ Dedicace PeriSel KineticEnergy }");
     step("Attach library by library name")
         .test(CLEAR, "{ \"LibraryHelp\" \"KineticEnergy\" }",
               ID_FilesMenu, ID_Attach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel }");
+        .expect("{ Dedicace LibraryHelp PeriSel KineticEnergy }");
 
 
     step("Math: Collatz conjecture benchmark")
-        .test(CLEAR, RSHIFT, H, F5, LENGTHY(5000), F1, ENTER, SWAP)
+        .test(CLEAR, RSHIFT, H, F5, F1, LENGTHY(5000), F1, ENTER, SWAP)
         .expect("1")
         .test(BSP)
         .match("duration:[1-9].*ms");
@@ -16091,26 +16091,26 @@ void tests::library()
     step("Check attached libraries")
         .test(CLEAR, ID_FilesMenu, ID_Libs)
         .expect("{ "
-                "Dedicace LibraryHelp KineticEnergy PeriSel "
+                "Dedicace LibraryHelp PeriSel "
                 "CollatzBenchmark CollatzConjecture CountPrimes "
-                "TriangleEquations "
+                "TriangleEquations KineticEnergy "
                 "}");
 
     step("Detach libraries")
         .test(CLEAR, "{ ⓁTriangleEquations ⓁCollatzConjecture }",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel "
-                "CollatzBenchmark CountPrimes }");
+        .expect("{ Dedicace LibraryHelp PeriSel "
+                "CollatzBenchmark CountPrimes KineticEnergy }");
 
     step("Detach libraries by number")
-        .test(CLEAR, "{ 0 { 1 2 }}",
+        .test(CLEAR, "{ 0 { 1 4 }}",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ PeriSel CollatzBenchmark CountPrimes }");
+        .expect("{ CollatzBenchmark CountPrimes KineticEnergy }");
 
     step("Detach libraries by name")
         .test(CLEAR, "{ \"CollatzBenchmark\" { CountPrimes }}",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ PeriSel }");
+        .expect("{ KineticEnergy }");
 }
 
 

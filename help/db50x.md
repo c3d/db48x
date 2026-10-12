@@ -17941,12 +17941,12 @@ StatTests section — see [StatTests](#stattestslibrary).
 Demonstrations of the distributions on random draws, a new case at each press.
 Seed the generator with RDZ to replay one.
 
-* DMOHisto: a law at random, or the one given, its histogram and its density.
-* DMOWalk: a Brownian walk and a Lévy flight side by side.
-* DMOMarkov: a Markov chain, its path and its stationary distribution.
+* DemoHisto: a law at random, or the one given, its histogram and its density.
+* DemoWalk: a Brownian walk and a Lévy flight side by side.
+* DemoMarkov: a Markov chain, its path and its stationary distribution.
 
 
-## DMOHisto
+## DemoHisto
 
 A law drawn at random among nine — Norml, LgNrm, Expon, Weibl, TriSym, UShape,
 Rayleigh, Logis and Chi2 — with random parameters, or the law given on the
@@ -17983,25 +17983,25 @@ as an argument. To replay the same law on fresh draws, remove the tag first.
 **1)** A law at random, reproducible with the seed:
 
 ```rpl
-1 RDZ ⓁDMOHisto
+1 RDZ ⓁDemoHisto
 ```
 
 **2)** A law chosen by name, its parameters at random:
 
 ```rpl
-"UShape" ⓁDMOHisto
+"UShape" ⓁDemoHisto
 ```
 
 **3)** A law and its parameters:
 
 ```rpl
-{ "Expon" { 1.2 } } ⓁDMOHisto
+{ "Expon" { 1.2 } } ⓁDemoHisto
 ```
 
 **4)** The same law twice, on fresh draws:
 
 ```rpl
-1 RDZ ⓁDMOHisto DeleteTag ⓁDMOHisto
+1 RDZ ⓁDemoHisto DeleteTag ⓁDemoHisto
 ```
 
 The bars wander around the curve: with 300 draws, a class that should hold
@@ -18012,7 +18012,7 @@ two peaks at the ends, and the exponential law, with its long tail, are the
 most striking.
 
 
-## DMOWalk
+## DemoWalk
 
 Two random walks in the plane, 200 steps each, in uniformly random directions
 and with the same mean step length, 3. Each walk is scaled to its own panel,
@@ -18042,23 +18042,23 @@ tunas where prey is sparse, and Brownian ones where it is plentiful.
 **1)** A walk and a flight:
 
 ```rpl
-1 RDZ ⓁDMOWalk
+1 RDZ ⓁDemoWalk
 ```
 
 **2)** The same seed, a lighter tail:
 
 ```rpl
-1 RDZ 1.9 ⓁDMOWalk
+1 RDZ 1.9 ⓁDemoWalk
 ```
 
 **3)** With `α = 3` the variance is finite, and the flight is a walk:
 
 ```rpl
-1 RDZ 3 ⓁDMOWalk
+1 RDZ 3 ⓁDemoWalk
 ```
 
 
-## DMOMarkov
+## DemoMarkov
 
 A Markov chain: the next state depends only on the present one, through a
 matrix of transition probabilities `P`, where `P(i,j)` is the probability of
@@ -18090,13 +18090,13 @@ then numbered.
 **1)** The default economy:
 
 ```rpl
-1 RDZ ⓁDMOMarkov
+1 RDZ ⓁDemoMarkov
 ```
 
 **2)** Two states; the stationary distribution is (5/6, 1/6):
 
 ```rpl
-1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDMOMarkov
+1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDemoMarkov
 ```
 
 **3)** Four states in a row, each passing only to its neighbours:
@@ -18104,7 +18104,7 @@ then numbered.
 ```rpl
 1 RDZ
 [[ 0.7 0.2 0.1 0 ][ 0.2 0.6 0.2 0 ][ 0 0.2 0.6 0.2 ][ 0 0 0.3 0.7 ]]
-ⓁDMOMarkov
+ⓁDemoMarkov
 ```
 
 
@@ -21547,16 +21547,16 @@ Demonstrations of a test on random samples: each press draws a new sample of
 ten values from a normal law of standard deviation 1, and tests its mean with
 TTest1 against μ₀ = 10. Seed the generator with RDZ to replay a sample.
 
-* DMOTTest1: the true mean is 10, so H₀ is true; the test still rejects it
+* DemoTTest1: the true mean is 10, so H₀ is true; the test still rejects it
   about one time in twenty — the risk α of a false alarm.
-* DMOTPower: the true mean is 10.5, so H₀ is false; the test detects it only
+* DemoTPower: the true mean is 10.5, so H₀ is false; the test detects it only
   about three times in ten — its power, with ten values and a shift of half a
   standard deviation.
 
 With the same seed, both draw the same ten values, shifted by 0.5.
 
 
-## DMOTTest1
+## DemoTTest1
 
 Ten values from a normal law of mean 10 and standard deviation 1, tested by
 TTest1 against μ₀ = 10. Returns the mean, the standard deviation s, the results
@@ -21565,14 +21565,14 @@ of TTest1 and a verdict at α = 5 %.
 **1)** Usually H₀ is kept:
 
 ```rpl
-1 RDZ ⓁDMOTTest1
+1 RDZ ⓁDemoTTest1
 @ Expecting verdict:"H₀ kept"
 ```
 
 **2)** Sometimes it is rejected, although it is true:
 
 ```rpl
-11 RDZ ⓁDMOTTest1
+11 RDZ ⓁDemoTTest1
 @ Expecting verdict:"H₀ rejected at 5 %, wrongly"
 ```
 
@@ -21581,7 +21581,7 @@ threshold itself. This is what α means: the rate of false alarms when nothing
 has changed, chosen before looking at the data.
 
 
-## DMOTPower
+## DemoTPower
 
 Ten values from a normal law of mean 10.5 and standard deviation 1, tested by
 TTest1 against μ₀ = 10: H₀ is false, the mean has shifted by half a standard
@@ -21590,14 +21590,14 @@ deviation.
 **1)** Here the shift is detected:
 
 ```rpl
-1 RDZ ⓁDMOTPower
+1 RDZ ⓁDemoTPower
 @ Expecting verdict:"H₀ rejected: the shift is detected"
 ```
 
 **2)** Here it is missed:
 
 ```rpl
-2 RDZ ⓁDMOTPower
+2 RDZ ⓁDemoTPower
 @ Expecting verdict:"H₀ kept: the shift is missed"
 ```
 
@@ -22023,7 +22023,7 @@ The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
 
 
 **3)** Random pairs make a good exercise. This draws two intervals between −100 and
-100 and compares them; run it several times, or press DMOΔConcord in
+100 and compares them; run it several times, or press DemoΔConcord in
 Applications/Demos:
 
 ```rpl
@@ -22075,7 +22075,7 @@ also weigh on the arithmetic of every uncertain value.
 
 **3)** Random measurements make a good exercise too. This draws two measurements of
 the same true value 10, with standard deviations between 0.5 and 2; run it
-several times, or press DMOσConcord in Applications/Demos. About one run in
+several times, or press DemoσConcord in Applications/Demos. About one run in
 twenty gives p < 0.05, although both measure the same thing:
 
 ```rpl
@@ -22464,7 +22464,7 @@ does not always solve them again.
 
 The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
 the range of each unknown, see ΔROOT. For
-the shape of the law of the result, see DMOPendulum, which
+the shape of the law of the result, see DemoPendulum, which
 draws it by the Monte Carlo method.
 
 **1)** The simple pendulum, its amplitude only known between 60° and 80°: the
@@ -22519,7 +22519,7 @@ These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
 
-See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+See also: [ΔROOT](#Δroot), [DemoPendulum](#dmopendulum).
 
 
 ## ΔROOT
@@ -22967,12 +22967,12 @@ Demonstrations: each key runs a command of the section on inputs drawn at
 random, so that every press shows a new case. Seed the generator with RDZ to
 replay the same sequence.
 
-* DMOΔConcord: two bounded intervals, compared by ΔConcord;
-* DMOσConcord: two measurements of the same quantity, compared by σConcord.
-* DMOExmnF2D: a narrow peak at random, examined by ExmnF2D.
+* DemoΔConcord: two bounded intervals, compared by ΔConcord;
+* DemoσConcord: two measurements of the same quantity, compared by σConcord.
+* DemoExmnF2D: a narrow peak at random, examined by ExmnF2D.
 
 
-## DMOΔConcord
+## DemoΔConcord
 
 Draws two intervals at random between −100 and 100 and compares them with
 ΔConcord: the drawing, the intersection, the parts covered and the relation.
@@ -22982,17 +22982,17 @@ relations of RngRel show up, the rare ones (meets, starts, equals…) excepted.
 **1)** A pair, reproducible with its seed:
 
 ```rpl
-42 RDZ ⓁDMOΔConcord
+42 RDZ ⓁDemoΔConcord
 ```
 
 **2)** Then as many new pairs as wanted:
 
 ```rpl
-ⓁDMOΔConcord
+ⓁDemoΔConcord
 ```
 
 
-## DMOσConcord
+## DemoσConcord
 
 Two measurements of the same true value, 10. Each has a standard deviation
 drawn between 0.5 and 2, and a value drawn from the normal law around 10 with
@@ -23007,17 +23007,17 @@ alone does not prove a disagreement.
 **1)** A pair, reproducible with its seed:
 
 ```rpl
-42 RDZ ⓁDMOσConcord
+42 RDZ ⓁDemoσConcord
 ```
 
 **2)** Then as many new pairs as wanted:
 
 ```rpl
-ⓁDMOσConcord
+ⓁDemoσConcord
 ```
 
 
-## DMOExmnF2D
+## DemoExmnF2D
 
 A narrow peak at a random place of the box 0…3 × 0…3, with a random height
 between 1 and 3 and a random width, on a gentle slope from 1 to 1.9:
@@ -23028,13 +23028,13 @@ demonstration returns, below its result, the summit (a, b), the true maximum
 **1)** A peak missed: the search gives the corner value 1.9, but the contours ring the summit and a hollow triangle marks it.
 
 ```rpl
-1 RDZ ⓁDMOExmnF2D
+1 RDZ ⓁDemoExmnF2D
 ```
 
 **2)** A peak found, near the centre of the box:
 
 ```rpl
-4 RDZ ⓁDMOExmnF2D
+4 RDZ ⓁDemoExmnF2D
 ```
 
 Over forty presses, the search found six peaks, about one in six. It
@@ -23838,11 +23838,11 @@ the propagation formula of σRFxjxi sums up in two numbers. An
 input given as a range, like an amplitude between 60° and 80°, becomes in this
 way an input of the equation.
 
-* DMOPendulum: the period of the simple pendulum, for small and for large
+* DemoPendulum: the period of the simple pendulum, for small and for large
   amplitudes.
 
 
-## DMOPendulum
+## DemoPendulum
 
 The two periods of Simple Pendulum in the Equation
 Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
@@ -23874,21 +23874,21 @@ for instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
 **1)** A range at random:
 
 ```rpl
-1 RDZ ⓁDMOPendulum
+1 RDZ ⓁDemoPendulum
 ```
 
 **2)** Small amplitudes, 5…15°: the two histograms almost coincide, and T is
 a good model.
 
 ```rpl
-1 RDZ { 5 15 } ⓁDMOPendulum
+1 RDZ { 5 15 } ⓁDemoPendulum
 ```
 
 **3)** Large amplitudes, 60…80°: Treal is longer than T by 0.08 s, thirty
 times the uncertainty of T, and its histogram is nearly flat.
 
 ```rpl
-1 RDZ { 60 80 } ⓁDMOPendulum
+1 RDZ { 60 80 } ⓁDemoPendulum
 ```
 
 Three lessons. First, the error of a model can be far larger than the

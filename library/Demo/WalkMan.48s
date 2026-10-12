@@ -1,0 +1,24 @@
+«
+	@ A little character, from p 2-39 of HP50G advanced reference
+	@ This tests the compatibility for GROB format
+	GROB 9 15 E300140015001C001400E3008000C110AA00940090004100220014102800
+	→ Walk
+	«
+		CLLCD
+		{ #0 #40 } PICT OVER Walk GXOR
+		1 99999 FOR i
+			i 420 MOD R->B
+			#40 2 →List
+			PICT OVER Walk GXOR
+			PICT ROT Walk GXOR
+
+			@ Set flag 48 for HP-48-style slow walk
+			IF 48 FS?
+			THEN
+				0.2 WAIT 5
+			ELSE
+				0.01 WAIT 1
+			END
+		STEP
+	»
+»

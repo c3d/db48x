@@ -1,0 +1,8 @@
+«
+	CASE
+		DUP "A" == THEN "Alpha" END
+		DUP "B" == THEN "Beta"	END
+		DUP "C" == THEN "Gamma" END
+		"D"		  WHEN "Delta" END
+	END
+»

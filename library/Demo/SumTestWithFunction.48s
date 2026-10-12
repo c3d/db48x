@@ -1,0 +1,7 @@
+«
+	@ Summation loop
+	@ See https://www.hpmuseum.org/forum/thread-9750.html
+	Radians
+	« x 1 1000 'cbrt(exp(sin(atan(x))))' sum »
+	TEval
+»

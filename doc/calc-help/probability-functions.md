@@ -153,12 +153,12 @@ StatTests section — see [StatTests](#stattestslibrary).
 Demonstrations of the distributions on random draws, a new case at each press.
 Seed the generator with RDZ to replay one.
 
-* DMOHisto: a law at random, or the one given, its histogram and its density.
-* DMOWalk: a Brownian walk and a Lévy flight side by side.
-* DMOMarkov: a Markov chain, its path and its stationary distribution.
+* DemoHisto: a law at random, or the one given, its histogram and its density.
+* DemoWalk: a Brownian walk and a Lévy flight side by side.
+* DemoMarkov: a Markov chain, its path and its stationary distribution.
 
 
-## DMOHisto
+## DemoHisto
 
 A law drawn at random among nine — Norml, LgNrm, Expon, Weibl, TriSym, UShape,
 Rayleigh, Logis and Chi2 — with random parameters, or the law given on the
@@ -195,25 +195,25 @@ as an argument. To replay the same law on fresh draws, remove the tag first.
 **1)** A law at random, reproducible with the seed:
 
 ```rpl
-1 RDZ ⓁDMOHisto
+1 RDZ ⓁDemoHisto
 ```
 
 **2)** A law chosen by name, its parameters at random:
 
 ```rpl
-"UShape" ⓁDMOHisto
+"UShape" ⓁDemoHisto
 ```
 
 **3)** A law and its parameters:
 
 ```rpl
-{ "Expon" { 1.2 } } ⓁDMOHisto
+{ "Expon" { 1.2 } } ⓁDemoHisto
 ```
 
 **4)** The same law twice, on fresh draws:
 
 ```rpl
-1 RDZ ⓁDMOHisto DeleteTag ⓁDMOHisto
+1 RDZ ⓁDemoHisto DeleteTag ⓁDemoHisto
 ```
 
 The bars wander around the curve: with 300 draws, a class that should hold
@@ -224,7 +224,7 @@ two peaks at the ends, and the exponential law, with its long tail, are the
 most striking.
 
 
-## DMOWalk
+## DemoWalk
 
 Two random walks in the plane, 200 steps each, in uniformly random directions
 and with the same mean step length, 3. Each walk is scaled to its own panel,
@@ -254,23 +254,23 @@ tunas where prey is sparse, and Brownian ones where it is plentiful.
 **1)** A walk and a flight:
 
 ```rpl
-1 RDZ ⓁDMOWalk
+1 RDZ ⓁDemoWalk
 ```
 
 **2)** The same seed, a lighter tail:
 
 ```rpl
-1 RDZ 1.9 ⓁDMOWalk
+1 RDZ 1.9 ⓁDemoWalk
 ```
 
 **3)** With `α = 3` the variance is finite, and the flight is a walk:
 
 ```rpl
-1 RDZ 3 ⓁDMOWalk
+1 RDZ 3 ⓁDemoWalk
 ```
 
 
-## DMOMarkov
+## DemoMarkov
 
 A Markov chain: the next state depends only on the present one, through a
 matrix of transition probabilities `P`, where `P(i,j)` is the probability of
@@ -302,13 +302,13 @@ then numbered.
 **1)** The default economy:
 
 ```rpl
-1 RDZ ⓁDMOMarkov
+1 RDZ ⓁDemoMarkov
 ```
 
 **2)** Two states; the stationary distribution is (5/6, 1/6):
 
 ```rpl
-1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDMOMarkov
+1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDemoMarkov
 ```
 
 **3)** Four states in a row, each passing only to its neighbours:
@@ -316,7 +316,7 @@ then numbered.
 ```rpl
 1 RDZ
 [[ 0.7 0.2 0.1 0 ][ 0.2 0.6 0.2 0 ][ 0 0.2 0.6 0.2 ][ 0 0 0.3 0.7 ]]
-ⓁDMOMarkov
+ⓁDemoMarkov
 ```
 
 

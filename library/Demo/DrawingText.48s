@@ -1,0 +1,154 @@
+«
+	@ Restore foreground and background in case we interrupted another program
+	0 Gray Foreground
+	64 STWS
+	1 Gray Background
+
+	0 300
+	for i
+		"Text line i=" i + " " + i 9 mod Disp
+		0.01 Wait
+	next
+
+	0 300
+	for i
+		"Fractional line i=" i + " " + i 16 / 9 mod Disp
+		0.01 Wait
+	next
+
+	«
+		Dup2
+		Disp
+		0.01 Wait
+		'Foreground' RCL
+		→ fg
+		«
+			1 gray Foreground
+			Disp
+			fg Foreground
+		»
+	»
+	→ DispThenErase
+	«
+		ClearLCD
+		0 300
+		for i
+			" Pixel positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
+			"Pos " { } #0 i + 223 mod + #0 i 45 mod + 25 + +
+			dup Rot Swap ToText + " " +
+			Swap
+			DispThenErase
+		next
+
+		ClearLCD
+		Degrees
+		1 360
+		for i
+			" Complex positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
+			" Angle " i +
+			4.5 i R->P 2.9 -
+			DispThenErase
+		next
+
+		ClearLCD
+		1 360
+		for i
+			" Scaled positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
+			" Angle " i +
+			{ } i cos 7 * 2.9 - + i 3 * sin 3 * +
+			DispThenErase
+		next
+	»
+
+
+	ClearLCD
+	" Fonts "	 { 10#200 10#180 2 true true 0 1 } Disp
+	0 11 for f
+			"Font " f +
+			{
+				{ 10#10	 10#0	 }
+				{ 10#10	 10#48 }
+				{ 10#10	 10#80 }
+				{ 10#10	 10#98 }
+				{ 10#10	 10#130 }
+				{ 10#240 10#0 }
+				{ 10#240 10#25 }
+				{ 10#240 10#45 }
+				{ 10#240 10#64 }
+				{ 10#240 10#84 }
+				{ 10#240 10#120 }
+				{ 10#240 10#150 }
+			}
+			f 1 + Get
+			f +
+			Disp
+	next
+	1.5 Wait
+
+	ClearLCD
+	" Patterns "	{ 10#200 10#180 2 true true 0 1 } Disp
+	0 15 for p
+		16#1111111111111111 p * Foreground
+		0 11 for f
+				"Font " f +
+				{
+					{ 10#10	 10#0	 }
+					{ 10#10	 10#48 }
+					{ 10#10	 10#80 }
+					{ 10#10	 10#98 }
+					{ 10#10	 10#130 }
+					{ 10#240 10#0 }
+					{ 10#240 10#25 }
+					{ 10#240 10#45 }
+					{ 10#240 10#64 }
+					{ 10#240 10#84 }
+					{ 10#240 10#120 }
+					{ 10#240 10#150 }
+				}
+				f 1 + Get
+				f +
+				Disp
+		next
+		0.2 Wait
+	next
+
+	ClearLCD
+	#0 Foreground
+	" Background "	{ 10#200 10#180 2 true true 0 1 } Disp
+	16#FFFFFFFFFFFFFFFF Foreground
+	0 15 for p
+		16#1111111111111111 p * Background
+		0 11 for f
+				"Font " f +
+				{
+					{ 10#10	 10#0	 }
+					{ 10#10	 10#48 }
+					{ 10#10	 10#80 }
+					{ 10#10	 10#98 }
+					{ 10#10	 10#130 }
+					{ 10#240 10#0 }
+					{ 10#240 10#25 }
+					{ 10#240 10#45 }
+					{ 10#240 10#64 }
+					{ 10#240 10#84 }
+					{ 10#240 10#120 }
+					{ 10#240 10#150 }
+				}
+				f 1 + Get
+				f +
+				Disp
+		next
+		0.2 Wait
+	next
+
+	ClearLCD
+	0 GRAY Foreground 1 GRAY Background
+	" Align left "	 { 10#000 10#120 2 true true  1  0 } Disp
+	" Align Right "	 { 10#400 10#120 2 true true -1  0 } Disp
+	" Center "	 { 10#200 10#120 2 true true  0  0 } Disp
+	" Align Top "	 { 10#200 10#000 2 true true  0  1 } Disp
+	" Align Bottom " { 10#200 10#240 2 true true  0 -1 } Disp
+»

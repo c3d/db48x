@@ -1,0 +1,46 @@
+«
+	@ Helper program to draw a line at index i
+	«
+		10 6 → i XSize YSize
+		«
+			@ Build starting point
+			{}
+			@ X coordinate
+			i sin XSize × +
+			@ Y coordinate
+			i 2.17 × cos YSize × +
+			@ Build end point
+			{}
+			@ X coordinate
+			i 2.3 × sin XSize × +
+			@ Y coordinate
+			i 2.615 × cos YSize × +
+			@ Draw the line and wait for 1ms
+			DrawLine
+		»
+	»
+	→ MyLine
+	«
+		Degrees ClearLCD 0 360000
+		for i
+			@ Erase old line
+			1 10 for g
+				g 10 / Gray Foreground
+				i 100 g + - MyLine
+			next
+
+			@ Set random foreground and draw new line
+			if
+				Ticks 1000 ÷ 10 mod 7 <
+			then
+				#0 Foreground
+			else
+				#1111111111111111 i 16 mod × Foreground
+			end
+			i MyLine
+
+			@ Wait 1ms
+			0.001 Wait
+		next
+	»
+»

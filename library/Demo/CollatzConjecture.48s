@@ -1,0 +1,25 @@
+«
+	@ --------------------------------------------------------------------
+	@
+	@ Collatz conjecture check - Check tail recursion in a test
+	@
+	@ --------------------------------------------------------------------
+	@ Interesting values to start with:
+	@ - Long stopping time: 1161, 2223, 2463, 2919, 3711, 6171
+	@ - High trajectory value: 138367, 159487, 270271, 665215, 704511
+	@ See https://en.wikipedia.org/wiki/Collatz_conjecture
+
+	DUP "	  " + 1 DISP
+	IF USBPowered THEN
+		MEM 2 DISP
+	END
+
+	IF DUP 1 ≠ THEN
+		IF DUP 2 MOD THEN
+			3 * 1 +
+		ELSE
+			2 /
+		END
+		ⓁCollatzConjecture
+	END
+»

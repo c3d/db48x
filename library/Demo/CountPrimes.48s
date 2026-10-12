@@ -1,0 +1,39 @@
+«
+        @ --------------------------------------------------------------------
+        @
+        @	 Count prime numbers under a given value
+        @
+        @ --------------------------------------------------------------------
+        @ This is inspired by https://www.youtube.com/watch?v=vwI5xbqIM7g
+
+	if Depth 1 < then 1000 end
+	«
+		3 Over Duplicate 2 ≤
+		Swap 2 mod or
+		→ n d r
+		«
+			while
+				r d x² n ≤ and
+			repeat
+				n d mod 'r' Store
+				d 2 + 'd' Store
+			end
+			r not not
+		»
+	»
+
+	1
+	→ MaxNumber CheckIfPrime Count
+	«
+		3 MaxNumber
+		for i
+			if
+				i CheckIfPrime
+			then
+				'Count' Increment Drop
+			end
+			2
+		step
+		Count
+	»
+»

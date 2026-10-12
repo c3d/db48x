@@ -1,0 +1,28 @@
+«
+	@ --------------------------------------------------------------------
+	@
+	@	 Multiple equations solver for triangle equations
+	@
+	@ --------------------------------------------------------------------
+
+	{
+		'SQ(AA)+SQ(BB)=SQ(CC)'
+
+		'sin(α)/a=sin(β)/b'
+		'sin(β)/b=sin(γ)/c'
+		'sin(α)/b=sin(γ)/c'
+		'α+β+γ=180'
+
+		's=(a+b+c)/2'
+		'A=sqrt(s*(s-a)*(s-b)*(s-c))'
+		'sq(c)=sq(a)+sq(b)-2*a*b*cos(γ)'
+		'sq(b)=sq(a)+sq(c)-2*a*c*cos(β)'
+		'sq(a)=sq(b)+sq(c)-2*b*c*cos(α)'
+	} STEQ
+
+	10_m 'AA' STO
+	85_ft 'BB' STO
+	1_cm 'CC' STO
+
+	SolvingMenu
+»

@@ -415,7 +415,7 @@ The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
 
 
 **3)** Random pairs make a good exercise. This draws two intervals between −100 and
-100 and compares them; run it several times, or press DMOΔConcord in
+100 and compares them; run it several times, or press DemoΔConcord in
 Applications/Demos:
 
 ```rpl
@@ -467,7 +467,7 @@ also weigh on the arithmetic of every uncertain value.
 
 **3)** Random measurements make a good exercise too. This draws two measurements of
 the same true value 10, with standard deviations between 0.5 and 2; run it
-several times, or press DMOσConcord in Applications/Demos. About one run in
+several times, or press DemoσConcord in Applications/Demos. About one run in
 twenty gives p < 0.05, although both measure the same thing:
 
 ```rpl
@@ -856,7 +856,7 @@ does not always solve them again.
 
 The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
 the range of each unknown, see ΔROOT. For
-the shape of the law of the result, see DMOPendulum, which
+the shape of the law of the result, see DemoPendulum, which
 draws it by the Monte Carlo method.
 
 **1)** The simple pendulum, its amplitude only known between 60° and 80°: the
@@ -911,7 +911,7 @@ These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
 
-See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+See also: [ΔROOT](#Δroot), [DemoPendulum](#dmopendulum).
 
 
 ## ΔROOT
@@ -1359,12 +1359,12 @@ Demonstrations: each key runs a command of the section on inputs drawn at
 random, so that every press shows a new case. Seed the generator with RDZ to
 replay the same sequence.
 
-* DMOΔConcord: two bounded intervals, compared by ΔConcord;
-* DMOσConcord: two measurements of the same quantity, compared by σConcord.
-* DMOExmnF2D: a narrow peak at random, examined by ExmnF2D.
+* DemoΔConcord: two bounded intervals, compared by ΔConcord;
+* DemoσConcord: two measurements of the same quantity, compared by σConcord.
+* DemoExmnF2D: a narrow peak at random, examined by ExmnF2D.
 
 
-## DMOΔConcord
+## DemoΔConcord
 
 Draws two intervals at random between −100 and 100 and compares them with
 ΔConcord: the drawing, the intersection, the parts covered and the relation.
@@ -1374,17 +1374,17 @@ relations of RngRel show up, the rare ones (meets, starts, equals…) excepted.
 **1)** A pair, reproducible with its seed:
 
 ```rpl
-42 RDZ ⓁDMOΔConcord
+42 RDZ ⓁDemoΔConcord
 ```
 
 **2)** Then as many new pairs as wanted:
 
 ```rpl
-ⓁDMOΔConcord
+ⓁDemoΔConcord
 ```
 
 
-## DMOσConcord
+## DemoσConcord
 
 Two measurements of the same true value, 10. Each has a standard deviation
 drawn between 0.5 and 2, and a value drawn from the normal law around 10 with
@@ -1399,17 +1399,17 @@ alone does not prove a disagreement.
 **1)** A pair, reproducible with its seed:
 
 ```rpl
-42 RDZ ⓁDMOσConcord
+42 RDZ ⓁDemoσConcord
 ```
 
 **2)** Then as many new pairs as wanted:
 
 ```rpl
-ⓁDMOσConcord
+ⓁDemoσConcord
 ```
 
 
-## DMOExmnF2D
+## DemoExmnF2D
 
 A narrow peak at a random place of the box 0…3 × 0…3, with a random height
 between 1 and 3 and a random width, on a gentle slope from 1 to 1.9:
@@ -1420,13 +1420,13 @@ demonstration returns, below its result, the summit (a, b), the true maximum
 **1)** A peak missed: the search gives the corner value 1.9, but the contours ring the summit and a hollow triangle marks it.
 
 ```rpl
-1 RDZ ⓁDMOExmnF2D
+1 RDZ ⓁDemoExmnF2D
 ```
 
 **2)** A peak found, near the centre of the box:
 
 ```rpl
-4 RDZ ⓁDMOExmnF2D
+4 RDZ ⓁDemoExmnF2D
 ```
 
 Over forty presses, the search found six peaks, about one in six. It
@@ -2230,11 +2230,11 @@ the propagation formula of σRFxjxi sums up in two numbers. An
 input given as a range, like an amplitude between 60° and 80°, becomes in this
 way an input of the equation.
 
-* DMOPendulum: the period of the simple pendulum, for small and for large
+* DemoPendulum: the period of the simple pendulum, for small and for large
   amplitudes.
 
 
-## DMOPendulum
+## DemoPendulum
 
 The two periods of Simple Pendulum in the Equation
 Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
@@ -2266,21 +2266,21 @@ for instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
 **1)** A range at random:
 
 ```rpl
-1 RDZ ⓁDMOPendulum
+1 RDZ ⓁDemoPendulum
 ```
 
 **2)** Small amplitudes, 5…15°: the two histograms almost coincide, and T is
 a good model.
 
 ```rpl
-1 RDZ { 5 15 } ⓁDMOPendulum
+1 RDZ { 5 15 } ⓁDemoPendulum
 ```
 
 **3)** Large amplitudes, 60…80°: Treal is longer than T by 0.08 s, thirty
 times the uncertainty of T, and its histogram is nearly flat.
 
 ```rpl
-1 RDZ { 60 80 } ⓁDMOPendulum
+1 RDZ { 60 80 } ⓁDemoPendulum
 ```
 
 Three lessons. First, the error of a model can be far larger than the

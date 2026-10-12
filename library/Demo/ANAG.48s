@@ -1,0 +1,10 @@
+« → A
+  «
+    CLLCD A SIZE 'B' STO DEPTH 'C' STO
+    1 B
+    FOR X
+      A X DUP SUB
+    NEXT
+    PRANAG PRDEPTH DROPN { B C } PURGE
+  »
+»

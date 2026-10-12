@@ -1,0 +1,8 @@
+«
+	«
+		0 25 for i
+			i 1_m/s * 1_km/yr convert drop
+		next
+	»
+	TEVAL
+»

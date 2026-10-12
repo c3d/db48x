@@ -5,7 +5,6 @@
 
 "Physics"
 
-	"KineticEnergy",	"="
 	"SiDensity",		"« → T '(8.35123E20 (cm↑-3))*exp((-7 555.17 K)÷T)' »"
 	"Fanning",		"« → Roughness Reynolds 'IFTE(Reynolds≤2100;16/Reynolds;(4.781-((-2۰log((Roughness)/3.7+12/Reynolds)-4.781)^2/((-2۰log((Roughness)/3.7+2.51۰(-2۰log((Roughness)/3.7+12/Reynolds))/Reynolds))-2۰(-2۰log((Roughness)/3.7+12/Reynolds))+4.781)))^-2)' »"
 
@@ -104,21 +103,93 @@
 	"MinΔtTraj",	"=/library/Astronautics/MinDeltatTraj.48s"
 	"GAssist",	"=/library/Astronautics/GAssist.48s"
 
-"Mathematics"
+"Demo"
 
-	"CollatzBenchmark",	"="
-	"CollatzConjecture",	"="
-	"CountPrimes",		"="
-	"TriangleEquations",	"="
-	"RombergPlot",		"="
+"Demo/Mathematics"
+
+	"CollatzBenchmark",	"=/library/Demo/CollatzBenchmark.48s"
+	"CollatzConjecture",	"=/library/Demo/CollatzConjecture.48s"
+	"CountPrimes",		"=/library/Demo/CountPrimes.48s"
+	"TriangleEquations",	"=/library/Demo/TriangleEquations.48s"
+	"RombergPlot",		"=/library/Demo/RombergPlot.48s"
+	"EquationSolving",	"=/library/Demo/EquationSolving.48s"
+	"MultiSolver",		"=/library/Demo/MultiSolver.48s"
+
+"Demo/Physics"
+
+	"KineticEnergy",	"=/library/Demo/KineticEnergy.48s"
+
+"Demo/Graphics"
+
+	"CurvePlottingExamples", "=/library/Demo/CurvePlottingExamples.48s"
+	"WalkMan",		"=/library/Demo/WalkMan.48s"
+	"DrawingLines",		"=/library/Demo/DrawingLines.48s"
+	"DrawingText",		"=/library/Demo/DrawingText.48s"
+	"DrawingShapes",	"=/library/Demo/DrawingShapes.48s"
+	"DrawingPatterns",	"=/library/Demo/DrawingPatterns.48s"
+	"RandomPlot",		"=/library/Demo/RandomPlot.48s"
+	"RandomXYPlot",		"=/library/Demo/RandomXYPlot.48s"
+	"XYPlots",		"=/library/Demo/XYPlots.48s"
+
+"Demo/Sound"
+
+	"Beeps",		"=/library/Demo/Beeps.48s"
+
+"Demo/Performance"
+
+	"NQueens",		"=/library/Demo/NQueens.48s"
+	"SumTestWithFunction",	"=/library/Demo/SumTestWithFunction.48s"
+	"SumTestWithLoop",	"=/library/Demo/SumTestWithLoop.48s"
+	"Recursion",		"=/library/Demo/Recursion.48s"
+	"UnitsBenchmark",	"=/library/Demo/UnitsBenchmark.48s"
+	"MatrixMultiplyBenchmark",	"=/library/Demo/MatrixMultiplyBenchmark.48s"
+
+"Demo/Examples"
+
+	"InteractiveMenu",	"=/library/Demo/InteractiveMenu.48s"
+	"PathHeader",		"=/library/Demo/PathHeader.48s"
+	"BatteryLevelHeader",	"=/library/Demo/BatteryLevelHeader.48s"
+	"RuntimeStatsHeader",	"=/library/Demo/RuntimeStatsHeader.48s"
+	"BatteryStatsHeader",	"=/library/Demo/BatteryStatsHeader.48s"
+	"IfTETest",		"=/library/Demo/IfTETest.48s"
+	"IfThenElseEval",	"=/library/Demo/IfThenElseEval.48s"
+	"CaseTest",		"=/library/Demo/CaseTest.48s"
+	"Prompting",		"=/library/Demo/Prompting.48s"
+	"Inputting",		"=/library/Demo/Inputting.48s"
+	"CustomMenu",		"=/library/Demo/CustomMenu.48s"
+
+"Demo/Anagram"
+
+	"PRANAG",		"=/library/Demo/PRANAG.48s"
+	"PRDEPTH",		"=/library/Demo/PRDEPTH.48s"
+	"ANAG",			"=/library/Demo/ANAG.48s"
+
+"Demo/Probability"
+
+	"DemoHisto",	"=/library/Probability/DemoHisto.48s"
+	"DemoWalk",	"=/library/Probability/DemoWalk.48s"
+	"DemoMarkov",	"=/library/Probability/DemoMarkov.48s"
+
+"Demo/StatTests"
+
+	"DemoTTest1",	"=/library/StatTests/DemoTTest1.48s"
+	"DemoTPower",	"=/library/StatTests/DemoTPower.48s"
+
+"Demo/Uncertainty"
+
+	"DemoΔConcord",	"=/library/Uncertainty/DemoDeltaConcord.48s"
+	"DemoσConcord",	"=/library/Uncertainty/DemoSigmaConcord.48s"
+	"DemoExmnF2D",	"=/library/Uncertainty/DemoExmnF2D.48s"
+	"DemoPendulum",	"=/library/Uncertainty/DemoPendulum.48s"
+
+"Demo/Astronomy"
+
+	"LightTime",	"=/library/AstroExamples/LightTime.48s"
+	"Elongation",	"=/library/AstroExamples/Elongation.48s"
+	"ApparentSize",	"=/library/AstroExamples/ApparentSize.48s"
+	"SkyCoords",	"=/library/AstroExamples/SkyCoords.48s"
 
 "Probability"
-
-"Probability/LawDemos"
-
-	"DMOHisto",	"=/library/Probability/DMOHisto.48s"
-	"DMOWalk",	"=/library/Probability/DMOWalk.48s"
-	"DMOMarkov",	"=/library/Probability/DMOMarkov.48s"
 
 "Probability/Norml"
 
@@ -505,11 +576,6 @@
 	"Anova1",	"=/library/StatTests/Anova1.48s"
 	"FTestLR",	"=/library/StatTests/FTestLR.48s"
 
-"StatTests/TestDemos"
-
-	"DMOTTest1",	"=/library/StatTests/DMOTTest1.48s"
-	"DMOTPower",	"=/library/StatTests/DMOTPower.48s"
-
 "Uncertainty"
 
 "Uncertainty/Rounding"
@@ -549,12 +615,6 @@
 
 "Uncertainty/Applications"
 
-"Uncertainty/Applications/Demos"
-
-	"DMOΔConcord",	"=/library/Uncertainty/DMODeltaConcord.48s"
-	"DMOσConcord",	"=/library/Uncertainty/DMOSigmaConcord.48s"
-	"DMOExmnF2D",	"=/library/Uncertainty/DMOExmnF2D.48s"
-
 "Uncertainty/Applications/GUMS1"
 
 	"S1Additive",	"=/library/Uncertainty/S1Additive.48s"
@@ -574,44 +634,11 @@
 	"StepG",	"=/library/Uncertainty/StepG.48s"
 	"StepH",	"=/library/Uncertainty/StepH.48s"
 
-"Uncertainty/Applications/EqDemos"
-
-	"DMOPendulum",	"=/library/Uncertainty/DMOPendulum.48s"
-
 "Uncertainty/Applications/Labs"
 
 	"Calorimetry",	"=/library/Uncertainty/Calorimetry.48s"
 	"WeakAcid",	"=/library/Uncertainty/WeakAcid.48s"
 	"BeamYoung",	"=/library/Uncertainty/BeamYoung.48s"
-
-"Graphics"
-	"CurvePlottingExamples", "="
-	"WalkMan", "="
-	"DrawingLines", "="
-	"DrawingText", "="
-	"DrawingShapes", "="
-	"DrawingPatterns", "="
-	"RandomPlot", "="
-	"RandomXYPlot", "="
-
-"Sound"
-	"Beeps", "="
-
-"Performance"
-	"NQueens", "="
-	"SumTestWithFunction", "="
-	"SumTestWithLoop", "="
-	"Recursion", "="
-	"UnitsBenchmark", "="
-
-"Examples"
-        "InteractiveMenu", "="
-
-"AstroExamples"
-        "LightTime", "=/library/AstroExamples/LightTime.48s"
-        "Elongation", "=/library/AstroExamples/Elongation.48s"
-        "ApparentSize", "=/library/AstroExamples/ApparentSize.48s"
-        "SkyCoords", "=/library/AstroExamples/SkyCoords.48s"
 
 "Missions"
 

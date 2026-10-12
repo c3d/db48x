@@ -1,0 +1,12 @@
+«
+	10000 CustomHeaderRefresh
+
+	@ We want statistics to persist even in case of low-bat crash
+	"BATTERY.CSV" 'ΣData' STO
+
+	«
+		TIME UVAL →Num BatteryVoltage DUP2 2 →Arry Σ+
+		ΣSize " " + Swap + " " + Swap 5 Round + " " + LowBattery +
+	»
+	HEADER
+»

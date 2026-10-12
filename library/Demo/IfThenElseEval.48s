@@ -1,0 +1,3 @@
+«
+  -> x << IF 'x<1' THEN "less" ELSE "more" END >>
+»

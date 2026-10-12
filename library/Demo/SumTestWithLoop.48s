@@ -1,0 +1,12 @@
+«
+	@ Summation loop
+	@ See https://www.hpmuseum.org/forum/thread-9750.html
+	Radians
+	«
+		0 1 1000
+		for x
+			x tan⁻¹ sin exp ∛ +
+		next
+	»
+	TEval
+»

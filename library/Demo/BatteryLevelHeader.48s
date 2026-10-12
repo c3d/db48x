@@ -1,0 +1,8 @@
+«
+	10000 CustomHeaderRefresh
+
+	«
+		BatteryVoltage " " + LowBattery +
+	»
+	HEADER
+»

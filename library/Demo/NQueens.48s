@@ -1,0 +1,32 @@
+«
+	«
+		@ User RPL program lifted straight from
+		@ https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=700
+		0
+		do
+			8 Swap 1 +
+			while
+				Duplicate2
+				do
+					1 -
+				until
+					Duplicate2 5 + Pick - norm Duplicate2 - × not
+				end
+			repeat
+				Drop
+				while
+					Swap Duplicate 1 same
+				repeat
+					-
+				end
+				1 - Swap
+			end
+			Drop
+		until
+			Duplicate 8 same
+		end
+		→List
+	»
+	@ Compute execution duration of that code
+	TEval
+»

@@ -1,0 +1,46 @@
+«
+	Degrees
+	#0 Foreground
+        -10 10 XRNG
+        -6 6 YRNG
+
+	1 LineWidth
+	'sin(325*X)*lgamma(X)' Function
+
+	2 LineWidth
+	'X' Polar
+
+	3 LineWidth
+	16#AAAAAAAAAAAAAAAA Foreground
+	« '9.5*sin(31.27*X)' Eval '5.5*cos(42.42*X)' Eval RealToComplex » Parametric
+
+	#0 Foreground
+
+	0 WAIT DROP
+
+	[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 ]
+	25 * sin BarPlot
+
+	0 WAIT DROP
+
+	CLLCD
+	16#CCCCCCCCCCCCCCCC Foreground
+	[ [ 1 -1 ] [2 -2] [3 -3] [4 -4] [5 -6] [7 -8] [9 -10] ]
+	33 * cos 2 * BarPlot
+
+	0 WAIT DROP
+
+	CLLCD
+
+	[ [ -5 -5 ] [ -3 0 ] [ -5 5] [ 0 3 ] [ 5 5 ] [ 3 0 ] [ 5 -5 ] [ 0 -3 ] [-5 -5] ]
+	DUP
+	NoCurveFilling
+	16#1111111111111111 Foreground
+	12 LineWidth
+	ScatterPlot
+
+	CurveFilling
+	16#0 Foreground
+	1 LineWidth
+	ScatterPlot
+»

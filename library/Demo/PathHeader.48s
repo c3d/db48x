@@ -1,0 +1,6 @@
+«
+	« TIME " " PATH TAIL TOTEXT + + "
+" + DATE + " Mem: " + MEM + »
+	HEADER
+	10000 CustomHeaderRefresh
+»

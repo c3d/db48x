@@ -1,0 +1,40 @@
+«
+	Ticks
+
+	0 LineWidth
+	0 255 for i
+		i 255 / Gray Foreground
+		{ } 10#25 i 16 mod *	 1 + + 10#15 #0 i + 16 / *	 1 + +
+		{ } 10#25 i 16 mod * 24 + + 10#15 #0 i + 16 / *	 14 + +
+		#10 RRect
+		0.01 Wait
+	next
+	#0 Foreground
+	Ticks Swap - 0.001 * "Finished in " Swap + " s" +
+	{ 10#150 10#100 2 1 1 } Disp
+	"Press a key to continue"
+	{ 10#140 10#150 2 1 1 } Disp
+	0 Wait DROP
+
+	Ticks
+	0 255 for r
+		0 255 for g
+			0 255 for b
+				r 255 /
+				g 255 /
+				b 255 /
+				RGB Foreground
+
+				{ } 10#1 g * 400 * 255 / 0 + +	10#1 b * 240 * 255 / 0 + +
+				{ } 10#1 g * 400 * 255 / 2 + +	10#1 b * 240 * 255 / 1 + +
+				Rect
+			next
+		next
+	25 step
+	#0 Foreground
+	Ticks	 Swap - 0.001 * "Finished in " Swap + " s" +
+	{ 10#150 10#100 2 1 1 } Disp
+	"Press a key to continue"
+	{ 10#140 10#150 2 1 1 } Disp
+	0 Wait DROP
+»

@@ -1,0 +1,8 @@
+«
+	Duplicate 1 =
+	« Drop "One" »
+	« 1 < "Less" "More" IFTE »
+	IFTE
+
+	'1=1' '1+1' '1*3' IFTE
+»

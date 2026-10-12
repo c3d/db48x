@@ -1,0 +1,6 @@
+«
+	1 + DUP 1 DISP
+        "Memory: " MEM + 2 DISP
+        "Not using memory for tail recursion" { 10#60 10#100 1 } DISP
+        ⓁRecursion
+»

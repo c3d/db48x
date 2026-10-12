@@ -1,0 +1,13 @@
+«
+         @ -------------------------------------------------------------------
+         @
+         @	 Collatz conjecture benchmark
+         @
+         @ -------------------------------------------------------------------
+         @ This is a case where the DM42 and DM32 will do much better than
+         @  HP's because of the tail recursion optimizations.
+         «
+         	 989345275647 ⓁCollatzConjecture
+         »
+         TEVAL
+»
