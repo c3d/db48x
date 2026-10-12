@@ -88,6 +88,7 @@ spellings.
 * `BeepOff`
 * `BeepOn`
 * `BestFit`
+* `BetaI`
 * `BigFractions`
 * `Bin` (`Binary`)
 * `Bins` (`FrequencyBins`)
@@ -309,6 +310,9 @@ spellings.
 * `FlagsMenu`
 * `FlatMenus`
 * `FlipBit`
+* `FlightRecorderConfigure`
+* `FlightRecorderDump` (`WSLog`)
+* `FlightRecorderDumpSome`
 * `floor`
 * `FoldConstants`
 * `FolderCornerForeground`
@@ -324,6 +328,7 @@ spellings.
 * `FS?S` (`TestFlagSetThenSet`)
 * `Function` (`FunctionPlot`)
 * `GAnd` (`GraphicAnd`)
+* `GammaP`
 * `GC` (`GarbageCollect`)
 * `GCD` (`GreatestCommonDenominator`)
 * `GCIconForeground`
@@ -714,6 +719,8 @@ spellings.
 * `SearchForeground`
 * `sec`
 * `sech`
+* `SelfTest` (`AutoTest`)
+* `SelfTests` (`AutoTests`)
 * `SelectedMenuForeground`
 * `SelectionBackground`
 * `SelectionForeground`
@@ -924,6 +931,10 @@ spellings.
 * `UpperCase` (`UpperCaseCommands`)
 * `UpperCaseNames` (`UpperCaseSymbols`)
 * `USBPowered`
+* `UTPC`
+* `UTPF`
+* `UTPN`
+* `UTPT`
 * `UseCrossForMultiplication`
 * `UseDotForMultiplication`
 * `UserCommandBackground`
@@ -1100,6 +1111,7 @@ spellings.
 * `BeepOff`
 * `BeepOn`
 * `BestFit`
+* `BetaI`
 * `BigFractions`
 * `Bin`
 * `Bins`
@@ -1321,6 +1333,9 @@ spellings.
 * `FlagsMenu`
 * `FlatMenus`
 * `FlipBit`
+* `FlightRecorderConfigure`
+* `FlightRecorderDump`
+* `FlightRecorderDumpSome`
 * `floor`
 * `FoldConstants`
 * `FolderCornerForeground`
@@ -1336,6 +1351,7 @@ spellings.
 * `FS?S`
 * `Function`
 * `GAnd`
+* `GammaP`
 * `GC`
 * `GCD`
 * `GCIconForeground`
@@ -1726,6 +1742,8 @@ spellings.
 * `SearchForeground`
 * `sec`
 * `sech`
+* `SelfTest`
+* `SelfTests`
 * `SelectedMenuForeground`
 * `SelectionBackground`
 * `SelectionForeground`
@@ -1936,6 +1954,10 @@ spellings.
 * `UpperCase`
 * `UpperCaseNames`
 * `USBPowered`
+* `UTPC`
+* `UTPF`
+* `UTPN`
+* `UTPT`
 * `UseCrossForMultiplication`
 * `UseDotForMultiplication`
 * `UserCommandBackground`
@@ -2112,6 +2134,7 @@ spellings.
 * `BeepOff`
 * `BeepOn`
 * `BestFit`
+* `BetaI`
 * `BigFractions`
 * `Bin`
 * `Bins`
@@ -2333,6 +2356,9 @@ spellings.
 * `FlagsMenu`
 * `FlatMenus`
 * `FlipBit`
+* `FlightRecorderConfigure`
+* `FlightRecorderDump`
+* `FlightRecorderDumpSome`
 * `floor`
 * `FoldConstants`
 * `FolderCornerForeground`
@@ -2348,6 +2374,7 @@ spellings.
 * `FS?S`
 * `Function`
 * `GAnd`
+* `GammaP`
 * `GC`
 * `GCD`
 * `GCIconForeground`
@@ -2738,6 +2765,8 @@ spellings.
 * `SearchForeground`
 * `sec`
 * `sech`
+* `SelfTest`
+* `SelfTests`
 * `SelectedMenuForeground`
 * `SelectionBackground`
 * `SelectionForeground`
@@ -2948,6 +2977,10 @@ spellings.
 * `UpperCase`
 * `UpperCaseNames`
 * `USBPowered`
+* `UTPC`
+* `UTPF`
+* `UTPN`
+* `UTPT`
 * `UseCrossForMultiplication`
 * `UseDotForMultiplication`
 * `UserCommandBackground`
@@ -3419,7 +3452,6 @@ As a result, they behave like normal names on DB48X.
 * `SYSEVAL`
 * `TRANSIO`
 * `UFL1→MINIF`
-* `WSLOG`
 * `XGET`
 * `XMIT`
 * `XPUT`
