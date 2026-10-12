@@ -674,6 +674,15 @@ bool load_system_state()
         char *state = get_reset_state_file();
         if (is_valid_state_file(state))
             return load_state_file_silent(state);
+#if SIMULATOR
+        extern bool clean_slate;
+        if (clean_slate)
+            return false;
+#endif
+
+        // On an uninitialized calculator, load the default demo state
+        if (load_state_file_silent("state/Demo.48S"))
+            return true;
     }
     return false;
 }
