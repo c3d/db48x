@@ -1,5 +1,189 @@
 # Release notes
 
+## Release 0.10.0 "Cosmic Labs" - Equation libraries, uncertainty, fixes
+
+This release is the largest since the beginning of the project.
+It adds major equation and function libraries for probability,
+uncertainty, aeronautics, astronautics, rocketry, and navigation,
+along with dozens of bug fixes across the calculator engine.
+
+This release marks a significant shift towards a community-built project:
+* Jean Wilson outdid himself, with many new additions to the library
+* As a result, this marks the first release with more features released as
+  user-visible RPL code than with C++
+* We also welcome a new prolific contributor, George Campbell, who fixed a lot
+  of bugs, from crashes to improving compatibility wth HP calculators
+* Ed van Gasteren also contributed quite a bit.
+
+In addition, several people were involved in Android testing.
+
+### New equation and function libraries
+
+* Probability section with thirty distributions as equations and functions
+* Eleven statistical tests on Student, chi-square and Fisher distributions
+* `UTPC`, `UTPF`, `UTPN`, `UTPT` upper tail probability functions (HP50G compat)
+* `GammaP` and `BetaI`, regularised incomplete gamma and beta functions
+* Uncertainty section with Monte Carlo propagation (`MCPropagate`)
+* Uncertainty propagation without lists (`σRf`, `σRFxjxi`)
+* Interval arithmetic for multivariate functions (`ΔRf`, `ΔRFxjxi`)
+* Function extrema examination (`Exmnf`, `ExmnFxjxi`, `ExmnF2D` with contours)
+* `σROOT` and `ΔROOT`, uncertainty/range of unknowns found by `ROOT`
+* `Cycling` between equivalent uncertainty representations
+* `Compare`, concordance of two measurements
+* `StudentRand` by Bailey's polar method
+* Worked examples: projectile experiment, calorimetry, beam Young's modulus,
+  weak acid pH, GUM Supplement 1
+* Demonstrations: histograms, random walks, Markov chains, pendulum
+* Aeronautics/Navigation section with geodesy on the WGS-84 ellipsoid
+* Route planning with waypoints, ETA and flight plan along the wind
+* `TAS3GS`, true airspeed from three GPS ground speeds
+* Aeronautics/Performance with `PolarFit`, `ClimbVxVy` and `TORoll`
+* Flight Management section: weight and balance, airspeeds, climb/descent,
+  decision points, wind, time and fuel
+* Rocketry subsection with 33 simulations including the Barrowman method
+* Astronautics section with 57 RPL functions
+* Missions suite: Earth to Mars and back, with light-time examples
+* `PeriSel` lunar perigee function (Meeus ch. 50)
+* Navigation section with great-circle routes on a sphere
+
+### New constants
+
+* WGS-84/GPS Earth reference values and calendar years
+* Orbital periods (`Porb`) for the nine planets
+* Planet and Moon perihelion/perigee passage times (`T₀`), computed live
+* Planetary and lunar masses `M = GM/G`
+* Rotation angular velocity `wrot = 2π/Prot`
+* Anomalistic month `Porb☽` via `PeriSel`
+* Fix Andromeda/Milky-Way galaxy values and references (#1707)
+* Reclassify astronomy sources into numbered references (#1706)
+
+### New commands and features
+
+* `PartFrac` command for partial fraction decomposition (#1806)
+* `SelfTest` / `SelfTests` commands to run test suites from RPL
+* `KEYEVAL` and `KEYCODE` commands
+* `RecorderTrace` and `RecorderDump` commands to control the recorder
+* Watt-hour and kilowatt-hour units (#1769)
+* Parse date, complex and range functions in algebraic expressions
+* `COLLECT` and `EXPAND` collect like terms using polynomials (#1806)
+* Accept `,` in builtin function calls, e.g. `Σ(I=1,10,I)` (#1811)
+* Accept name-first argument order in `STO+`, `STO-`, `STO×`, `STO÷`
+* Simulator `-Z` option for clean-slate (zero initial state)
+* Help topics for every menu key that previously had none (#1768)
+* `ShowAmbiguousNames` highlights names that conflict with library/commands
+* Optimize name-chain evaluation, with `MaxChainNameLength` limit
+* Detect unbounded recursive calls with `MaxCallRecursion` limit
+* Limit stack depth during recursive calls with `MaxStackDepth` limit
+
+### Bug fixes
+
+#### Crashes and corruption
+
+* `PCoef` segfault on bad input (#1790)
+* Nested `PUT` crash into a non-list item (#1808)
+* `→LIST` and recursive calls producing malformed lists (#1808)
+* Circular name references causing infinite loops (#1808)
+* Complex crashes at poles, negative powers and angle units (#1810)
+* Storing a directory into itself corrupting memory (#1807)
+* `atan(-ⅈ)` crash
+* Purging a list could leave the directory corrupted
+* Crash when nested `PUT` indices do not fit in 32 bits
+* Text/list concatenation unsafe across garbage collection (#1779)
+* Several GC-unsafe pointers in datetime, constants, grobs and `object::at`
+* OOM during loop body allocation now returns a parse error, not a crash
+* Detach libraries gracefully when running out of memory
+* `scribble` refactor to prevent junk in constructed objects
+* Stale pointer protection in constant lookup and menu scanning
+* Stack cache invalidation after runtime cleanup
+* Polynomial variable insertion fix when merging polynomials
+* units: check for scratchpad allocation failure in unit_file
+* list: Avoid comparison with stale pointers after evaluation
+* unique: Avoid comparision with a stale object in the list
+* error: Avoid crash if out of memory displaying an error
+* partfrac: Check growth, use GC-safe pointer, avoid redundancy
+
+#### Wrong results
+
+* Never produce or compare negative zero (#1812)
+* `REF`/`RREF`/`RREFP` pivot row exchange broken (#1793)
+* `PRoot` fails for irrational, complex and repeated roots (#1801)
+* `DFC` type-check, `XROOT` symbolic wrapping, hyperbolic precision (#1802)
+* Complex equality, `-ⅈ` parsing, error handling in comparisons (#1802)
+* `DET` of 1×1 and symbolic matrices, `M^0` identity, complex `NORM` (#1813)
+* Fraction normalization: unit denominator → integer (#1813)
+* Range/uncertain integer powers, `abs` and self-cancellation (#1804)
+* Solver: verify solutions and use guess to pick root (#1803)
+* `COLLECT`/`EXPAND` like-term collection (#1806)
+* Angle mode in symbolic derivative and primitive (#1805)
+* `Zeros`: complete and simplify general solutions (#1792)
+* `0^y` for positive non-integer `y` now returns 0
+* Tiny operand no longer treated as negligible next to zero
+* Incorrect Laguerre sign-change detection in polynomial root finding
+* Integer power falling back to decimal no longer leaves a stale error
+* Range power with even exponent crossing zero
+* Symbolic `==` comparisons kept symbolic instead of forced numeric (#1811)
+* `ShowAsDecimal` now correctly formats equations
+* Redraw the status bar when one of its settings changes (#1772)
+* Fix simulator parsing when not using spaces after options
+
+#### Parser and evaluation
+
+* Bare `ⅈ` swallowing what follows it in an expression (#1796)
+* Undefined function calls kept symbolic instead of error (#1795)
+* `√` and `∛` rejected as name characters (#1794)
+* `PEval` error on invalid input (#1791)
+* Reject numbers with two decimal dots (#1811)
+* Reject an operand directly following another operand (#1811)
+* Improved parsing of constants and library items (#1809)
+* Symbolic flags in algebraic expressions (#1814)
+* Exponential re-evaluation of symbolic sums
+* Evaluate function calls without C recursion
+* Rewrite matching tries each position only once (performance)
+* `CrDir` with a list is now atomic and GC-safe
+* Do not put numbered menus on the stack (#1819)
+* Help Page Up across topics lands where it should (#1818)
+
+### Platform and build
+
+* Android file access and resource extraction (#1816)
+* Android haptic feedback, back key, long-press help, foreground refresh
+* Android splash screen, 16K page alignment, black screen fix
+* Windows installation instructions fix (#1777)
+* Windows help file corruption fixed (LF normalization, `rfind` fixes)
+* Windows: switch from MinGW to UCRT, fix 32-bit masks and `SIZE_MAX`
+* Windows: fix RGB565 color packing for DM32 screenshots
+* Linux: fix build with GCC 16
+* Help: follow links with non-ASCII anchors, Page Up across topics
+* Simulator: key map measured on keyboard image, press goes to nearest key
+* GitHub CI and Windows builds back to green (Qt 6.9.2, macOS 26,
+  test timeouts, artifact retention, Fedora/Arch builds)
+* GitLab CI uses shared runners
+* Update recorder and make-it-quick submodules
+* Cache the install dependencies to accelerate CI
+* Generte QRC files more efficiently to fit Windows limits
+* Fix WASM image match linker error
+
+### Improvements
+
+* Reorganize demo programs into `library/Demo/` with library references
+* `Demo.48s` now uses `Ⓛ` library references instead of inline code,
+  making it a lightweight default state for uninitialized calculators
+* `cleaner purge` idiom for logical, stats and comparison operations
+* `MCPropagate` uses Welford's algorithm with O(1) memory
+* `recorder_dump()` on `object_error()` for easier debugging
+* GC pointer adapter for the recorder (`%t` format)
+* Open files in binary mode so seeks land where intended
+* Deterministic `Sort` across platforms for tied values
+* `char32_t` literals instead of `wchar_t` for Unicode codepoints
+* Documentation for constants library hierarchy and library configuration
+* Updated Quick Start Guide
+* Refreshed implementation status
+* Added George Campbell and Ed van Gasteren to AUTHORS
+* Add `-Dall` option to dump all traces on test failure
+* Optimize evaluation of names containing names, `MaxNameChainLength` setting
+* Many CI improvements to finally get an "all-green" reasonably fast test
+* Update agent guidelines
+
 ## Release 0.9.20 "Corpus" - Polynomials and algebraic expressions
 
 This release focuses on support for polynomial, root finding and algebraic
