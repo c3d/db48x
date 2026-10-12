@@ -158,6 +158,8 @@ user_interface::user_interface()
       blink(false),
       follow(false),
       skipTopicSync(0),
+      helpUpTarget(0),
+      helpUpOffset(0),
       force(false),
       dirtyMenu(false),
       dirtyStack(false),
@@ -607,6 +609,7 @@ void user_interface::clear_help()
     impos       = 0;
     topic       = 0;
     skipTopicSync = 0;
+    helpUpTarget = 0;
     follow      = false;
     last        = 0;
     longpress   = false;
@@ -3171,6 +3174,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     follow    = false;
     dirtyHelp = true;
     dirtyMenu = true;
+    helpUpTarget = 0;
 
     if (!memcmp(topic, "http", 4))
     {
@@ -4198,8 +4202,8 @@ restart:
            help, line, topic, int(ytop + 2 - line), int(ytop), height,
            stackTop);
 
-    // Display until end of help
-    while (y < ybot)
+    // Display until end of help, and beyond while measuring an up scroll
+    while (y < ybot || helpUpTarget)
     {
         byte       buffer[80];
         uint       widx    = 0;
@@ -4208,6 +4212,22 @@ restart:
         bool       yellow  = false;
         bool       blue    = false;
         style_name restyle = style;
+
+        // After an up scroll across topics, the position we came from is
+        // now reached: shift the view so that it lands where it should,
+        // helpUpOffset pixels below the top, and draw again
+        if (helpUpTarget && helpfile.position() >= helpUpTarget)
+        {
+            int want  = int(ytop + 2) + helpUpOffset;
+            int moved = int(line) + int(y) - want;
+            record(help_trace, "up measured: target=%u y=%d want=%d line %u->%d",
+                   helpUpTarget, int(y), want, line, moved);
+            helpUpTarget = 0;
+            line         = moved > 0 ? uint(moved) : 0;
+            dirtyHelp    = true;
+            Screen.clip(clip);
+            goto restart;
+        }
 
         if (!shown)
         {
@@ -4218,11 +4238,14 @@ restart:
                        shown, int(y), line, helpfile.position());
             }
             else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H &&
-                     style == NORMAL && !in_table)
+                     style == NORMAL && !in_table && !hadTitle)
             {
                 // Resume later drawings from here, but only outside of code
                 // blocks and tables: restarting inside a ``` block would
-                // swap code and text until the next fence
+                // swap code and text until the next fence. Not right after
+                // a title either: the space below the title is only added
+                // with the next word, and a restart would lose it, so that
+                // the next drawing would shift the text up
                 uint oldHelp = help;
                 uint oldLine = line;
                 help = helpfile.position();
@@ -5247,6 +5270,12 @@ bool user_interface::handle_help(int &key)
         }
         else
         {
+            // The line count below only estimates the height walked over:
+            // long lines wrap, code blocks and figures have their own
+            // height. Record where the current position must land, count
+            // lines below the top, so that draw_help can measure it there.
+            helpUpTarget = help;
+            helpUpOffset = int(count * height) - int(line);
             line = 0;
             count++;
             skipTopicSync = 2;
