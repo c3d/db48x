@@ -1586,6 +1586,8 @@ symbol_p unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
             else if (column == 1 && found)
             {
                 byte *buf = scr.allocate(1);
+                if (!buf)
+                    return def;
                 *buf = byte(c);
             }
             index++;
@@ -1644,6 +1646,8 @@ symbol_p unit_file::next(bool menu)
             if (column == 0)
             {
                 byte *buf = scr.allocate(1);
+                if (!buf)
+                    return sym;
                 *buf = byte(c);
             }
         }
