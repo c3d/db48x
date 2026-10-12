@@ -70,9 +70,9 @@ does not exceed turnMax.
 `t3lo t3hi` → `{ t3 tv t4 ΔVTEI matchErr turnReq turnMax tof }`
 
 ```rpl
-2459920 2459980 ⓁRTPlanOpp
-@ affichage complet : { 2459930 2460150 2460220 5.90 0.00084 30.93 49.72 290 }
-@ Expecting { 2 459 930 2 460 150 2 460 220 5.90036 89128 9D 8.44315 38744 9⁳⁻⁴D 30.92503 57352D ° 49.71715 56229D 290 5.44155 12278 3D }
+@ The rounding hides minor differences between platforms for hw_double
+2459920 2459980 ⓁRTPlanOpp 10 ROUND
+@ Expecting { 2 459 930. 2 460 150. 2 460 220. 5.90036 89129 0.00084 43154 30.92503 57352 ° 49.71715 56229 290. 5.44155 12278 }
 @ Mars 2022-12-16 → Venus 2023-07-24 → Earth 2023-10-02; Earth entry only ~4.9 km/s
 ```
 
