@@ -509,9 +509,9 @@ QRC_FILES=		sim/config.qrc		\
 			sim/help/img.qrc
 
 # Build Qt simulator directly with qmake
-qt-$(TARGET): $(QMAKEFILE)
+qt-$(TARGET): $(QMAKEFILE) $(QRC_FILES)
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F)
-qt-%: $(QMAKEFILE)
+qt-%: $(QMAKEFILE) $(QRC_FILES)
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
 
 $(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS) $(CHUCK_H) .config
@@ -555,7 +555,7 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	 done;							\
 	 echo ' </qresource>';					\
 	 echo '</RCC>')						\
-	> $@
+	> $@.$$$$ && mv $@.$$$$ $@
 
 
 QRC_EXT_config=*.csv *.cfg *.48k
