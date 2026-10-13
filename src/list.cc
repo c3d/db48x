@@ -1953,96 +1953,77 @@ list_p list::map(algebraic_r x, arithmetic_fn fn, size_t recurse) const
 //
 // ============================================================================
 
-int memory_compare(object_p *xp, object_p *yp)
+int memory_compare(object_p x, object_p y)
 // ----------------------------------------------------------------------------
 //   Compare using type IDs and memory content
 // ----------------------------------------------------------------------------
 {
-    object_p x = *xp;
-    object_p y = *yp;
+    if (!x || !y)
+        return !x - !y;
     return x->compare_to(y);
 }
 
 
-int value_compare(object_p *xp, object_p *yp)
+int value_compare(object_p x, object_p y)
 // ----------------------------------------------------------------------------
 //   Sort items according to value
 // ----------------------------------------------------------------------------
+//   Note that if the two values are identical by value, we break ties with
+//   a memory comparison. This has two benefits:
+//   - It make Sort stable across platforms for numerically-equal values
+//   - It makes Uniq distinguish numerically-identical values such as 0. and 0
 {
-    object_p x = *xp;
-    object_p y = *yp;
+    if (!x || !y)
+        return !x - !y;
     object::id xty = x->type();
     object::id yty = y->type();
     if ((object::is_algebraic(xty) && object::is_algebraic(yty)) ||
         (xty == object::ID_array   && yty == object::ID_array)   ||
         (xty == object::ID_list    && yty == object::ID_list))
     {
-        algebraic_g xa     = algebraic_p(x);
-        algebraic_g ya     = algebraic_p(y);
+        algebraic_g xa     = algebraic_p(+x);
+        algebraic_g ya     = algebraic_p(+y);
         gcutf8      errm   = rt.error_message();
         int         result = 0;
         xa = xa->evaluate();
         ya = ya->evaluate();
-        if (comparison::compare(&result, xa, ya))
-            return result;
+        if (xa && ya && comparison::compare(&result, xa, ya))
+            if (result)
+                return result;
 
         // Values that cannot be compared, e.g. complex, are not an error
         rt.clear_error();
         rt.error_message(+errm);
+
+        // The above evaluation may have GC-ed
+        x = +xa;
+        y = +ya;
+        if (!x || !y)
+            return !x - !y;
     }
     return x->compare_to(y);
 }
 
 
-static int value_sort_compare(object_p *xp, object_p *yp)
-// ----------------------------------------------------------------------------
-//   Sort by value, breaking ties with reverse symbolic compare
-// ----------------------------------------------------------------------------
-{
-    object_p x = *xp;
-    object_p y = *yp;
-    object::id xty = x->type();
-    object::id yty = y->type();
-    if ((object::is_algebraic(xty) && object::is_algebraic(yty)) ||
-        (xty == object::ID_array   && yty == object::ID_array)   ||
-        (xty == object::ID_list    && yty == object::ID_list))
-    {
-        algebraic_g xa     = algebraic_p(x);
-        algebraic_g ya     = algebraic_p(y);
-        int         result = 0;
-        xa = xa->evaluate();
-        ya = ya->evaluate();
-        if (comparison::compare(&result, xa, ya))
-        {
-            if (result)
-                return result;
-            return y->compare_to(x);
-        }
-        rt.clear_error();
-    }
-    return x->compare_to(y);
-}
-
-
-static int value_sort_compare_reverse(object_p *xp, object_p *yp)
-// ----------------------------------------------------------------------------
-//   Sort in decreasing value order, breaking ties with symbolic compare
-// ----------------------------------------------------------------------------
-{
-    return -value_sort_compare(xp, yp);
-}
-
-
-static int memory_compare_reverse(object_p *xp, object_p *yp)
+static int value_compare_reverse(object_p x, object_p y)
 // ----------------------------------------------------------------------------
 //   Sort item according in decreasing value order
 // ----------------------------------------------------------------------------
 {
-    return -memory_compare(xp, yp);
+    return -value_compare(x, y);
 }
 
 
-static object::result do_sort(int (*compare)(object_p *x, object_p *y))
+static int memory_compare_reverse(object_p x, object_p y)
+// ----------------------------------------------------------------------------
+//   Sort item according in decreasing value order
+// ----------------------------------------------------------------------------
+{
+    return -memory_compare(x, y);
+}
+
+
+static object::result do_sort(runtime::sort_fn compare)
 // ----------------------------------------------------------------------------
 //   Shared code for all RPL sorting commands
 // ----------------------------------------------------------------------------
@@ -2063,7 +2044,7 @@ static object::result do_sort(int (*compare)(object_p *x, object_p *y))
 }
 
 
-static object::result do_unique(int (*compare)(object_p *x, object_p *y))
+static object::result do_unique(runtime::sort_fn compare)
 // ----------------------------------------------------------------------------
 //   Shared code for all RPL sorting commands
 // ----------------------------------------------------------------------------
@@ -2089,7 +2070,7 @@ COMMAND_BODY(Sort)
 //   Sort contents of a list according to value
 // ----------------------------------------------------------------------------
 {
-    return do_sort(value_sort_compare);
+    return do_sort(value_compare);
 }
 
 
@@ -2107,7 +2088,7 @@ COMMAND_BODY(ReverseSort)
 //   Sort contents of a list according to value
 // ----------------------------------------------------------------------------
 {
-    return do_sort(value_sort_compare_reverse);
+    return do_sort(value_compare_reverse);
 }
 
 
@@ -3012,17 +2993,15 @@ list_p list::sort() const
 //   Return a sorted list based on value-compare
 // ----------------------------------------------------------------------------
 {
-    return sort(value_sort_compare);
+    return sort(value_compare);
 }
 
 
-list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
+list_p list::sort(runtime::sort_fn compare) const
 // ----------------------------------------------------------------------------
 //  Return a sorted list based on the given comparison function
 // ----------------------------------------------------------------------------
 {
-    typedef int (*qsort_fn)(const void *, const void*);
-    qsort_fn            cmp = qsort_fn(compare);
     id                  ty  = type();
     stack_depth_restore sdr;
     for (object_p item : *this)
@@ -3030,8 +3009,8 @@ list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
             return nullptr;
 
     size_t count = sdr.extra_depth();
-    if (cmp)
-        qsort(rt.stack_base(), count, sizeof(object_p), cmp);
+    if (compare)
+        rt.sort(count, compare);
 
     scribble scr;
     for (size_t i = 0; i < count; i++)
@@ -3052,7 +3031,7 @@ list_p list::unique() const
 }
 
 
-list_p list::unique(int (*compare)(object_p *x, object_p *y)) const
+list_p list::unique(runtime::sort_fn compare) const
 // ----------------------------------------------------------------------------
 //  Return a list where consecutive items comparing equal are merged
 // ----------------------------------------------------------------------------
@@ -3062,7 +3041,7 @@ list_p list::unique(int (*compare)(object_p *x, object_p *y)) const
     scribble scr;
     for (object_p item : *this)
     {
-        if (!last || compare((object_p *) &last, (object_p *) &item) != 0)
+        if (!last || compare(+last, item) != 0)
             if (!scr.append(+item))
                 return nullptr;
         last = item;

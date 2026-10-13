@@ -374,9 +374,9 @@ struct list : text
 
     // Get a sorted list
     list_p sort() const;
-    list_p sort(int (*compare)(object_p *x, object_p *y)) const;
+    list_p sort(runtime::sort_fn compare) const;
     list_p unique() const;
-    list_p unique(int (*compare)(object_p *x, object_p *y)) const;
+    list_p unique(runtime::sort_fn compare) const;
 
 public:
     // Shared code for parsing and rendering, taking delimiters as input
@@ -445,8 +445,8 @@ inline list_g operator*(list_r x, uint y)
 }
 
 
-int value_compare(object_p *xp, object_p *yp);
-int memory_compare(object_p *xp, object_p *yp);
+int value_compare(object_p x, object_p y);
+int memory_compare(object_p x, object_p y);
 // ----------------------------------------------------------------------------
 //   Value and memory comparison for sorting
 // ----------------------------------------------------------------------------

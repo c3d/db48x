@@ -5614,9 +5614,7 @@ bool user_interface::handle_editing(int key)
             if (xshift)
             {
                 // Sort by value
-                typedef int (*qsort_fn)(const void *, const void*);
-                qsort(rt.stack_base(), interactive,
-                      sizeof(object_p), qsort_fn(value_compare));
+                rt.sort(interactive, value_compare);
             }
             else if (shift)
             {
@@ -5636,9 +5634,7 @@ bool user_interface::handle_editing(int key)
             if (xshift)
             {
                 // Sort by memory representation
-                typedef int (*qsort_fn)(const void *, const void*);
-                qsort(rt.stack_base(), interactive,
-                      sizeof(object_p), qsort_fn(memory_compare));
+                rt.sort(interactive,  memory_compare);
             }
             else if (shift)
             {

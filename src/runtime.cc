@@ -1202,6 +1202,85 @@ bool runtime::stack(uint idx, object_p obj)
 }
 
 
+void runtime::sort(size_t count, runtime::sort_fn cmp)
+// ----------------------------------------------------------------------------
+//   GC-aware sort of the bottom 'count' stack entries
+// ----------------------------------------------------------------------------
+//   System qsort is unsafe here because its comparison function may trigger GC,
+//   which can relocate both the objects and the stack array itself.
+//   This sort always re-reads Stack[idx] after any comparison call, so it
+//   tolerates GC moving the stack array between comparisons.
+//   The comparison function receives object_p by value, not by pointer.
+{
+    if (count <= 1)
+        return;
+
+    // Try to allocate a temporary buffer on the stack for merge sort
+    bool has_buffer = true;
+    for (size_t i = 0; i < count; i++)
+    {
+        if (!push(Stack[0]))
+        {
+            drop(i);
+            has_buffer = false;
+            break;
+        }
+    }
+
+    if (has_buffer)
+    {
+        // Bottom-up merge sort: O(n log n) comparisons
+        // After pushing, data is at Stack[count..2*count-1],
+        // temp buffer is at Stack[0..count-1]
+        bool src_upper = true;
+        for (size_t width = 1; width < count; width *= 2)
+        {
+            size_t src = src_upper ? count : 0;
+            size_t dst = src_upper ? 0 : count;
+            for (size_t i = 0; i < count; i += 2 * width)
+            {
+                size_t mid = i + width < count ? i + width : count;
+                size_t end = i + 2*width < count ? i + 2*width : count;
+                size_t l = i, r = mid, k = i;
+                while (l < mid && r < end)
+                {
+                    if (cmp(Stack[src + l], Stack[src + r]) <= 0)
+                        Stack[dst + k++] = Stack[src + l++];
+                    else
+                        Stack[dst + k++] = Stack[src + r++];
+                }
+                while (l < mid)
+                    Stack[dst + k++] = Stack[src + l++];
+                while (r < end)
+                    Stack[dst + k++] = Stack[src + r++];
+            }
+            src_upper = !src_upper;
+        }
+
+        // Ensure sorted data is in the upper half before dropping the buffer
+        if (!src_upper)
+            for (size_t i = 0; i < count; i++)
+                Stack[count + i] = Stack[i];
+        drop(count);
+    }
+    else
+    {
+        // Fallback: insertion sort, no extra memory needed
+        for (size_t i = 1; i < count; i++)
+        {
+            object_g key = Stack[i];
+            size_t j = i;
+            while (j > 0 && cmp(Stack[j - 1], +key) > 0)
+            {
+                Stack[j] = Stack[j - 1];
+                j--;
+            }
+            Stack[j] = +key;
+        }
+    }
+}
+
+
 bool runtime::swap(uint a, uint b)
 // ----------------------------------------------------------------------------
 //    Swap two arbitrary levels of the stack

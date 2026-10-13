@@ -793,6 +793,12 @@ struct runtime
         return Stack;
     }
 
+    typedef int (*sort_fn)(object_p, object_p);
+    void sort(size_t count, sort_fn cmp);
+    // ------------------------------------------------------------------------
+    //   GC-aware sort of the bottom 'count' stack entries
+    // ------------------------------------------------------------------------
+
 
 
     // ========================================================================

@@ -2404,19 +2404,24 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                             y = c / x;
                     }
                 }
+                record(polyroots, "Pre-simplify x=%t y=%t", +x, +y);
                 if (Settings.AutoSimplify())
                 {
                     if (expression_p expr = y->as<expression>())
                         y = expr->simplify();
+                    record(polyroots, "After simplify(y) x=%t y=%t", +x, +y);
                     if (expression_p expr = x->as<expression>())
                         x = expr->simplify();
+                    record(polyroots, "After simplify(x) x=%t y=%t", +x, +y);
                 }
                 drop_negligible_imaginary(x, eps);
                 drop_negligible_imaginary(y, eps);
+                record(polyroots, "After drop_neg x=%t y=%t", +x, +y);
                 if (round && x && y)
                 {
                     to_exact_root(x, x, eps, nullptr, orig);
                     to_exact_root(y, y, eps, nullptr, orig);
+                    record(polyroots, "After to_exact x=%t y=%t", +x, +y);
                 }
                 record(polyroots, "Solutions %t and %t", +x, +y);
                 if (cplx || !is_complex_value(x))
