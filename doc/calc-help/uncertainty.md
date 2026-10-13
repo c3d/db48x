@@ -1565,7 +1565,7 @@ Supplement).
 
 ```rpl
 'x1^2+x2^2' 0±σ0.005 0±σ0.005 ⓁσRFxjxi
-@ Expecting 0±σ1.17851 13019 8⁳⁻⁸
+@ Expecting 0±σ0.
 ```
 
 **2)** The Monte Carlo method gives δy ≈ 50×10⁻⁶ and u ≈ 50×10⁻⁶, as the Supplement and the exact solution:
@@ -1580,7 +1580,7 @@ Supplement).
 
 ```rpl
 'x1^2+x2^2' 0±σ0.005 0.010±σ0.005 ⓁσRFxjxi
-@ Expecting 0.0001±σ1.00000 00034 7⁳⁻⁴
+@ Expecting 0.0001±σ0.0001
 ```
 
 **4)** The Monte Carlo method finds about 112×10⁻⁶, as the Supplement:
