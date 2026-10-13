@@ -1652,18 +1652,23 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
         return subtract(x, decimal_g(flip_sign(y)));
     add::remember(target<add>);
 
-    // A zero has no meaningful exponent, so it can't make y negligible
-    if (x->is_zero())
-        return y;
-    if (y->is_zero())
-        return x;
-
     // Read information from both numbers
     info  xi = x->shape();
     info  yi = y->shape();
+    bool  xz = xi.nkigits == 0;
+    bool  yz = yi.nkigits == 0;
     large xe = xi.exponent;
     large ye = yi.exponent;
     id    ty = x->type();
+
+    // A zero has no meaningful exponent, so it can't make y negligible
+    if (xe != ye)
+    {
+        if (xz)
+            xe = ye;
+        else if (yz)
+            ye = xe;
+    }
 
     // Put the smallest exponent in y
     bool lt = xe < ye;
@@ -1685,10 +1690,6 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
     // Size of result - y can be wider than x
     size_t   ps     = (Settings.Precision() + 2) / 3;
     size_t   rs     = std::min(ps, std::max(xs, ys + (yshift + 2) / 3));
-
-    // Check if y is negligible relative to x
-    if (rs < kshift)
-        return lt ? y : x;
 
     // Allocate the mantissa
     scribble scr;
@@ -1773,21 +1774,26 @@ decimal_p decimal::subtract(decimal_r x, decimal_r y)
         return add(x, decimal_g(flip_sign(y)));
     subtract::remember(target<subtract>);
 
-    // A zero has no meaningful exponent, so it can't make y negligible
-    if (x->is_zero())
-        return neg(y);
-    if (y->is_zero())
-        return x;
-
     // Read information from both numbers
     info  xi = x->shape();
     info  yi = y->shape();
+    bool  xz = xi.nkigits == 0;
+    bool  yz = yi.nkigits == 0;
     large xe = xi.exponent;
     large ye = yi.exponent;
     id    ty = x->type();
-    bool  lt = xe < ye;
+
+    // A zero has no meaningful exponent, so it can't make y negligible
+    if (xe != ye)
+    {
+        if (xz)
+            xe = ye;
+        else if (yz)
+            ye = xe;
+    }
 
     // Put the smallest exponent in y
+    bool lt = xe < ye;
     if (lt)
     {
         std::swap(xe, ye);
@@ -1806,10 +1812,6 @@ decimal_p decimal::subtract(decimal_r x, decimal_r y)
     // Size of result - y can be wider than x
     size_t   ps     = (Settings.Precision() + 2) / 3;
     size_t   rs     = std::min(ps, std::max(xs, ys + (yshift + 2) / 3));
-
-    // Check if y is negligible relative to x
-    if (rs < kshift)
-        return lt ? neg(y) : decimal_p(x);
 
     // Allocate the mantissa
     scribble scr;

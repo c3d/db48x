@@ -15952,6 +15952,14 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Check decimal cancellation")
+        .test(CLEAR,
+              "3.1415926535897932384626433832795028841971693993751058209749 "
+              "DUP 1E-121 SWAP - "
+              "60 Precision + "
+              "'Precision' PURGE", ENTER)
+        .expect("3.38327 95028 8⁳⁻²⁴");
+
     step("Crash in MSLV")
         .test(CLEAR, "'A+B=3' { A B } { 0 1 } MSLV", ENTER)
         .error("Unable to solve for all variables")
