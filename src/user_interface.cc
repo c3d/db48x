@@ -2985,7 +2985,7 @@ bool user_interface::draw_error()
         {
             text_p cmdr = cmd->as_text();
             size_t sz   = 0;
-            utf8   cmdt = cmdr->value(&sz);
+            utf8   cmdt = cmdr ? cmdr->value(&sz) : utf8("Memory Full");
             coord  x    = Screen.text(r.x1, r.y1, cmdt, sz, ErrorFont, fg);
             Screen.text(x, r.y1, utf8(" error:"), ErrorFont);
         }
