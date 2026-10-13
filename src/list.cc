@@ -3039,9 +3039,9 @@ list_p list::unique(runtime::sort_fn compare) const
     id       ty = type();
     object_g last;
     scribble scr;
-    for (object_p item : *this)
+    for (object_g item : *this)
     {
-        if (!last || compare(+last, item) != 0)
+        if (!last || compare(+last, +item) != 0)
             if (!scr.append(+item))
                 return nullptr;
         last = item;
