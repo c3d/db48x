@@ -44,6 +44,7 @@
 #include "functions.h"
 #include "hwfp.h"
 #include "integer.h"
+#include "library.h"
 #include "object.h"
 #include "parser.h"
 #include "range.h"
@@ -1002,6 +1003,32 @@ static bool is_inert_symbolic(expression_p eq)
         case object::ID_symbol:
             if (directory::recall_all(obj, false))
                 return false;
+            if (Settings.AutomaticXLibs())
+            {
+                symbol_p sym = symbol_p(obj);
+                size_t len = 0;
+                utf8 txt = sym->value(&len);
+                byte buffer[64];
+                if (len <= sizeof(buffer))
+                {
+                    memcpy(buffer, txt, len);
+                    if (xlib::lookup(buffer, len, false))
+                        return false;
+                }
+            }
+            if (Settings.AutomaticConstants())
+            {
+                symbol_p sym = symbol_p(obj);
+                size_t len = 0;
+                utf8 txt = sym->value(&len);
+                byte buffer[64];
+                if (len <= sizeof(buffer))
+                {
+                    memcpy(buffer, txt, len);
+                    if (constant::lookup(buffer, len, false))
+                        return false;
+                }
+            }
             break;
         default:
             return false;
