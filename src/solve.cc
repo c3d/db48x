@@ -487,7 +487,6 @@ algebraic_p Root::solve(program_r   pgm,
 
     algebraic_g      yeps0       = yeps;
     bool             is_expr     = expression::get(+eq) != nullptr;
-    algebraic_g      ycheck;
 
     // Check if we can isolate the variable algebraically
     if (unique)
@@ -606,10 +605,6 @@ algebraic_p Root::solve(program_r   pgm,
                     yeps = neps;
             }
 
-            // Threshold below which we check residual relative to terms
-            ycheck = abs::run(y) * verify_epsilon();
-            if (unit_p cu = unit::get(ycheck))
-                ycheck = cu->value();
         }
         record(solve, "[%u] x=%t [%t, %t]  y=%t [%t, %t] err=%t",
                i, +x, +lx, +hx, +y, +ly, +hy, +yeps);
@@ -638,13 +633,8 @@ algebraic_p Root::solve(program_r   pgm,
                 dy = yu->value();
             else
                 dy = y;
-            // For expressions, check the residual relative to the terms,
-            // otherwise relative to the initial value of the function.
-            // Computing the magnitude of terms is expensive, so only do it
-            // when the residual is small or for the initial guess.
             bool good = dy->is_zero() || smaller_magnitude(dy, yeps);
-            if (is_expr && (good || !i ||
-                            (ycheck && smaller_magnitude(dy, ycheck))))
+            if (good && is_expr)
                 good = residual_ok(eq, x, dy, yeps0);
             if (good)
             {
