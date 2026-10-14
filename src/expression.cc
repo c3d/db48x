@@ -2526,6 +2526,7 @@ GRAPH_BODY(expression)
     if (!expr->expand_without_size())
         return nullptr;
 
+    save<bool> su(symbol::unambiguous, true);
     int    prec   = 0;
     grob_g result = graph(g, depth, prec);
     bool   more   = rt.depth() > depth;

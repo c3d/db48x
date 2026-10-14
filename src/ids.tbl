@@ -1102,6 +1102,7 @@ FLAG(LaxArrayResizing,          StrictArrayResizing)
 FLAG(EchelonFormKeepLastColumn, EchelonFormReduceLastColumn)
 FLAG(ExplicitConstants,         AutomaticConstants)
 FLAG(ExplicitXLibs,             AutomaticXLibs)
+FLAG(HideAmbiguousNames,        ShowAmbiguousNames)
 
 SETTING_BITS(ListRecursionDepth, uint, 16, 0U, 65535U,    1U)
 

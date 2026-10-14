@@ -1371,6 +1371,7 @@ object::result show(object_r obj)
 {
     if (obj)
     {
+        save<bool> su(symbol::unambiguous, true);
         grob_g graph = obj->graph(true);
         if (!graph)
         {
@@ -1457,6 +1458,7 @@ COMMAND_BODY(ToGrob)
                   fid,
                   Settings.Foreground(), Settings.Background(),
                   true, false, true);
+        save<bool> su(symbol::unambiguous, true);
         if (grob_p gr = obj->graph(g))
             if (rt.drop() && rt.top(gr))
                 return OK;
@@ -1543,6 +1545,7 @@ static object::result to_graphic(bool compatible, bool colorized)
               Settings.ResultFont(),
               Settings.Foreground(), Settings.Background(),
               true, false, true);
+    save<bool> su(symbol::unambiguous, true);
     if (grob_p r = obj->graph(g))
     {
 #if CONFIG_COLOR

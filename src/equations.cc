@@ -3204,6 +3204,8 @@ GRAPH_BODY(assignment)
     coord       nv    = g.voffset;
     grob_g      vg    = value->graph(g);
     coord       vv    = g.voffset;
+
+    save<bool> su(symbol::unambiguous, true);
     if (g.expression)
         ng = expression::infix(g, vv, vg, 0, "▶", nv, ng);
     else

@@ -543,6 +543,8 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
     bool   need_indent = lty == ID_program;
     bool   expr        = r.expression();
     settings::SaveShowEquationBody sseb(false);
+    if (lty != ID_expression)
+        r.expression(false);
 
     if (!expr)
     {
@@ -638,6 +640,7 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
     if (crpgm)
         r.wantCR();
 
+    r.expression(expr);
     return r.size();
 }
 

@@ -1343,6 +1343,7 @@ GRAPH_BODY(polynomial)
     polynomial_g poly  = o;
     size_t       nvars = poly->variables();
     grob_g       vars[nvars];
+    save<bool>   su(symbol::unambiguous, true);
 
     // Get each of the variables and render it graphically
     for (size_t v = 0; v < nvars; v++)

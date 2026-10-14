@@ -2008,6 +2008,7 @@ bool user_interface::draw_header()
                 grapher g(LCD_W, LCD_H / 3, fid,
                           grob::pattern::black, grob::pattern::white,
                           true, true, true);
+                save<bool> su(symbol::unambiguous, true);
                 if (grob_p gr = eval->graph(g))
                 {
                     pattern       fg = Settings.HeaderForeground();
@@ -3100,6 +3101,7 @@ bool user_interface::draw_object(object_p objp, uint top, uint bottom)
     grapher g(LCD_W, bottom - top, fid,
               grob::pattern::black, grob::pattern::white,
               true);
+    settings::SaveShowAmbiguousNames san(false);
     g.reduce_font();
     grob_g graph = nullptr;
     object_g obj = objp;

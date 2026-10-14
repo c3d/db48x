@@ -74,6 +74,7 @@ struct renderer
     bool   editing() const              { return edit; }
     bool   graphing() const             { return graph; }
     bool   expression() const           { return expr; }
+    void   expression(bool e)           { expr = e; }
     bool   stack() const                { return stk; }
     bool   multiline_stack() const      { return mlstk; }
     file * file_save() const            { return saving; }

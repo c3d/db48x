@@ -94,13 +94,15 @@ struct symbol : text
     bool       found_in(object_p obj) const;
     object_p   library_lookup() const;
 
-  public:
+public:
     OBJECT_DECL(symbol);
     PARSE_DECL(symbol);
     EVAL_DECL(symbol);
     RENDER_DECL(symbol);
     GRAPH_DECL(symbol);
     PREC_DECL(SYMBOL);
+
+    static bool unambiguous;
 };
 
 symbol_g operator+(symbol_r x, symbol_r y);

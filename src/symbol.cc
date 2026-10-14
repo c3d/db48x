@@ -48,6 +48,9 @@
 #include <string.h>
 
 
+bool symbol::unambiguous = false;
+
+
 static bool circular_reference(symbol_p name, object_p value)
 // ----------------------------------------------------------------------------
 //   Check if a variable value is a chain of bare names leading back to name
@@ -139,14 +142,26 @@ RENDER_BODY(symbol)
 //   Render the symbol into the given symbol buffer
 // ----------------------------------------------------------------------------
 {
-    size_t len    = 0;
-    utf8   txt    = o->value(&len);
-    size_t cmdlen = len;
-    auto   format = r.editing() ? ID_LongFormNames : Settings.NameDisplayMode();
-    if (r.editing() && !r.graphing())
-        if ((command::lookup(txt, cmdlen) && cmdlen == len) ||
-            o->library_lookup())
+    size_t   len    = 0;
+    utf8     txt    = o->value(&len);
+    size_t   cmdlen = len;
+    auto format = r.editing() ? ID_LongFormNames : Settings.NameDisplayMode();
+    if (!unambiguous && (r.editing() || (Settings.ShowAmbiguousNames() &&
+                                         (!r.graphing() || !r.expression()))))
+    {
+        if (command::lookup(+txt, cmdlen) && cmdlen == len)
+        {
             r.put(unicode(U'Ⓥ'));
+        }
+        else
+        {
+            // Library lookup may allocate and GC
+            gcutf8 t = txt;
+            if (o->library_lookup())
+                r.put(unicode(U'Ⓥ'));
+            txt = +t;
+        }
+    }
     r.put(format, txt, len);
     return r.size();
 }
@@ -337,6 +352,7 @@ GRAPH_BODY(symbol)
 {
     using pixsize = grob::pixsize;
 
+    save<bool> su(unambiguous, true);
     grob_g sym = object::do_graph(o, g);
     if (!sym || unit::mode)
         return sym;
@@ -362,5 +378,4 @@ GRAPH_BODY(symbol)
     }
 
     return result;
-
 }
