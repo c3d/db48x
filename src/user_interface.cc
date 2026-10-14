@@ -4982,9 +4982,12 @@ restart:
         }
 
         // Check if we need to draw the image
+        // Its height counts even when the line that holds it has scrolled
+        // above the top: otherwise the text below jumps up by the height of
+        // the image as soon as its first line leaves the screen
         if (imdsp)
         {
-            if (image && draw)
+            if (image)
             {
                 grob::surface srcs = image->pixels();
                 rect drect = srcs.area();
