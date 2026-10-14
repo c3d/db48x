@@ -13508,7 +13508,7 @@ The 110 variables in the Rocketry section are:
 * `θ`: Convergent cone half-angle
 * `a`: Solid rocket propellant burn rate coefficient
 * `Ab`: Area of the cylindrical burning surface (in solid rocket motor)
-* `Ae`: Nozzle exit area 
+* `Ae`: Nozzle exit area
 * `AeAt`: Ratio of nozzle exit area over sonic throat area
 * `At`: Nozzle sonic throat area
 * `C`: Effective exhaust gas velocity (dim.: speed)
@@ -13520,7 +13520,7 @@ The 110 variables in the Rocketry section are:
 * `CtnRatio`: Contraction ratio of the major cross-sectional area of the combuster divided by the throat area
 * `Dt`: Throat diameter
 * `Fnet`: Net engine thrust (dim.: force, in SI: N)
-* `H`: Starting height of rocket engine 
+* `H`: Starting height of rocket engine
 * `Isp`: Specific impulse (dim.: time, in SI: s)
 * `Isp1`: First stage specific impulse (dim.: time, in SI: s)
 * `Isp2`: Second stage specific impulse (dim.: time, in SI: s)
@@ -13531,21 +13531,21 @@ The 110 variables in the Rocketry section are:
 * `Lstar`: Combustion chamber characteristic length for a given propellant
 * `M`: average molecular weight of the exhaust gases
 * `Md`: Spacecraft's dry mass
-* `Md1`: Spacecraft's stage 1 dry mass 
+* `Md1`: Spacecraft's stage 1 dry mass
 * `Md2`: Spacecraft's stage 2 dry mass
 * `Mf`: Spacecraft's total mass
 * `Mf1`: Total vehicle mass when stage 1 is burned out but not yet discarded
 * `Mf2`: Total vehicle mass when stage 2 is burned out but not yet discarded
-* `Mo`: Spacecraft's initial mass 
-* `Mo1`: Total vehicle mass when stage 1 is ignited 
-* `Mo2`: Total vehicle mass when stage 2 is ignited 
+* `Mo`: Spacecraft's initial mass
+* `Mo1`: Total vehicle mass when stage 1 is ignited
+* `Mo2`: Total vehicle mass when stage 2 is ignited
 * `Mp`: Spacecraft's propellant mass
 * `Mp1`: Spacecraft's stage 1 propellant mass
 * `Mp2`: Spacecraft's stage 2 propellant mass
 * `Mpl`: Spacecraft's payload mass
 * `MplMo`: Ratio of payload to initial masses
 * `Nm`: Mach number as the ratio of the gas velocity to the local speed of sound
-* `Pa`: Ambient external pressure (dim.: force/area, in SI: kPa) 
+* `Pa`: Ambient external pressure (dim.: force/area, in SI: kPa)
 * `Pc`: Combustion chamber pressure (dim.: force/area, in SI: MPa)
 * `Pe`: Pressure at the nozzle exit (dim.: force/area, in SI: MPa)
 * `Pt`: Gas pressure at the nozzle throat (dim.: force/area, in SI: MPa)
@@ -13554,7 +13554,7 @@ The 110 variables in the Rocketry section are:
 * `R`: Conical nozzle circular arc radius (dim.: length, in SI: m)
 * `r`: Solid rocket propellant burn rate (dim.: mass/time, in SI: kg/s)
 * `ts`: Propellant stay-time
-* `Tc`: Combustion chamber temperature 
+* `Tc`: Combustion chamber temperature
 * `Tt`: Gas temperature at the nozzle throat
 * `V`: Average specific volume
 * `Vc`: Combustion chamber volume
@@ -13611,14 +13611,14 @@ The 24 simulations are inspired from the solutions of P#1 to #12 of [1] and ex. 
 
 #### Thrust
 
-These equations derive from the conservation of momentum during the propulsion phase of a rocket whose engine ejects gas at velocity `Ve`, consuming fuel at rate `Q` to produce thrust `Fnet`. After burn duration `Δt` this results in a change in velocity, `ΔV`, for the rocket. 
+These equations derive from the conservation of momentum during the propulsion phase of a rocket whose engine ejects gas at velocity `Ve`, consuming fuel at rate `Q` to produce thrust `Fnet`. After burn duration `Δt` this results in a change in velocity, `ΔV`, for the rocket.
 
 ![Thrust](img/RocketPropulsion.bmp)
 
 * To calculate: `[Fnet_kN]` (Rocket thrust) from 7 known variables:
 ```rpl
 Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
-@ Expecting [ Fnet=96.5 kN ] 
+@ Expecting [ Fnet=96.5 kN ]
 'ROOT(ⒺThrust;[Fnet];[1_kN])'
 ```
 
@@ -13637,7 +13637,7 @@ Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
 ```rpl
 Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
 @ Expecting [ Mo=93 999.97959 06 kg Mp=18 999.97959 06 kg ]
-'ROOT(ⒺTsiolkovsky & Propellant Mass;[Mo;Mp];[1_kg;1_kg])' 
+'ROOT(ⒺTsiolkovsky & Propellant Mass;[Mo;Mp];[1_kg;1_kg])'
 ```
 
 #### Burn Duration
@@ -13648,7 +13648,7 @@ Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
 ```rpl
 Mo=5000_kg  C=3000_m/s  Vf=12000_m/s  Vi=7790_m/s  Q=10_kg/s
 @ Expecting [ ΔV=4 210 m/s Δt=377.11182 8738 s ]
-'ROOT(ⒺBurn Duration;[ΔV;Δt];[1_m/s;1_s])' 
+'ROOT(ⒺBurn Duration;[ΔV;Δt];[1_m/s;1_s])'
 ```
 
 #### Rocket Engine Exhaust Velocity
@@ -13671,7 +13671,7 @@ Fnet=1000000_N  Q=400_kg/s
 
 #### Exhaust Nozzle Throat Parameters
 
-* To calculate: `[Pt_MPa  Tt_K  At_m↑2]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area) from 5 known variables: 
+* To calculate: `[Pt_MPa  Tt_K  At_m↑2]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area) from 5 known variables:
 ```rpl
 Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
 @ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 ]
@@ -13695,7 +13695,7 @@ Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
 
 * To calculate: `[Nm_1;Ae_m²;AeAt_1;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Pressure at the nozzle exit) from 4 known variables:
 ```rpl
-Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa
 @ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 Pe=0.0795 MPa ]
 'ROOT(ⒺNozzle Mach number & Optimal Exit Area;[Nm;Ae;AeAt;Pe];[1_1;1_m²;1_1;1_MPa])'
 ```
@@ -13705,8 +13705,8 @@ Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa
 * For a third stage rocket nozzle optimised for `H=5000_m` in Earth atmosphere (`♁`).
 To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
 ```rpl
-Pc=5.066_MPa At=0.1756_m↑2  k=1.221  H=5000_m 
-@ Expecting [ Nm=3.39632 79963 7 Ae=1.89765 87728 9 m↑2 AeAt=10.80671 28297 Pa=5.40482 54060 8⁳⁻² MPa Pe=5.40482 54060 8⁳⁻² MPa ]
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221  H=5000_m
+@ Expecting [ Nm=3.39632 79963 7 Ae=1.89765 87728 9 m↑2 AeAt=10.80671 28297 Pa=0.05404 82540 61 MPa Pe=0.05404 82540 61 MPa ]
 'ROOT(ⒺOptimised Third Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
 ```
 
@@ -13725,7 +13725,7 @@ Pc=5.066_MPa  At=0.1756_m↑2  k=1.221  H=3_m
 * For a second stage rocket nozzle optimised for `H` unknown in Earth atmosphere (`♁`).
 To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]`  (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
 ```rpl
-Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa
 @ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 H=2 000.14258 71 m Pe=0.0795 MPa ]
 'ROOT(ⒺOptimised Second Stage Rocket Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
 ```
@@ -13803,7 +13803,7 @@ Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.05_MPa
 * When the exhaust nozzle pressure `Pe` is greater than the ambient pressure `Pa`.
 To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
 ```rpl
-Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa  
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa
 @ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.03213 30836 Ae=0.24268 50403 71 m↑2 Ve=2 677.44630 755 m/s Fnet=279.87888 2774 kN ]
 'ROOT(ⒺUnder Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
 ```
@@ -13813,7 +13813,7 @@ Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa
 * When the exhaust nozzle pressure `Pe` is less than the ambient pressure `Pa`.
 To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
 ```rpl
-Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa  
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa
 @ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.76599 41252 2 Ae=0.69630 57034 83 m↑2 Ve=2 962.65092 497 m/s Fnet=278.85744 991 kN ]
 'ROOT(ⒺOver Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
 ```
@@ -13835,7 +13835,7 @@ At=1756_cm↑2  θ=20_°  Lstar=110_cm @For LOX/RP-1 propellant combination
 
 ![Solid Rocket Burn Rate](img/SolidRocket1.bmp)
 
-- For a solid rocket motor, we search the combustion product generation rate `Qs` and the propellant burn rate `r` when the chamber pressure is `Pc=5.0 MPa`. 
+- For a solid rocket motor, we search the combustion product generation rate `Qs` and the propellant burn rate `r` when the chamber pressure is `Pc=5.0 MPa`.
 To calculate: `[Ab_m²;r_mm/s;Qs_kg/s]` (Solid rocket: Area of the cylindrical burning surface & Propellant burn rate; Combustion product generation rate) from 6 known variables.
 ```rpl
 a=0.1  n=0.3  Pc=5_MPa  ρp=1.7_g/ml  L=10_m  D=1_m
