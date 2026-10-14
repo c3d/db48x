@@ -546,8 +546,8 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	$(PRINT_GENERATE) (echo '<RCC>';			\
 	 echo ' <qresource prefix="/'$*'">';			\
 	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
-		J=$$(basename $$I);				\
-		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$*'/'$$J'</file>';	\
+		J=$${I#$*/};					\
+		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$$I'</file>';	\
 	 done;							\
 	 echo ' </qresource>';					\
 	 echo '</RCC>')						\
@@ -558,7 +558,7 @@ QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx
 QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
-QRC_EXT_library=*.48[sS]
+QRC_EXT_library=*.48[sS] */*.48[sS]
 QRC_EXT_state=*.48[sS]
 
 keyboard:				\
