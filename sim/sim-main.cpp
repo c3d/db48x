@@ -245,7 +245,7 @@ static bool sim_parse_args(int argc, char *argv[])
 
         cstring arg = as[2] ? as + 2 : a + 1 < argc ? argv[a + 1] : nullptr;
         uint nargs = 0;
-#define check_arg()     if (!arg) goto missing_arg; nargs = 1;
+#define check_arg()     if (!arg) goto missing_arg; nargs = as[2] == 0;
         switch (as[1])
         {
         case 'C':
@@ -254,7 +254,10 @@ static bool sim_parse_args(int argc, char *argv[])
             break;
         case 'D':
             check_arg();
-            tests::dump_on_fail = arg;
+            if (!*arg || strcmp(arg, "all") == 0)
+                tests::dump_on_fail = ".*";
+            else
+                tests::dump_on_fail = arg;
             break;
 
         case 'd':
