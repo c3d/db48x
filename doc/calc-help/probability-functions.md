@@ -180,7 +180,7 @@ class times the density. The law and its parameters are written above, and
 returned on the stack, tagged `law`. The draws stay in ΣData, for Average or
 StandardDeviation.
 
-Some laws draw slowly on a calculator: Norml, LgNrm, UShape or Chi2 would
+Some laws draw slowly on a calculator: Norml, LgNrm or Chi2 would
 take several minutes for 300 draws on a DM32. The draws therefore stop after
 about 30 seconds, with 30 of them at least, and the classes follow their
 number: 25 classes for 300 draws, 8 for 30. The number of draws is written
