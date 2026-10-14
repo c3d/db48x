@@ -71,29 +71,30 @@ struct symbol : text
         return rt.make<symbol>(ID_symbol, s, len);
     }
 
-    object_p recall(bool noerror = true) const;
-    bool     store(object_g obj) const;
-    bool     is_same_as(symbol_p other) const;
+    object_p   recall(bool noerror = true) const;
+    bool       store(object_g obj) const;
+    bool       is_same_as(symbol_p other) const;
 
-    bool     matches(cstring name) const
+    bool       matches(cstring name) const
     {
         return matches(utf8(name), strlen(name));
     }
-    bool     matches(utf8 name, size_t len) const;
+    bool       matches(utf8 name, size_t len) const;
 
-    bool     starts_with(cstring name) const
+    bool       starts_with(cstring name) const
     {
         return starts_with(utf8(name), strlen(name));
     }
-    bool     starts_with(utf8 name, size_t len) const;
+    bool       starts_with(utf8 name, size_t len) const;
 
-    bool     is_alpha() const;
+    bool       is_alpha() const;
 
     static int compare(utf8 x, utf8 y, size_t len);
 
-    bool     found_in(object_p obj) const;
+    bool       found_in(object_p obj) const;
+    object_p   library_lookup() const;
 
-public:
+  public:
     OBJECT_DECL(symbol);
     PARSE_DECL(symbol);
     EVAL_DECL(symbol);

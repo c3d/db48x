@@ -489,7 +489,8 @@ struct object
                           size_t &size,
                           int     precedence = 0,
                           unicode separator  = 0,
-                          bool    truenames  = false);
+                          bool    truenames  = false,
+                          bool    quoted     = false);
     // ------------------------------------------------------------------------
     //  Try parsing the object as a top-level temporary
     // ------------------------------------------------------------------------

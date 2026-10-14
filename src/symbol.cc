@@ -48,41 +48,6 @@
 #include <string.h>
 
 
-static object_p library_lookup(symbol_r name)
-// ----------------------------------------------------------------------------
-//   Find a library entry or constant for a name that has no variable
-// ----------------------------------------------------------------------------
-//   This is done at evaluation time so that a variable always takes
-//   precedence over a library entry or constant with the same name, even if
-//   the variable was created after the code referencing it was parsed.
-//   Constants are only substituted when a numerical value is requested,
-//   e.g. with `→NUM`, so that symbolic evaluation leaves an undefined name
-//   such as `G` alone instead of turning it into a unit object.
-{
-    bool xlibs  = Settings.AutomaticXLibs();
-    bool consts = Settings.AutomaticConstants() &&
-        (Settings.NumericalConstants() || Settings.NumericalResults());
-    if (!xlibs && !consts)
-        return nullptr;
-
-    // Copy the name, since the lookup allocates and may move the symbol
-    byte   buffer[64];
-    size_t len = 0;
-    utf8   txt = name->value(&len);
-    if (len > sizeof(buffer))
-        return nullptr;
-    memcpy(buffer, txt, len);
-
-    if (xlibs)
-        if (xlib_p xl = xlib::lookup(buffer, len, false))
-            return xl;
-    if (consts)
-        if (constant_p cst = constant::lookup(buffer, len, false))
-            return cst;
-    return nullptr;
-}
-
-
 static bool circular_reference(symbol_p name, object_p value)
 // ----------------------------------------------------------------------------
 //   Check if a variable value is a chain of bare names leading back to name
@@ -125,13 +90,6 @@ EVAL_BODY(symbol)
                 return ERROR;
             }
             return program::run_program(found);
-        }
-        else
-        {
-            symbol_g sym = o;
-            if (object_p found = library_lookup(sym))
-                return program::run_program(found);
-            o = sym;            // The lookup may have moved the symbol
         }
     }
     if (object_g eq = expression::make(o))
@@ -186,7 +144,8 @@ RENDER_BODY(symbol)
     size_t cmdlen = len;
     auto   format = r.editing() ? ID_LongFormNames : Settings.NameDisplayMode();
     if (r.editing() && !r.graphing())
-        if (command::lookup(txt, cmdlen) && cmdlen == len)
+        if ((command::lookup(txt, cmdlen) && cmdlen == len) ||
+            o->library_lookup())
             r.put(unicode(U'Ⓥ'));
     r.put(format, txt, len);
     return r.size();
@@ -343,6 +302,31 @@ bool symbol::found_in(object_p obj) const
         }
     }
     return false;
+}
+
+
+object_p symbol::library_lookup() const
+// ----------------------------------------------------------------------------
+//   Find a library entry or constant for a name that has no variable
+// ----------------------------------------------------------------------------
+//   Used to prefix ambiguous names with Ⓥ
+{
+    bool xlibs  = Settings.AutomaticXLibs();
+    bool consts = Settings.AutomaticConstants();
+    if (!xlibs && !consts)
+        return nullptr;
+
+    // Copy the name, since the lookup allocates and may move the symbol
+    size_t len = 0;
+    gcutf8 txt = value(&len);
+
+    if (xlibs)
+        if (xlib_p xl = xlib::lookup(+txt, len, false))
+            return xl;
+    if (consts)
+        if (constant_p cst = constant::lookup(+txt, len, false))
+            return cst;
+    return nullptr;
 }
 
 

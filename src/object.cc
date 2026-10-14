@@ -197,7 +197,8 @@ object_p object::parse(utf8    source,
                        size_t &size,
                        int     precedence,
                        unicode separator,
-                       bool    truenames)
+                       bool    truenames,
+                       bool    quoted)
 // ----------------------------------------------------------------------------
 //  Try parsing the object as a top-level temporary
 // ----------------------------------------------------------------------------
@@ -220,7 +221,7 @@ object_p object::parse(utf8    source,
     result  r      = SKIP;
     bool    is_fp  = false;
     unicode cp     = utf8_codepoint(source);
-    parser  p(source, size, precedence, separator, truenames);
+    parser  p(source, size, precedence, separator, truenames, quoted);
 
 retry:
     switch (cp)
@@ -373,6 +374,13 @@ retry:
             }
             if (r == SKIP)
                 r = local::do_parse(p);
+            if (!p.truenames)
+            {
+                if (r == SKIP && Settings.AutomaticXLibs())
+                    r = xlib::do_parse(p);
+                if (r == SKIP && Settings.AutomaticConstants())
+                    r = constant::do_parse(p);
+            }
             if (r == SKIP)
                 r = symbol::do_parse(p);
         }

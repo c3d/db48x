@@ -43,13 +43,15 @@ struct parser
            size_t  length,
            int     precedence = 0,
            unicode separator  = 0,
-           bool    truenames  = false)
+           bool    truenames  = false,
+           bool    quoted     = false)
         : source(source),
           length(length),
           out(nullptr),
           precedence(precedence),
           separator(separator),
-          truenames(truenames)
+          truenames(truenames),
+          quoted(quoted)
     {}
 
     parser(const parser &from, utf8 source, int precedence)
@@ -68,6 +70,7 @@ public:
     int         precedence;     // Precedence level in equations
     unicode     separator;      // Separator in multi-part objects
     bool        truenames;      // Do not parse constants or xlibs
+    bool        quoted;         // Set right after we see a quote
 };
 
 #endif // PARSER_H

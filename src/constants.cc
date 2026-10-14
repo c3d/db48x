@@ -2867,14 +2867,13 @@ object::result constant::do_parsing(config_r cfg, parser &p)
     size_t  max    = p.length;
     size_t  parsed = 0;
 
-    // First character must be a constant marker. Unmarked names such as `c`
-    // are parsed as symbols, and are only resolved to a constant or library
-    // entry when evaluated, if no variable by that name exists then
-    // (see symbol::evaluate)
-    unicode cp = utf8_codepoint(source);
-    if (cp != cfg.prefix)
+    // First character must be a constant marker
+    unicode cp     = utf8_codepoint(source);
+    bool    needed = cp == cfg.prefix;
+    if (!needed && unit::mode)
         return SKIP;
-    parsed = utf8_next(source, parsed, max);
+    if (needed)
+        parsed = utf8_next(source, parsed, max);
     size_t first = parsed;
 
     // Other characters must be alphabetic
@@ -2882,12 +2881,36 @@ object::result constant::do_parsing(config_r cfg, parser &p)
         parsed = utf8_next(source, parsed, max);
     if (parsed <= first)
         return SKIP;
+    if (!needed)
+    {
+        // Check if the name exists in the current directory, prefer it if so
+        if (symbol_p sym = directory::lookup_all(source, parsed))
+        {
+            p.length = parsed;
+            p.out    = sym;
+            return OK;
+        }
+
+        // Never use a constant in an assignent
+        size_t remain  = max - parsed;
+        size_t next    = parsed + utf8_skip_whitespace(source + parsed, remain);
+        if (next < max)
+        {
+            unicode cp   = utf8_codepoint(source + next);
+            bool    ineq = p.precedence;
+            if (cp == '_'                               // Units
+                || (!ineq && cp == '=')                 // X=0 (assignment)
+                || (ineq && (cp == '(' ||               // 'F(...)'
+                             (cp =='\'' && p.quoted)))) // 'A'
+                return SKIP;
+        }
+    }
 
     size_t     len = parsed - first;
-    constant_p cst = do_lookup(cfg, source + first, len, true);
+    constant_p cst = do_lookup(cfg, source + first, len, needed);
     p.length       = parsed;
     p.out          = cst;
-    return cst ? OK : ERROR;
+    return cst ? OK : needed ? ERROR : SKIP;
 }
 
 

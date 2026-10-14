@@ -86,6 +86,7 @@ object::result list::list_parse(id      type,
     size_t   non_alg_len = 0;
     bool     xroot       = false;
     bool     alist       = precedence && (open == '[' || open == '{');
+    bool     quoted      = open == '\'';
 
     // Some commands such as IFTE, Sum, Integrate or Root are special in that
     // we need to defer argument evaluation, i.e. keep arguments as expressions
@@ -314,7 +315,8 @@ object::result list::list_parse(id      type,
 
         if (!obj && length)
         {
-            obj = object::parse(s, length, precedence);
+            obj = object::parse(s, length, precedence, 0, false, quoted);
+            quoted = false;
             record(list_parse,
                    "Item parsed as %t length %u arity %u",
                    object_p(obj), length, arity);
