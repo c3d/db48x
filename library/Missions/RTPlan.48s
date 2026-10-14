@@ -25,6 +25,9 @@
 @@ ============================================================
  → t1lo t1hi stay
  «
+ @ EXIT inside a solver stops the run with an error: restore the settings,
+ @ drop the intermediate values, then pass the error on
+ DEPTH → dep « IFERR
     'Ⓛ♁Pf' 'Ⓛ♂Pf' t1lo t1hi 150 250 ⓁMinΔVTraj
     → outb
     «
@@ -46,7 +49,12 @@
           »
        »
     »
- »
+   THEN
+    DEPTH dep - DROPN
+    savP Precision  IF savH THEN HFP ELSE SFP END
+    ErrorMessage DoError
+   END
+ » »
 savP Precision  IF savH THEN HFP ELSE SFP END
  »
 »

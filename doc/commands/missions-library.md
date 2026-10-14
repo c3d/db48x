@@ -49,6 +49,14 @@ outbound Earth→Mars leg, then the return Mars→Earth leg departing after a mi
 surface stay, and returns the full itinerary. Slow, so the example sets a fast search
 precision first. It reproduces the real Perseverance outbound window.
 
+These optimisers compute in hardware floating point with 15 digits, about
+twice as fast, and restore your settings when they finish, or when they stop
+on an error, which also drops their intermediate values. To stop a long run,
+press EXIT. If the program is only suspended, its intermediate values left on
+the stack, Continue lets it finish and restore your settings. If you Kill it
+instead, the hardware floating point mode and the 15 digits stay on: clear the
+stack and restore your own settings, for instance with SFP 24 Precision.
+
 `t1lo t1hi stay` → `{ t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot }`
 
 ```rpl
@@ -66,6 +74,14 @@ favouring a ballistic and turn-feasible Venus swing-by. Keep the window narrow (
 each leg of the itineraries is computed once, so it takes about 2 s on the
 simulator, a few minutes on a calculator. The result is feasible when matchErr is near zero and turnReq
 does not exceed turnMax.
+
+These optimisers compute in hardware floating point with 15 digits, about
+twice as fast, and restore your settings when they finish, or when they stop
+on an error, which also drops their intermediate values. To stop a long run,
+press EXIT. If the program is only suspended, its intermediate values left on
+the stack, Continue lets it finish and restore your settings. If you Kill it
+instead, the hardware floating point mode and the 15 digits stay on: clear the
+stack and restore your own settings, for instance with SFP 24 Precision.
 
 `t3lo t3hi` → `{ t3 tv t4 ΔVTEI matchErr turnReq turnMax tof }`
 
@@ -113,11 +129,19 @@ It chains both optimisers: about 5 s on the simulator, several minutes on a
 calculator. Then explore your own windows with RTPlan and
 RTPlanOpp directly.
 
+These optimisers compute in hardware floating point with 15 digits, about
+twice as fast, and restore your settings when they finish, or when they stop
+on an error, which also drops their intermediate values. To stop a long run,
+press EXIT. If the program is only suspended, its intermediate values left on
+the stack, Continue lets it finish and restore your settings. If you Kill it
+instead, the hardware floating point mode and the 15 digits stay on: clear the
+stack and restore your own settings, for instance with SFP 24 Precision.
+
 (no input) → `Conj_years Conj_dVtot Opp_return_d Opp_TEI Opp_entry`
 
 ```rpl
 ⓁMarsRoundTrip
-@ affichage complet : Conj_years:2.71 Conj_dVtot:12.80 Opp_return_d:290 Opp_TEI:5.90 Opp_entry:5.44
+@ Rounded: Conj_years:2.71 Conj_dVtot:12.80 Opp_return_d:290 Opp_TEI:5.90 Opp_entry:5.44
 @ Expecting Opp_entry:5.44155 12278 3D
 @ Conjunction 2.71 yr / 12.80 km/s; opposition Venus return, Earth entry only 5.4 km/s.
 ```
@@ -167,7 +191,7 @@ returns the return-leg itinerary as tagged values. The original 2022 mission. Ve
 
 ```rpl
 ⓁETMB1
-@ affichage complet : MarsDeparture:2459930 VenusFlyby:2460150 EarthArrival:2460220 ReturnDays:290
+@ Rounded: MarsDeparture:2459930 VenusFlyby:2460150 EarthArrival:2460220 ReturnDays:290
 @ Expecting EarthEntry_kms:5.44155 12169 6
 @ dVTEI_kms:5.90 turnReq_deg:30.9° EarthEntry_kms:5.44
 ```
@@ -184,7 +208,7 @@ returns the return-leg itinerary as tagged values. **★ Featured mission.** The
 
 ```rpl
 ⓁETMB2
-@ affichage complet : MarsDeparture:2464635 VenusFlyby:2464825 EarthArrival:2464915 ReturnDays:280
+@ Rounded: MarsDeparture:2464635 VenusFlyby:2464825 EarthArrival:2464915 ReturnDays:280
 @ Expecting EarthEntry_kms:3.97248 80606 2
 @ dVTEI_kms:7.14 turnReq_deg:39.3° EarthEntry_kms:3.97
 ```
@@ -201,7 +225,7 @@ returns the return-leg itinerary as tagged values. Venus-light: the 6.4-year res
 
 ```rpl
 ⓁETMB3
-@ affichage complet : MarsDeparture:2466965 VenusFlyby:2467105 EarthArrival:2467170 ReturnDays:205
+@ Rounded: MarsDeparture:2466965 VenusFlyby:2467105 EarthArrival:2467170 ReturnDays:205
 @ Expecting EarthEntry_kms:14.68803 65576
 @ dVTEI_kms:9.19 turnReq_deg:7.5° EarthEntry_kms:14.69
 ```
@@ -218,7 +242,7 @@ returns the return-leg itinerary as tagged values. The cheapest full mission (ou
 
 ```rpl
 ⓁETMB4
-@ affichage complet : MarsDeparture:2469315 VenusFlyby:2469470 EarthArrival:2469535 ReturnDays:220
+@ Rounded: MarsDeparture:2469315 VenusFlyby:2469470 EarthArrival:2469535 ReturnDays:220
 @ Expecting EarthEntry_kms:9.57918 83462 1
 @ dVTEI_kms:6.24 turnReq_deg:9.7° EarthEntry_kms:9.58
 ```
