@@ -37,6 +37,7 @@
 #include "equations.h"
 #include "fraction.h"
 #include "integer.h"
+#include "main.h"
 #include "parser.h"
 #include "polynomial.h"
 #include "program.h"
@@ -1103,7 +1104,7 @@ COMMAND_BODY(Version)
 // ----------------------------------------------------------------------------
 {
     const utf8 version_text = (utf8)
-        "DB48X " DB48X_VERSION "\n"
+        PROGRAM_NAME " " DB48X_VERSION "\n"
         "A modern implementation of\n"
         "Reverse Polish Lisp (RPL)\n"
         "and a tribute to\n"
