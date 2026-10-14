@@ -1277,6 +1277,7 @@ RENDER_BODY(polynomial)
     for (size_t v = 0; v < nvars; v++)
         vars[v] = poly->variable(v);
 
+    save<bool> su(symbol::unambiguous, true);
     bool editing = r.editing();
     if (editing || Settings.PrefixPolynomialRender())
         r.put(unicode(U'Ⓟ'));
