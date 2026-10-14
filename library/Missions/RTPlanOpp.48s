@@ -20,6 +20,9 @@
 @@ ============================================================
  → t3lo t3hi
  « 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH « HFP 15 Precision DEG
+   @ EXIT inside a solver stops the run with an error: restore the settings,
+   @ drop the intermediate values, then pass the error on
+   DEPTH → dep « IFERR
    @ The two legs of an itinerary, each computed once per pair of dates:
    @ Mars → Venus depends on (t3, tv) only, Venus → Earth on (tv, t4) only.
    @ The penalty then combines them as OppRoute does, in the same order.
@@ -82,6 +85,11 @@
      »
      zzt3 zztv zzt4 3 →List   zzt3 zztv zzt4 ⓁOppRoute  +
    »
+   THEN
+     DEPTH dep - DROPN
+     savP Precision  IF savH THEN HFP ELSE SFP END
+     ErrorMessage DoError
+   END »
    savP Precision  IF savH THEN HFP ELSE SFP END »
  »
 »
