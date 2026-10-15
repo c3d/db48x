@@ -1858,6 +1858,15 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 //
 // ============================================================================
 
+bool tests::image_match(cstring, int, int, int, int, bool)
+// ----------------------------------------------------------------------------
+//   Image matching is not supported on WASM
+// ----------------------------------------------------------------------------
+{
+    return false;
+}
+
+
 static uint refresh_count = 0;
 
 RECORDER(wasm, 16, "WASM interface");
