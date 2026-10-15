@@ -1195,6 +1195,7 @@ SETTING(MaxFactorIterations,  1024U, 16777216U,       10000U)
 SETTING(MaxPolynomialDegree,     5U, 100000U,           100U)
 SETTING(MaxLaguerreIterations,   5U,   1000U,            80U)
 SETTING(MaxRootDivisor,          5U,100000000U,     1000000U)
+SETTING(MaxNameChainLength,      1U,    65535U,          32U)
 
 SETTING_ENUM(SingleRowMenus,    nullptr,        MenuAppearance)
 SETTING_ENUM(FlatMenus,         nullptr,        MenuAppearance)

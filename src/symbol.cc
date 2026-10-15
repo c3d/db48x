@@ -51,27 +51,6 @@
 bool symbol::unambiguous = false;
 
 
-static bool circular_reference(symbol_p name, object_p value)
-// ----------------------------------------------------------------------------
-//   Check if a variable value is a chain of bare names leading back to name
-// ----------------------------------------------------------------------------
-//   Evaluating such a value as a tail call would loop forever without
-//   ever growing the call stack, e.g. 'A' 'A' STO or 'B' 'A' STO 'A' 'B' STO.
-//   Cycles that do not include `name` are caught when evaluating their names.
-{
-    for (uint hops = 0; hops < 32 && value; hops++)
-    {
-        symbol_p next = value->as_quoted<symbol>();
-        if (!next)
-            return false;
-        if (next->is_same_as(name))
-            return true;
-        value = directory::recall_all(next, false);
-    }
-    return false;
-}
-
-
 EVAL_BODY(symbol)
 // ----------------------------------------------------------------------------
 //   Evaluate a symbol by looking it up
@@ -87,14 +66,29 @@ EVAL_BODY(symbol)
         }
         else if (object_p found = directory::recall_all(o, false))
         {
-            if (circular_reference(o, found))
+            // Optimization: quick chase chains of names without eval loop
+            uint hops = 0;
+            while (symbol_p next = found->as_quoted<symbol>())
             {
-                rt.recursion_error();
-                return ERROR;
+                if (next == o || hops++ > Settings.MaxNameChainLength())
+                {
+                    rt.recursion_error();
+                    return ERROR;
+                }
+                if (object_p nfound = directory::recall_all(next, false))
+                {
+                    found = nfound;
+                    continue;
+                }
+
+                // We found a name that does not resolve: that's it
+                o = next;
+                goto notfound;
             }
             return program::run_program(found);
         }
     }
+notfound:
     if (object_g eq = expression::make(o))
         if (rt.push(eq))
             return OK;

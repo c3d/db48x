@@ -31789,6 +31789,19 @@ Disable the saving of command arguments during program execution.
 If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
 
+## MaxNameChainLength
+
+Maximum length of a chain of names during evaluation.
+
+A name that evaluates as a name is a name chain. While evaluating names, the
+calculator will verify if you return to the original name, which indicates an
+infinite recursion. It will also limit the number of names you can chase that
+way to the value of `MaxNameChainLength` (32 by default).
+
+This is used to detect infinite recursion in programs (if the name references
+itself) or inefficient programming (if your program relies on very long chains
+of names that can presumably be simplified by the programmer).
+
 
 # Plot settings
 
