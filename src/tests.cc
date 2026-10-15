@@ -294,6 +294,7 @@ int tests::run(uint onlyCurrent)
         plotting();
         plotting_all_functions();
         graphic_commands();
+        offline_graphics();
         user_input_commands();
         hms_dms_operations();
         date_operations();
@@ -18038,7 +18039,7 @@ void tests::offline_graphics()
               ("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
         .image("function-offline")
         .test(EXIT);
-    step("Expliti DRAX")
+    step("Explicit DRAX")
         .test(CLEAR, ("DRAX"), ENTER)
         .image("function+drax-offline")
         .test(EXIT);
