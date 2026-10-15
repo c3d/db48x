@@ -272,20 +272,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make sim
 
-    - name: Run test suite
-      shell: msys2 {0}
-      continue-on-error: true
-      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
-
-    - name: Upload failed test images
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db48x-test-images-windows
-        path: images/bad/*.png
-        if-no-files-found: ignore
-        retention-days: 1
-
     - name: Upload Windows help file for debugging
       if: always()
       uses: actions/upload-artifact@v7
@@ -606,20 +592,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make color-dm32-sim
 
-    - name: Run test suite
-      shell: msys2 {0}
-      continue-on-error: true
-      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
-
-    - name: Upload failed test images
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db50x-test-images-windows
-        path: color-images/bad/*.png
-        if-no-files-found: ignore
-        retention-days: 1
-
     - name: Upload Windows help file for debugging
       if: always()
       uses: actions/upload-artifact@v7
@@ -683,6 +655,94 @@ jobs:
           help/
         retention-days: 7
 
+  test-simulator-windows:
+    name: Test Windows DB48x - ${{ matrix.name }}
+    runs-on: windows-latest
+    needs: [build-simulator-windows]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        cache: true
+
+    - name: Download test artifact
+      uses: actions/download-artifact@v7
+      with:
+        name: db48x-simulator-windows
+
+    - name: Run test shard
+      shell: msys2 {0}
+      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help ${{ matrix.flags }}
+
+  test-color-simulator-windows:
+    name: Test Windows DB50x - ${{ matrix.name }}
+    runs-on: windows-latest
+    needs: [build-color-simulator-windows]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        cache: true
+
+    - name: Download test artifact
+      uses: actions/download-artifact@v7
+      with:
+        name: db50x-color-simulator-windows
+
+    - name: Run test shard
+      shell: msys2 {0}
+      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help ${{ matrix.flags }}
+
   test-simulator-macos:
     name: Test macOS DB48x - ${{ matrix.name }}
     runs-on: macos-latest
@@ -700,7 +760,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -738,7 +802,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -776,7 +844,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -825,7 +897,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -875,7 +951,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     env:
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
@@ -943,7 +1023,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     env:
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
@@ -1011,7 +1095,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     env:
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
@@ -1078,7 +1166,11 @@ jobs:
           - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
           - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
           - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
-          - { name: examples,             flags: "-Texamples" }
+          - { name: examples-1,           flags: "-Texamples -texample_start=1:example_end=267" }
+          - { name: examples-2,           flags: "-Texamples -texample_start=268:example_end=533" }
+          - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
+          - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
+          - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
     env:
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
@@ -1154,9 +1246,15 @@ jobs:
         version: 'latest'
         actions-cache-folder: 'emsdk-cache'
 
+    - name: Add Emscripten to PATH
+      run: |
+        echo "${{ github.workspace }}/emsdk-cache/emsdk-main" >> $GITHUB_PATH
+        echo "${{ github.workspace }}/emsdk-cache/emsdk-main/upstream/emscripten" >> $GITHUB_PATH
+
     - name: Verify Emscripten
       run: |
         emcc --version
+        em++ --version
 
     - name: Build WASM
       shell: bash
