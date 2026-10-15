@@ -117,8 +117,9 @@ The intrinsic carrier density of silicon at a temperature `T`:
 ### Fanning
 
 The Fanning friction factor of a pipe, from its relative roughness and the
-Reynolds number: `16/Reynolds` in laminar flow (Reynolds up to 2100), an
-explicit approximation of the Colebrook equation above.
+Reynolds number: `16/Reynolds` in laminar flow (Reynolds up to 2100), and
+above, Serghides' explicit approximation of the Colebrook equation, which
+gives the Darcy factor, divided by 4.
 
 `Roughness` `Reynolds` ▶ friction factor
 
