@@ -41,9 +41,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make sim
 
-    - name: Run test suite
-      run: ./db48x.app/Contents/MacOS/db48x -H -I -w 20000 -r 50 -Tall
-
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db48x.app
@@ -64,6 +61,16 @@ jobs:
       if: ${{ env.APPLE_CERT_DATA == '' }}
       run: |
         codesign --force --deep --sign - db48x.app
+
+    - name: Create test app tarball
+      run: tar -czf db48x-test-app.tar.gz db48x.app/
+
+    - name: Upload test app artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-test-app-macos
+        path: db48x-test-app.tar.gz
+        retention-days: 1
 
     - name: Create macOS archive
       run: |
@@ -104,9 +111,6 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make sim
-
-    - name: Run test suite
-      run: ./db48x -H -I -w 20000 -r 50 -Tall
 
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
@@ -166,9 +170,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make sim
 
-    - name: Run test suite
-      run: ./db48x -H -I -w 20000 -r 50 -Tall
-
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
       with:
@@ -223,9 +224,6 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make sim
-
-    - name: Run test suite
-      run: ./db48x -H -I -w 20000 -r 50 -Tall
 
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
@@ -377,9 +375,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
 
-    - name: Run test suite
-      run: ./db50x.app/Contents/MacOS/db50x -H -I -w 20000 -r 50 -Tall
-
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db50x.app
@@ -400,6 +395,16 @@ jobs:
       if: ${{ env.APPLE_CERT_DATA == '' }}
       run: |
         codesign --force --deep --sign - db50x.app
+
+    - name: Create test app tarball
+      run: tar -czf db50x-test-app.tar.gz db50x.app/
+
+    - name: Upload test app artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-test-app-macos
+        path: db50x-test-app.tar.gz
+        retention-days: 1
 
     - name: Create macOS archive
       run: |
@@ -440,9 +445,6 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
-
-    - name: Run test suite
-      run: ./db50x -H -I -w 20000 -r 50 -Tall
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
@@ -502,9 +504,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
 
-    - name: Run test suite
-      run: ./db50x -H -I -w 20000 -r 50 -Tall
-
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
       with:
@@ -559,9 +558,6 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
-
-    - name: Run test suite
-      run: ./db50x -H -I -w 20000 -r 50 -Tall
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
@@ -686,6 +682,450 @@ jobs:
           translations/
           help/
         retention-days: 7
+
+  test-simulator-macos:
+    name: Test macOS DB48x - ${{ matrix.name }}
+    runs-on: macos-latest
+    needs: [build-simulator-macos]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Download test app
+      uses: actions/download-artifact@v7
+      with:
+        name: db48x-test-app-macos
+
+    - name: Extract test app
+      run: tar -xzf db48x-test-app.tar.gz
+
+    - name: Make binary executable
+      run: chmod +x db48x.app/Contents/MacOS/db48x
+
+    - name: Run test shard
+      run: ./db48x.app/Contents/MacOS/db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-color-simulator-macos:
+    name: Test macOS DB50x - ${{ matrix.name }}
+    runs-on: macos-latest
+    needs: [build-color-simulator-macos]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Download test app
+      uses: actions/download-artifact@v7
+      with:
+        name: db50x-test-app-macos
+
+    - name: Extract test app
+      run: tar -xzf db50x-test-app.tar.gz
+
+    - name: Make binary executable
+      run: chmod +x db50x.app/Contents/MacOS/db50x
+
+    - name: Run test shard
+      run: ./db50x.app/Contents/MacOS/db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-simulator-linux:
+    name: Test Ubuntu DB48x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    needs: [build-simulator-linux]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.2'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db48x-simulator-linux
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db48x
+
+    - name: Run test shard
+      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-color-simulator-linux:
+    name: Test Ubuntu DB50x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    needs: [build-color-simulator-linux]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.2'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db50x-color-simulator-linux
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db50x
+
+    - name: Run test shard
+      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-simulator-linux-fedora:
+    name: Test Fedora DB48x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    needs: [build-simulator-linux-fedora]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+    steps:
+    - name: Install git
+      run: dnf install -y git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install runtime dependencies
+      run: |
+        dnf install -y glibc-langpack-en pulseaudio-libs \
+          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
+        dnf install -y python3 python3-pip
+        python3 -m pip install aqtinstall
+        python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
+          --modules qtmultimedia
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db48x-simulator-linux-fedora
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db48x
+
+    - name: Run test shard
+      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-color-simulator-linux-fedora:
+    name: Test Fedora DB50x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    needs: [build-color-simulator-linux-fedora]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+    steps:
+    - name: Install git
+      run: dnf install -y git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install runtime dependencies
+      run: |
+        dnf install -y glibc-langpack-en pulseaudio-libs \
+          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
+        dnf install -y python3 python3-pip
+        python3 -m pip install aqtinstall
+        python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
+          --modules qtmultimedia
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db50x-color-simulator-linux-fedora
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db50x
+
+    - name: Run test shard
+      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-simulator-linux-arch:
+    name: Test Arch DB48x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    needs: [build-simulator-linux-arch]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+    steps:
+    - name: Install git
+      run: pacman -Sy --noconfirm git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install runtime dependencies
+      run: |
+        pacman -Syu --noconfirm libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
+        pacman -Syu --noconfirm python python-pip
+        python -m pip install --break-system-packages aqtinstall
+        python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
+          --modules qtmultimedia
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db48x-simulator-linux-arch
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db48x
+
+    - name: Run test shard
+      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+
+  test-color-simulator-linux-arch:
+    name: Test Arch DB50x - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    needs: [build-color-simulator-linux-arch]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ui-control,           flags: "-Tdefaults -Tshifts -Tkeyboard -Teditor -Tstack -Tistack -Tglobals -Tlocals -Tfor_loops -Tconditionals -Tlogical -Tarithmetic" }
+          - { name: numerics-trig,        flags: "-Tstyles -Tiformat -Tdformat -Tifunctions -Tdfunctions -Tdfc -Tfloat -Tdouble -Thighp -Tround -Ttrigoptim -Ttrigunits -Tsectrig -Thyprecip -Tdfrac" }
+          - { name: complex-ranges-units, flags: "-Tctypes -Tcarith -Tcfunctions -Tautocplx -Tranges -Tuncertain -Tunits -Tsorting" }
+          - { name: linalg-integration,   flags: "-Tlists -Tvectors -Tmatrices -Trref -Tlu -Tsolver -Tintegrate -Tsyminteg" }
+          - { name: symbolic-poly,        flags: "-Tsimplify -Trewrites -Tsymbolic -Tderivative -Tprimitive -Tprootzeros -Tpoly -Tpartfrac -Tquorem -Tprimes -Txq -Texpr" }
+          - { name: constants-equations,  flags: "-Tcstlib -Tequations -Tcolnbeams -Tconstops -Tconstants -Tcharacters -Tautoconst" }
+          - { name: flags-infrastructure, flags: "-Tsysflags -Tflags -Tsettings -Trotate -Ttagged -Tcycle -Ttext -Thms -Tdate -Tinfinity -Toverflow -Thelp -Tgstack" }
+          - { name: plotting-stats,       flags: "-Tdefaults -Tplotting -Tplotfns -Tgraphics -Tinput -Tstatistics -Tprobabilities -Tinsert -Trandom -Texplode -Tfinance -Tlibrary -Tsumprod" }
+          - { name: commands-demos,       flags: "-Tcommands -Tdemo_ui -Tdemo_math -Tdemo_pgm -Tregressions" }
+          - { name: examples,             flags: "-Texamples" }
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+    steps:
+    - name: Install git
+      run: pacman -Sy --noconfirm git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install runtime dependencies
+      run: |
+        pacman -Syu --noconfirm libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
+        pacman -Syu --noconfirm python python-pip
+        python -m pip install --break-system-packages aqtinstall
+        python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
+          --modules qtmultimedia
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Download simulator
+      uses: actions/download-artifact@v7
+      with:
+        name: db50x-color-simulator-linux-arch
+        path: .
+
+    - name: Make binary executable
+      run: chmod +x db50x
+
+    - name: Run test shard
+      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
 
   build-wasm:
     name: WASM simulator
@@ -983,6 +1423,14 @@ jobs:
     name:  Release Package
     runs-on: ubuntu-latest
     needs: [
+      test-simulator-macos,
+      test-color-simulator-macos,
+      test-simulator-linux,
+      test-color-simulator-linux,
+      test-simulator-linux-fedora,
+      test-color-simulator-linux-fedora,
+      test-simulator-linux-arch,
+      test-color-simulator-linux-arch,
       build-simulator-macos,
       build-simulator-linux,
       build-simulator-linux-fedora,
@@ -1047,6 +1495,14 @@ jobs:
     name: Create Release and Upload Assets
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: [
+      test-simulator-macos,
+      test-color-simulator-macos,
+      test-simulator-linux,
+      test-color-simulator-linux,
+      test-simulator-linux-fedora,
+      test-color-simulator-linux-fedora,
+      test-simulator-linux-arch,
+      test-color-simulator-linux-arch,
       build-simulator-macos,
       build-simulator-linux,
       build-simulator-linux-fedora,
