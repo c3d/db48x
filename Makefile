@@ -544,25 +544,19 @@ sim/help-$(NAME).qrc: $(MIQ_MAKEDEPS)
 	> $@
 
 
-sim/%.qrc: $(MIQ_MAKEDEPS)
+GEN_QRC=tools/generate-qrc.sh
+sim/%.qrc: $(MIQ_MAKEDEPS) $(GEN_QRC)
 	@mkdir -p $(@D)
-	$(PRINT_GENERATE) (echo '<RCC>';			\
-	 echo ' <qresource prefix="/'$*'">';			\
-	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
-		J=$${I#$*/};					\
-		E=$$(printf '%s' "$$J" | sed -e 's/&/\&amp;/g');	\
-		echo '  <file alias="'"$$E"'">../'$(QRC_DOT_$*)$*'/'"$$E"'</file>';	\
-	 done;							\
-	 echo ' </qresource>';					\
-	 echo '</RCC>')						\
-	> $@.$$$$ && mv $@.$$$$ $@
-
+	$(PRINT_GENERATE) $(GEN_QRC) "$*"			\
+				"$(QRC_EXT_$*)"			\
+				"../$(QRC_DOT_$*)$*"		\
+				> $@.$$$$ && mv $@.$$$$ $@
 
 QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx
 QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
-QRC_EXT_library=*.48[sS] */*.48[sS]
+QRC_EXT_library=*.48[sS]
 QRC_EXT_state=*.48[sS]
 
 # The pattern rule above lists a directory, but make cannot know that from
