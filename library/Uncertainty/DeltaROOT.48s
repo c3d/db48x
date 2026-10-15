@@ -35,11 +35,12 @@
       «
         1 drtvars Size For drti
           @ A variable of the equations, which is not an unknown
+          @ Names compare in capitals: m and M are the same variable
           0 1 drtnames 1 Get Size 1 Get For drtj
-            drtnames 1 Get drtj Get →Text drtvars drti Get →Text == Or
+            drtnames 1 Get drtj Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop drtvars drti Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == Or
           Next
           0 1 drteqv 1 Get Size 1 Get For drtj
-            drteqv 1 Get drtj Get →Text drtvars drti Get →Text == Or
+            drteqv 1 Get drtj Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop drtvars drti Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == Or
           Next
           Swap Not And
           If Then
