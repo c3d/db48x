@@ -57,6 +57,10 @@ volatile uint test_command = 0;
 
 RECORDER(tests, 256, "Information about tests");
 RECORDER_TWEAK_DEFINE(snapshots, 0, "Record snapshots for failing tests");
+RECORDER_TWEAK_DEFINE(example_start, 0U, "First example to test");
+RECORDER_TWEAK_DEFINE(example_end, ~0U, "Last example to test");
+RECORDER_TWEAK_DEFINE(example_skip,  1, "Example skip interval");
+
 RECORDER_DECLARE(errors);
 
 uint        tests::default_wait_time  = 2000;
@@ -16249,6 +16253,9 @@ void tests::check_help_examples()
     char        topic[80];
     std::string ubuf;
     std::string ref;
+    uint        start = RECORDER_TWEAK(example_start);
+    uint        end  = RECORDER_TWEAK(example_end);
+    uint        skip = RECORDER_TWEAK(example_skip);
 
     while (true)
     {
@@ -16312,44 +16319,51 @@ void tests::check_help_examples()
                 closecheck = 0;
                 if (testing)
                 {
-                    bool keep =
-                        ubuf.find("@ Keep") != ubuf.npos ||
-                        ubuf.find("@ Save") != ubuf.npos;
-                    itest(CLEAR, EXIT, (ubuf));
-                    ubuf.clear();
-
+                    bool keep = ubuf.find("@ Keep") != ubuf.npos ||
+                                ubuf.find("@ Save") != ubuf.npos;
+                    if (sindex < start || sindex > end || (sindex-start) % skip)
+                    {
+                        skiptest = true;
+                        ok = 2;
+                    }
                     size_t nfailures = failures.size();
                     testing          = false;
-                    itest(LENGTHY(20000), ENTER).noerror();
-                    if (rt.depth() && Stack.type() == object::ID_expression)
-                        itest(LENGTHY(20000), RUNSTOP).noerror();
-                    if (!ref.empty())
+                    if (!skiptest)
                     {
-                        if (inimg)
+                        itest(CLEAR, EXIT, (ubuf));
+                        itest(LENGTHY(20000), ENTER).noerror();
+                        if (rt.depth() && Stack.type() == object::ID_expression)
+                            itest(LENGTHY(20000), RUNSTOP).noerror();
+
+                        if (!ref.empty())
                         {
-                            std::string imgname = ref+"-test-"+(topic+1);
-                            bool        skip    = false;
+                            if (inimg)
+                            {
+                                std::string imgname = ref+"-test-"+(topic+1);
+                                bool        skip    = false;
 #ifndef _WIN32
-                            static cstring failing[] = {
-                                "extracted-battery-test-FromLCD",
-                                nullptr
-                            };
-                            for (cstring *f = failing; *f; f++)
-                                if (imgname == *f)
-                                    skip = true;
+                                static cstring failing[] = {
+                                    "extracted-battery-test-FromLCD",
+                                    nullptr
+                                };
+                                for (cstring *f = failing; *f; f++)
+                                    if (imgname == *f)
+                                        skip = true;
 #endif
-                            if (!skip)
-                                image_noheader(imgname.c_str());
-                            inimg = false;
-                        }
-                        else
-                        {
-                            want(ref.c_str());
-                            itest(BSP);
+                                if (!skip)
+                                    image_noheader(imgname.c_str());
+                                inimg = false;
+                            }
+                            else
+                            {
+                                want(ref.c_str());
+                                itest(BSP);
+                            }
                         }
                     }
+
                     bool fails = failures.size() > nfailures;
-                    if (fails || skiptest)
+                    if (fails || (skiptest && ok <= 1))
                     {
                         passfail(!skiptest ? 0 : fails ? 1 : -1);
 
@@ -16361,13 +16375,15 @@ void tests::check_help_examples()
                         if (skiptest && fails)
                             ok = -1;
                     }
-                    ref      = "";
                     skiptest = false;
                     if (!keep)
                         itest(CLEARERR, CLEAR, EXIT,
                               ("variables "
-                                     "{ Foreground Background LineWidth } + "
-                                     "purge"), ENTER);
+                               "{ Foreground Background LineWidth } + "
+                               "purge"), ENTER);
+
+                    ref = "";
+                    ubuf.clear();
                 }
             }
         }
@@ -18576,10 +18592,12 @@ tests &tests::passfail(int ok)
 #define GREEN  "\033[32m"
 #define ORANGE "\033[43;90m"
 #define RED    "\033[41;97m"
+#define BLUE   "\033[34m"
 #define RESET  "\033[39;49;99;27m"
     fprintf(stderr,
             "%s\n",
             ok < 0   ? ORANGE "[TODO]" RESET
+            : ok > 1 ? BLUE "[SKIP]" RESET
             : ok > 0 ? GREEN "[PASS]" RESET
                      : RED "[FAIL]" RESET);
 #undef GREEN
