@@ -31802,6 +31802,23 @@ This is used to detect infinite recursion in programs (if the name references
 itself) or inefficient programming (if your program relies on very long chains
 of names that can presumably be simplified by the programmer).
 
+## MaxCallRecursion
+
+Maximum depth for recursive calls
+
+The `MaxCallRecursion` setting limits the number of recursive calls that are
+allowed, so that an errant RPL program is interrupted before it consumes all
+memory
+
+## MaxStackDepth
+
+Maximum stack depth during recursive function calls
+
+When a function calls itself recursively, it pushes arguments on the stack. If
+the termination condition is not correct, this may only terminate when memory is
+exhausted, which may take a long time. As a protection against unbounded
+recursion, function calls detect if the stack depth is above a certain threshold
+and if so reject the call with a `Stack is too deep` message.
 
 # Plot settings
 
@@ -35479,4 +35496,3 @@ _Content loaded dynamically at runtime._
 ### UnitsMenu
 
 _Content loaded dynamically at runtime._
-

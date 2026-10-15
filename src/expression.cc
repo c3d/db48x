@@ -2991,6 +2991,12 @@ EVAL_BODY(funcall)
         }
     }
 
+    if (rt.depth() > Settings.MaxStackDepth())
+    {
+        rt.stack_depth_error();
+        return ERROR;
+    }
+
     return o->run(false);
 }
 

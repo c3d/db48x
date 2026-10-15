@@ -16699,17 +16699,45 @@ void tests::regression_checks()
 
     step("Infinitely recursive user-defined function call")
         .test(CLEAR, "'F(X)' 'F' STO 'F(2)' EVAL", LENGTHY(30000), ENTER)
-        .error("Out of memory");
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, ID_Depth)
+        .expect("2 049");
     step("Infinitely recursive function call through a name")
         .test(CLEAR, "'Q(X)' 'Q' STO 'Q' EVAL", LENGTHY(30000), ENTER)
-        .error("Out of memory");
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, ID_Depth)
+        .expect("2 049");
     step("Function call evaluating to itself")
         .test(CLEAR, "'Q(2)' 'Q' STO 'Q(2)' EVAL", LENGTHY(30000), ENTER)
-        .error("Out of memory");
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, "Depth", ENTER)
+        .expect("2 049");
     step("Mutually recursive function calls")
         .test(CLEAR, "'R(Y)' 'Q' STO 'Q(Y)' 'R' STO 'Q(2)' EVAL",
               LENGTHY(30000), ENTER)
-        .error("Out of memory");
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, ID_Depth)
+        .expect("2 049");
+    step("Setting max call depth")
+        .test(CLEAR, "256 MaxStackDepth", ENTER).noerror();
+    step("Function call evaluating to itself with restricted depth")
+        .test(CLEAR, "'Q(2)' 'Q' STO 'Q(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, "Depth", ENTER)
+        .expect("257");
+    step("Mutually recursive function calls with restricted depth")
+        .test(CLEAR, "'R(Y)' 'Q' STO 'Q(Y)' 'R' STO 'Q(2)' EVAL",
+              LENGTHY(30000), ENTER)
+        .error("Stack is too deep")
+        .test(EXIT, EXIT, ID_Depth)
+        .expect("257");
+    step("Restoring max call depth")
+        .test(CLEAR, "'MaxStackDepth' PURGE", ENTER).noerror();
+    step("Infinitely recursive user-defined function call with call stack")
+        .test(CLEAR, "'F(X)+F(Y)' 'F' STO 'F(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Too many recursive calls")
+        .test(EXIT, EXIT, "Depth", ENTER)
+        .expect("512");
 
     step("Name whose value is itself")
         .test(CLEAR, "'A' 'A' STO A", ENTER)

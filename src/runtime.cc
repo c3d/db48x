@@ -2192,7 +2192,8 @@ bool runtime::call_stack_grow(object_p &next, object_p &end)
     size_t   block = sizeof(object_p) * CALLS_BLOCK ;
     object_g nextg = next;
     object_g endg  = end;
-    if (available(block) < block)
+    if (size_t(HighMem - CallStack) >= Settings.MaxCallRecursion() ||
+        available(block) < block)
     {
         recursion_error();
         return false;
