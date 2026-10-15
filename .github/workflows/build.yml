@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-simulator-macos:
-    name: Build Simulator (macOS)
+    name: macOS DB48x
     runs-on: macos-latest
     env:
       APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
@@ -78,7 +78,7 @@ jobs:
         retention-days: 7
 
   build-simulator-linux:
-    name: Build Simulator (Linux, Ubuntu)
+    name: Ubuntu DB48x
     runs-on: ubuntu-latest
 
     steps:
@@ -118,7 +118,7 @@ jobs:
         retention-days: 7
 
   build-simulator-linux-fedora:
-    name: Build Simulator (Linux, Fedora)
+    name: Fedora DB48x
     runs-on: ubuntu-latest
     container: fedora:latest
     env:
@@ -179,7 +179,7 @@ jobs:
         retention-days: 7
 
   build-simulator-linux-arch:
-    name: Build Simulator (Linux, Arch)
+    name: Arch DB48x
     runs-on: ubuntu-latest
     container: archlinux:latest
     env:
@@ -237,7 +237,7 @@ jobs:
         retention-days: 7
 
   build-simulator-windows:
-    name: Build Simulator (Windows)
+    name: Windows DB48x
     runs-on: windows-latest
     env:
       WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
@@ -352,7 +352,7 @@ jobs:
         retention-days: 7
 
   build-color-simulator-macos:
-    name: Build Color DM32 Simulator (macOS)
+    name: macOS DB50x
     runs-on: macos-latest
     env:
       APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
@@ -414,7 +414,7 @@ jobs:
         retention-days: 7
 
   build-color-simulator-linux:
-    name: Build Color DM32 Simulator (Linux, Ubuntu)
+    name: Ubuntu DB50x
     runs-on: ubuntu-latest
 
     steps:
@@ -454,7 +454,7 @@ jobs:
         retention-days: 7
 
   build-color-simulator-linux-fedora:
-    name: Build Color DM32 Simulator (Linux, Fedora)
+    name: Fedora DB50x
     runs-on: ubuntu-latest
     container: fedora:latest
     env:
@@ -515,7 +515,7 @@ jobs:
         retention-days: 7
 
   build-color-simulator-linux-arch:
-    name: Build Color DM32 Simulator (Linux, Arch)
+    name: Arch DB50x
     runs-on: ubuntu-latest
     container: archlinux:latest
     env:
@@ -573,7 +573,7 @@ jobs:
         retention-days: 7
 
   build-color-simulator-windows:
-    name: Build Color DM32 Simulator (Windows)
+    name: Windows DB50x
     runs-on: windows-latest
     env:
       WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
@@ -688,7 +688,7 @@ jobs:
         retention-days: 7
 
   build-wasm:
-    name: Build WebAssembly
+    name: WASM simulator
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -736,7 +736,7 @@ jobs:
         retention-days: 7
 
   build-android:
-    name: Build Android App (db48x)
+    name: Android DB48x
     runs-on: ubuntu-latest
     env:
       ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
@@ -816,7 +816,7 @@ jobs:
         retention-days: 7
 
   build-color-android:
-    name: Build Android App (db50x)
+    name: Android DB50x
     runs-on: ubuntu-latest
     env:
       ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
@@ -896,7 +896,7 @@ jobs:
         retention-days: 7
 
   build-dm42-firmware:
-    name: Build DM42 Firmware
+    name: DM42 Firmware
     runs-on: ubuntu-latest
 
     steps:
@@ -924,7 +924,7 @@ jobs:
         retention-days: 7
 
   build-dm32-firmware:
-    name: Build DM32 Firmware
+    name: DM32 Firmware
     runs-on: ubuntu-latest
 
     steps:
@@ -952,7 +952,7 @@ jobs:
         retention-days: 7
 
   build-dm42n-firmware:
-    name: Build DM42n Firmware
+    name: DM42n Firmware
     runs-on: ubuntu-latest
 
     steps:
@@ -980,7 +980,7 @@ jobs:
         retention-days: 7
 
   build-release-package:
-    name: Create Release Package
+    name:  Release Package
     runs-on: ubuntu-latest
     needs: [
       build-simulator-macos,
