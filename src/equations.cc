@@ -325,7 +325,9 @@ static const cstring basic_equations[] =
     "Flow In Full Pipes",  "{ "
     "  '(ρ_(kg/m^3))*((Ⓒπ*(D_m)²)/4)*(vavg_(m/s))*((ΔP_Pa)/(ρ_(kg/m^3))+Ⓒg*(Δy_m)+(vavg_(m/s))²*(2*f*((L_m)/(D_m))+ΣK/2))=(W_W)' "
   //"  'f=FANNING((ε_m)/(D_m);Reynolds)' "
-    "  'f=IFTE(Reynolds ≤ 2100;16/Reynolds;(4.781-((-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds)-4.781)²/((-2*log(((ϵ_m)/(D_m))/3.7+2.51*(-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds))/Reynolds))-2*(-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds))+4.781)))^-2)' "
+    // Fanning factor: 16/Re in laminar flow; in turbulent flow, Serghides'
+    // explicit form of Colebrook gives the Darcy factor, four times larger
+    "  'f=IFTE(Reynolds ≤ 2100;16/Reynolds;((4.781-((-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds)-4.781)²/((-2*log(((ϵ_m)/(D_m))/3.7+2.51*(-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds))/Reynolds))-2*(-2*log(((ϵ_m)/(D_m))/3.7+12/Reynolds))+4.781)))^-2)/4)' "
     "  '(ΔP_Pa)=(P2_Pa)-(P1_Pa)' "
     "  '(Δy_m)=(y2_m)-(y1_m)' "
     "  '(M_(kg/s))=(ρ_(kg/m^3))*(Q_(m^3/s))' "

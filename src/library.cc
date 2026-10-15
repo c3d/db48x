@@ -61,7 +61,7 @@ static const cstring basic_library[] =
     "LibraryHelp",  "\"To modify the library, edit the config/library.csv file\"",
     "Physics",          nullptr,
     "SiDensity", "« → T '√((2.81e19)*(1.83e19))*(1_(1/cm^3))*exp(-(1.12_eV)/(2*Ⓒk*UBASE(T_K)))' »",
-    "Fanning", "« → Roughness Reynolds 'IFTE(Reynolds≤2100;16/Reynolds;(4.781-((-2۰log((Roughness)/3.7+12/Reynolds)-4.781)^2/((-2۰log((Roughness)/3.7+2.51۰(-2۰log((Roughness)/3.7+12/Reynolds))/Reynolds))-2۰(-2۰log((Roughness)/3.7+12/Reynolds))+4.781)))^-2)' »",
+    "Fanning", "« → Roughness Reynolds 'IFTE(Reynolds≤2100;16/Reynolds;((4.781-((-2*log((Roughness)/3.7+12/Reynolds)-4.781)^2/((-2*log((Roughness)/3.7+2.51*(-2*log((Roughness)/3.7+12/Reynolds))/Reynolds))-2*(-2*log((Roughness)/3.7+12/Reynolds))+4.781)))^-2)/4)' »",
 };
 //   clang-format on
 
