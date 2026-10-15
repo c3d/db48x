@@ -294,6 +294,7 @@ int tests::run(uint onlyCurrent)
         plotting();
         plotting_all_functions();
         graphic_commands();
+        offline_graphics();
         user_input_commands();
         hms_dms_operations();
         date_operations();
@@ -17671,7 +17672,7 @@ void tests::offline_graphics()
     step("Clear LCD")
         .test(CLEAR, "ClearLCD", ENTER)
         .noerror()
-        .image("cllcd")
+        .image("cllcd-offline")
         .test(EXIT)
         .test(CLEAR, "CLLCD 1 1 DISP CLLCD", ENTER)
         .noerror()
@@ -18038,7 +18039,7 @@ void tests::offline_graphics()
               ("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
         .image("function-offline")
         .test(EXIT);
-    step("Expliti DRAX")
+    step("Explicit DRAX")
         .test(CLEAR, ("DRAX"), ENTER)
         .image("function+drax-offline")
         .test(EXIT);
@@ -18047,6 +18048,9 @@ void tests::offline_graphics()
                             "'sin(150*x)' FUNCTIONPLOT"), ENTER)
         .image("two-functions-offline")
         .test(EXIT, ("{ FOREGROUND LINEWIDTH } PURGE"), ENTER).noerror();
+
+    step("Clear PICT")
+        .test(CLEAR, "'PICT' PURGE", ENTER, CLEARERR);
 }
 
 
