@@ -135,7 +135,7 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         dnf install -y @development-tools gcc gcc-c++ git which python3 \
           python3-pip glibc-langpack-en \
@@ -143,10 +143,23 @@ jobs:
           libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel \
           pkgconfig xcb-util-wm-devel xcb-util-image-devel \
           xcb-util-keysyms-devel xcb-util-renderutil-devel
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
         python3 -m pip install aqtinstall
         python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build simulator
       run: |
@@ -183,15 +196,28 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         pacman -Syu --noconfirm base-devel git which python python-pip \
           libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
         python -m pip install --break-system-packages aqtinstall
         python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build simulator
       run: |
@@ -445,7 +471,7 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         dnf install -y @development-tools gcc gcc-c++ git which python3 \
           python3-pip glibc-langpack-en \
@@ -453,10 +479,23 @@ jobs:
           libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel \
           pkgconfig xcb-util-wm-devel xcb-util-image-devel \
           xcb-util-keysyms-devel xcb-util-renderutil-devel
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
         python3 -m pip install aqtinstall
         python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build color DM32 simulator
       run: |
@@ -493,15 +532,28 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         pacman -Syu --noconfirm base-devel git which python python-pip \
           libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+
+    - name: Cache Qt
+      uses: actions/cache@v4
+      id: cache-qt
+      with:
+        path: /opt/Qt/6.9.2
+        key: qt-6.9.2-linux-gcc_64-qtmultimedia
+
+    - name: Install Qt
+      if: steps.cache-qt.outputs.cache-hit != 'true'
+      run: |
         python -m pip install --break-system-packages aqtinstall
         python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Add Qt to PATH
+      run: echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build color DM32 simulator
       run: |
@@ -638,6 +690,7 @@ jobs:
   build-wasm:
     name: Build WebAssembly
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
     - name: Checkout code
@@ -659,6 +712,7 @@ jobs:
       uses: mymindstorm/setup-emsdk@v16
       with:
         version: 'latest'
+        actions-cache-folder: 'emsdk-cache'
 
     - name: Verify Emscripten
       run: |
@@ -668,7 +722,7 @@ jobs:
       shell: bash
       run: |
         echo "${{ github.run_number }}" > .build_id
-        make SHELL=/bin/bash wasm
+        make -j4 SHELL=/bin/bash wasm
 
     - name: Upload WASM artifacts
       uses: actions/upload-artifact@v7
@@ -711,9 +765,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v4
 
+    - name: Cache Android NDK
+      uses: actions/cache@v4
+      id: cache-ndk
+      with:
+        path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
+        key: android-ndk-27.2.12479018
+
     - name: Install Android NDK
-      run: |
-        sdkmanager --install "ndk;27.2.12479018"
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      run: sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
@@ -784,9 +845,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v4
 
+    - name: Cache Android NDK
+      uses: actions/cache@v4
+      id: cache-ndk
+      with:
+        path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
+        key: android-ndk-27.2.12479018
+
     - name: Install Android NDK
-      run: |
-        sdkmanager --install "ndk;27.2.12479018"
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      run: sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
