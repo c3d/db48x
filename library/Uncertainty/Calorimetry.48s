@@ -16,10 +16,10 @@
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
   @ The measurements
   0.1±σ0.00001_kg 'ms' Sto
-  '372.85…373.05_K' →Num 'Ts' Sto
+  372.95_K 0.1_K 1 { } ⓁBound→σ 'Ts' Sto
   0.2±σ0.00001_kg 'mw' Sto
   ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
-  '40…60_J/K' →Num 'Ccal' Sto
+  50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto
   293.15±σ0.1_K 'Tw' Sto
   296.45±σ0.1_K 'Tf' Sto
   @ The specific heat of the sample, with its uncertainty

@@ -2326,6 +2326,18 @@ water cw comes from the constants library, ⒸcpH2O, with its standard
 uncertainty ⓈcpH2O: →Num gives their values, and →σRange joins them. The
 temperatures are in kelvins, as the specific heats of the constants library.
 
+The two bounds, Ts and Ccal, are stored as standard uncertainties, by
+Bound→σ with the rectangular law (σ = half-width/√3), as σROOT would take
+them anyway; ΔROOT turns them back into the same bounds. All the variables
+being then of the same kind, a±σb, the solving menu of the Equation Library
+(Labs ▶ Calorimetry) can solve for them too, with their uncertainty, as long
+as it can isolate the unknown: cs, ms, mw, Ccal, Ts or Tw. Tf appears twice
+in the equation; the menu would have to search for it numerically, which it
+cannot do on uncertain values. The menu propagates the uncertainties one
+operation at a time, so that Tf counts as two independent readings: about
+16.6 J/(kg·K) for cs instead of 16.9. σROOT, which moves each variable once,
+remains the reference.
+
 The key Calorimetry runs the whole exercise: it stores the measurements, finds
 cs and its uncertainty with σROOT, compares it with the specific heats of
 copper, aluminium and iron of the constants library, ⒸcpCu, ⒸcpAl and ⒸcpFe,
@@ -2342,9 +2354,9 @@ comparison, and the metals compatible at the 5 % level.
 **2)** Step by step: the measurements, then cs and its standard uncertainty.
 
 ```rpl
-0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+0.1±σ0.00001_kg 'ms' Sto  372.95_K 0.1_K 1 { } ⓁBound→σ 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
-'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
 @ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
 ```
@@ -2354,9 +2366,9 @@ the range of cs. Copper, 385 J/(kg·K), lies inside; iron, 450 J/(kg·K), and
 aluminium, 902 J/(kg·K), do not.
 
 ```rpl
-0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+0.1±σ0.00001_kg 'ms' Sto  372.95_K 0.1_K 1 { } ⓁBound→σ 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
-'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
 @ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
 ```
@@ -2365,9 +2377,9 @@ aluminium, 902 J/(kg·K), do not.
 difference D and returns d, σD, z and p: here z = 0.16 and p = 0.88.
 
 ```rpl
-0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+0.1±σ0.00001_kg 'ms' Sto  372.95_K 0.1_K 1 { } ⓁBound→σ 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
-'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT 1 Get DeleteTag
 ⒸcpCu →Num Dup UVAL ⓈcpCu →Num UVAL →σRange Swap →Unit
 ⓁσConcord
@@ -2510,6 +2522,12 @@ The measurements, on a bar of an unknown light metal: L = 500 mm with a tape,
 ±0.5 mm, a bound; b = 25.00 mm and h = 3.00 mm with a caliper, u = 0.02 mm;
 m = 0.500 kg, u = 0.001 kg; δ = 3.29 mm with a dial gauge, u = 0.01 mm.
 
+The bound of L is stored as a standard uncertainty, by Bound→σ with the
+rectangular law, as for Calorimetry: σROOT and ΔROOT give the same results,
+and the solving menu of the Equation Library (Labs ▶ BeamYoung) can solve
+for E, I, δ or m too, with their uncertainty; not for L or h, which are
+cubed, and which it would have to search for numerically.
+
 The key BeamYoung runs the whole exercise: it stores the measurements, finds
 E±σ by σROOT and the range of E by ΔROOT, and compares that range with the
 usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses 97…125 GPa,
@@ -2528,7 +2546,7 @@ on a phone, a few minutes on a calculator.
 **2)** Step by step: E and its standard uncertainty, by σROOT.
 
 ```rpl
-'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+500_mm 0.5_mm 1 { } ⓁBound→σ 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
 0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
 'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
 @ Expecting { E:68.99871 94641±σ1.40878 87031 5 GPa I:56.25±σ1.12589 96419 5 mm↑4 }
@@ -2537,7 +2555,7 @@ on a phone, a few minutes on a calculator.
 **3)** The range of E, by ΔROOT:
 
 ```rpl
-'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+500_mm 0.5_mm 1 { } ⓁBound→σ 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
 0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
 'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT
 @ Expecting { E:65.79463 64935…72.38884 63822 GPa I:54.24858 28957…58.30181 73443 mm↑4 }
@@ -2547,7 +2565,7 @@ on a phone, a few minutes on a calculator.
 draws both: the range of the handbook lies within that of the measurement.
 
 ```rpl
-'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+500_mm 0.5_mm 1 { } ⓁBound→σ 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
 0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
 'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT 1 Get DeleteTag
 '68…72_GPa' →Num ⓁΔConcord
@@ -2557,7 +2575,7 @@ draws both: the range of the handbook lies within that of the measurement.
 caliper: the uncertainty of E falls from 1.41 GPa to about 0.32 GPa.
 
 ```rpl
-'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.002_mm 'h' Sto
+500_mm 0.5_mm 1 { } ⓁBound→σ 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.002_mm 'h' Sto
 0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
 'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
 @ Expecting { E:68.99871 94641±σ0.31527 69128 72 GPa I:56.25±σ0.12116 62081 62 mm↑4 }
