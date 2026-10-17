@@ -57,9 +57,9 @@ volatile uint test_command = 0;
 
 RECORDER(tests, 256, "Information about tests");
 RECORDER_TWEAK_DEFINE(snapshots, 0, "Record snapshots for failing tests");
-RECORDER_TWEAK_DEFINE(example_start, 0U, "First example to test");
-RECORDER_TWEAK_DEFINE(example_end, ~0U, "Last example to test");
-RECORDER_TWEAK_DEFINE(example_skip,  1, "Example skip interval");
+RECORDER_TWEAK_DEFINE(example_start, 0, "First example to test");
+RECORDER_TWEAK_DEFINE(example_end, INTPTR_MAX, "Last example to test");
+RECORDER_TWEAK_DEFINE(example_skip, 1, "Example skip interval");
 
 RECORDER_DECLARE(errors);
 
