@@ -659,6 +659,7 @@ jobs:
     name: Test Windows DB48x - ${{ matrix.name }}
     runs-on: windows-latest
     needs: [build-simulator-windows]
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -677,6 +678,8 @@ jobs:
           - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
           - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
           - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -703,6 +706,7 @@ jobs:
     name: Test Windows DB50x - ${{ matrix.name }}
     runs-on: windows-latest
     needs: [build-color-simulator-windows]
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -721,6 +725,8 @@ jobs:
           - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
           - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
           - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -765,6 +771,8 @@ jobs:
           - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
           - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
           - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -807,6 +815,8 @@ jobs:
           - { name: examples-3,           flags: "-Texamples -texample_start=534:example_end=800" }
           - { name: examples-4,           flags: "-Texamples -texample_start=801:example_end=1066" }
           - { name: examples-5,           flags: "-Texamples -texample_start=1067:example_end=1333" }
+    env:
+      QT_QPA_PLATFORM: offscreen
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -972,7 +982,7 @@ jobs:
     - name: Install runtime dependencies
       run: |
         dnf install -y glibc-langpack-en pulseaudio-libs \
-          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype \
+          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype fontconfig \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
@@ -1044,7 +1054,7 @@ jobs:
     - name: Install runtime dependencies
       run: |
         dnf install -y glibc-langpack-en pulseaudio-libs \
-          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype \
+          libxcb mesa-libGL mesa-libEGL libxkbcommon-x11 freetype fontconfig \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
@@ -1240,21 +1250,17 @@ jobs:
         make -C recorder TARGET=opt BUILDENV=auto RECURSE=.config .config
         cp recorder/.build/linux/opt/config.h recorder/config.h
 
-    - name: Setup Emscripten
-      uses: mymindstorm/setup-emsdk@v16
+    - name: Cache emsdk
+      uses: actions/cache@v4
       with:
-        version: 'latest'
-        actions-cache-folder: 'emsdk-cache'
+        path: emsdk/upstream
+        key: emsdk-upstream-${{ runner.os }}-latest-v1
 
-    - name: Add Emscripten to PATH
+    - name: Install Emscripten
       run: |
-        echo "${{ github.workspace }}/emsdk-cache/emsdk-main" >> $GITHUB_PATH
-        echo "${{ github.workspace }}/emsdk-cache/emsdk-main/upstream/emscripten" >> $GITHUB_PATH
-
-    - name: Verify Emscripten
-      run: |
-        emcc --version
-        em++ --version
+        cd emsdk
+        ./emsdk install latest
+        ./emsdk activate latest
 
     - name: Build WASM
       shell: bash
