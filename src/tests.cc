@@ -96,6 +96,9 @@ volatile bool tests::abort_requested  = false;
             return;                             \
     } while (0)
 
+
+#ifndef WASM
+
 TESTS(defaults,         "Reset settings to defaults");
 TESTS(demo_ui,          "Demo of DB48X user interface");
 TESTS(demo_math,        "Demo of DB48X math capabilities");
@@ -20277,7 +20280,7 @@ tests &tests::source(cstring ref, uint extrawait)
     fail();
     return *this;
 }
-
+#endif // WASM
 
 
 // ============================================================================
@@ -20293,8 +20296,10 @@ static void run_self_test_thread()
 {
     tests::abort_requested = false;
     ui_ms_sleep(500);
+#ifndef WASM
     tests t;
     t.run(0);
+#endif // WASM
 }
 
 
