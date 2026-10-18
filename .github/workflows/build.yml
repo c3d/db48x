@@ -1266,7 +1266,7 @@ jobs:
       shell: bash
       run: |
         echo "${{ github.run_number }}" > .build_id
-        make -j4 SHELL=/bin/bash wasm
+        make SHELL=/bin/bash wasm
 
     - name: Upload WASM artifacts
       uses: actions/upload-artifact@v7
