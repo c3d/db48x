@@ -149,7 +149,7 @@ jobs:
           xcb-util-keysyms-devel xcb-util-renderutil-devel
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -204,7 +204,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -469,7 +469,7 @@ jobs:
           xcb-util-keysyms-devel xcb-util-renderutil-devel
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -524,7 +524,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -986,7 +986,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -1058,7 +1058,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -1129,7 +1129,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -1200,7 +1200,7 @@ jobs:
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
 
     - name: Cache Qt
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-qt
       with:
         path: /opt/Qt/6.9.2
@@ -1251,16 +1251,16 @@ jobs:
         cp recorder/.build/linux/opt/config.h recorder/config.h
 
     - name: Cache emsdk
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: emsdk/upstream
-        key: emsdk-upstream-${{ runner.os }}-latest-v1
+        key: emsdk-upstream-${{ runner.os }}-6.0.8-v1
 
     - name: Install Emscripten
       run: |
         cd emsdk
-        ./emsdk install latest
-        ./emsdk activate latest
+        ./emsdk install 6.0.8
+        ./emsdk activate 6.0.8
 
     - name: Build WASM
       shell: bash
@@ -1310,7 +1310,7 @@ jobs:
       uses: android-actions/setup-android@v4
 
     - name: Cache Android NDK
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-ndk
       with:
         path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
@@ -1390,7 +1390,7 @@ jobs:
       uses: android-actions/setup-android@v4
 
     - name: Cache Android NDK
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       id: cache-ndk
       with:
         path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
