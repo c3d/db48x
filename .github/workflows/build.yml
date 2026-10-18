@@ -1250,17 +1250,10 @@ jobs:
         make -C recorder TARGET=opt BUILDENV=auto RECURSE=.config .config
         cp recorder/.build/linux/opt/config.h recorder/config.h
 
-    - name: Cache emsdk
-      uses: actions/cache@v6
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v16
       with:
-        path: emsdk/upstream
-        key: emsdk-upstream-${{ runner.os }}-6.0.8-v1
-
-    - name: Install Emscripten
-      run: |
-        cd emsdk
-        ./emsdk install 6.0.8
-        ./emsdk activate 6.0.8
+        version: '6.0.8'
 
     - name: Build WASM
       shell: bash
