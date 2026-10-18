@@ -44,6 +44,8 @@ jobs:
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db48x.app
+        QT_PLUGINS=$(qmake -query QT_INSTALL_PLUGINS 2>/dev/null || qmake6 -query QT_INSTALL_PLUGINS)
+        cp "$QT_PLUGINS/platforms/libqoffscreen.dylib" db48x.app/Contents/PlugIns/platforms/
 
     - name: Code sign macOS app (with Apple Developer certificate)
       if: ${{ env.APPLE_CERT_DATA != '' }}
@@ -285,6 +287,7 @@ jobs:
       shell: msys2 {0}
       run: |
         windeployqt6 db48x.exe
+        cp /ucrt64/share/qt6/plugins/platforms/qoffscreen.dll platforms/
         # Copy UCRT64 runtime and MSYS2 dependencies
         cp /ucrt64/bin/libgcc_s_seh-1.dll .
         cp /ucrt64/bin/libstdc++-6.dll .
@@ -364,6 +367,8 @@ jobs:
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db50x.app
+        QT_PLUGINS=$(qmake -query QT_INSTALL_PLUGINS 2>/dev/null || qmake6 -query QT_INSTALL_PLUGINS)
+        cp "$QT_PLUGINS/platforms/libqoffscreen.dylib" db50x.app/Contents/PlugIns/platforms/
 
     - name: Code sign macOS app (with Apple Developer certificate)
       if: ${{ env.APPLE_CERT_DATA != '' }}
@@ -605,6 +610,7 @@ jobs:
       shell: msys2 {0}
       run: |
         windeployqt6 db50x.exe
+        cp /ucrt64/share/qt6/plugins/platforms/qoffscreen.dll platforms/
         # Copy UCRT64 runtime and MSYS2 dependencies
         cp /ucrt64/bin/libgcc_s_seh-1.dll .
         cp /ucrt64/bin/libstdc++-6.dll .
