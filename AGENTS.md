@@ -16,6 +16,8 @@ DB48X is a modern implementation of RPL (Reverse Polish Lisp) targeting SwissMic
   is clean and a git operation would make it easy to restore the earlier state,
   then making extra changes is OK. Otherwise, add ideas to the todo list to
   be done later in a separate commit.
+* **Commits must contain the user's Signed-off-by line** in addition to the Co-authored-by mentioning the model. Do not invent a Signed-off-by address, when in doubt check earlier commits for that author in the history.
+* **Never push anything without being explicitly asked to for that commit** A request to push for one commit is not an authorization to push later ones.
 - **Avoid overwriting the user's edits.** When making changes, the user may have
   adjusted files themselves. Read the current file state before editing; prefer
   minimal, targeted edits that accomplish the goal without clobbering unrelated
@@ -53,9 +55,12 @@ make -j8 debug          # Debug build
 make -j8 dm32           # Build for DM32 (db50x.pg5)
 ```
 
-**QSPI CRC rebuilds:** If you see "Run build once more", run `make` again. QSPI is flash memory containing numerical routines; the build forces CRC compatibility with original DM42 firmware to allow switching between DB48X and stock DM42 firmware.
-- `help/db48x.md` and `help/db50x.md` are **auto-generated** by the build.
-  Never edit them directly; edit `doc/commands/*.md` instead.
+**QSPI CRC rebuilds:** If you see "Run build once more", run `make` again. QSPI is flash memory containing numerical routines;
+the build forces CRC compatibility with original DM42 firmware to allow
+        switching between DB48X and stock DM42
+                       firmware.- `help / db48x.md` and `help / db50x.md` are **auto -
+    generated **by the build.Never edit them directly;
+edit `doc / commands/*.md` instead.
 - **Documentation internal links**: use only the anchor part, e.g. `(#Anchor)`,
   not `(settings.md#Anchor)`. The shipped help (`db48x.md`, `db50x.md`) is built
   by concatenating and sed-editing the input markdown files into a single file,
