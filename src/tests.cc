@@ -63,15 +63,16 @@ RECORDER_TWEAK_DEFINE(example_skip, 1, "Example skip interval");
 
 RECORDER_DECLARE(errors);
 
-uint        tests::default_wait_time  = 2000;
-uint        tests::key_delay_time     = 0;
-uint        tests::refresh_delay_time = 20;
-uint        tests::image_wait_time    = 500;
-cstring     tests::dump_on_fail       = nullptr;
-std::string tests::testing_path       = ".";
-bool        tests::running            = false;
-bool        tests::simulate_typing    = false;
-volatile bool tests::abort_requested  = false;
+static const uint DEFAULT_WAIT_TIME         = 2000;
+uint              tests::default_wait_time  = DEFAULT_WAIT_TIME;
+uint              tests::key_delay_time     = 0;
+uint              tests::refresh_delay_time = 20;
+uint              tests::image_wait_time    = 500;
+cstring           tests::dump_on_fail       = nullptr;
+std::string       tests::testing_path       = ".";
+bool              tests::running            = false;
+bool              tests::simulate_typing    = false;
+volatile bool     tests::abort_requested    = false;
 
 #define TEST_CATEGORY(name, enabled, descr)                     \
     RECORDER_TWEAK_DEFINE(est_##name, enabled, "Test " descr);  \
@@ -18802,6 +18803,16 @@ tests &tests::show(tests::failure &f, std::string &last, uint &line)
 //
 // ============================================================================
 
+uint tests::adjusted_wait_time(uint extrawait)
+// ----------------------------------------------------------------------------
+//  Adjust the wait time proportionally to default wait time increase
+// ----------------------------------------------------------------------------
+{
+    uint base = tests::default_wait_time;
+    return base + extrawait * base / DEFAULT_WAIT_TIME;
+}
+
+
 tests &tests::rpl_command(uint command, uint extrawait)
 // ----------------------------------------------------------------------------
 //   Send a command to the RPL thread and wait for it to be picked up
@@ -18824,7 +18835,7 @@ tests &tests::rpl_command(uint command, uint extrawait)
 
     // Wait for the RPL thread to have processed it
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (test_command == command && sys_current_ms() - start < wait_time)
         sys_delay(key_delay_time);
 
@@ -18907,7 +18918,7 @@ tests &tests::screen_refreshed(uint extrawait)
            refresh_count,
            ui_refresh_count());
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
 
     // Wait for a screen redraw
     record(tests, "Waiting for screen update");
@@ -18934,7 +18945,7 @@ tests &tests::refreshed(uint extrawait)
 {
     // Wait for a stack update
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     int  key       = 0;
     bool found     = false;
     bool updated   = false;
@@ -19674,7 +19685,7 @@ tests &tests::nokeys(uint extrawait)
 // ----------------------------------------------------------------------------
 {
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (sys_current_ms() - start < wait_time && !key_empty())
         sys_delay(refresh_delay_time);
     if (!key_empty())
@@ -19693,7 +19704,7 @@ tests &tests::data_entry_noerror(uint extrawait)
 // ----------------------------------------------------------------------------
 {
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (sys_current_ms() - start < wait_time && rt.error())
         sys_delay(refresh_delay_time);
 
@@ -19730,7 +19741,7 @@ tests &tests::want(cstring ref, uint extrawait)
     cindex++;
 
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (sys_current_ms() - start < wait_time)
     {
         if (rt.error())
@@ -19793,7 +19804,7 @@ tests &tests::expect(cstring output, uint extrawait)
     ready(extrawait);
     cindex++;
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (sys_current_ms() - start < wait_time)
     {
         if (rt.error())
@@ -19898,7 +19909,7 @@ tests &tests::match(cstring restr, uint extrawait)
     cindex++;
 
     uint start     = sys_current_ms();
-    uint wait_time = default_wait_time + extrawait;
+    uint wait_time = adjusted_wait_time(extrawait);
     while (sys_current_ms() - start < wait_time)
     {
         if (rt.error())

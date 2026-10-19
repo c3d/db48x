@@ -370,7 +370,7 @@ public:
     template <typename... Args>
     tests &itest(LENGTHY length, Args... args)
     {
-        save<uint> save(default_wait_time, default_wait_time + length.length);
+        save<uint> save(default_wait_time, adjusted_wait_time(length.length));
         return itest(args...);
     }
 
@@ -487,6 +487,7 @@ public:
     }
 
     bool image_match(cstring file, int x, int y, int w, int h, bool force);
+    uint adjusted_wait_time(uint extrawait);
 
 protected:
     cstring              file;
