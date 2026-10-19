@@ -2974,7 +2974,7 @@ static size_t partfrac_one_root(polynomial_r poly,
 //   Pick the largest root of a univariate polynomial
 // ----------------------------------------------------------------------------
 {
-    list_p rlist = poly->roots_internal(object::ID_array, var);
+    list_g rlist = poly->roots_internal(object::ID_array, var);
     if (!rlist)
         return 0;
     algebraic_g best;
