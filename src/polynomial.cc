@@ -3013,12 +3013,9 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
 {
     record(partfrac, "decompose_proper: rem=%t, den=%t", rem, den);
 
-    polynomial_g work = polynomial::make(den->as_expression());
+    polynomial_g work = +den;
     if (!work)
-    {
-        record(partfrac_error, "Failed to make polynomial from den");
         return false;
-    }
 
     algebraic_g root;
     size_t      loop = 0;
