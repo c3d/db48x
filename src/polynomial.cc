@@ -1917,7 +1917,12 @@ size_t polynomial::expand(stack_buffer &sbuf, bool error) const
                     rt.dimension_error();
                 return 0;
             }
-            sbuf.grow(exp + 1 - sbuf.items());
+            if (!sbuf.grow(exp + 1 - sbuf.items()))
+            {
+                if (error)
+                    rt.out_of_memory_error();
+                return 0;
+            }
         }
         factor = it.factor();
         object_p obj = sbuf[exp];
