@@ -706,7 +706,7 @@ jobs:
 
     - name: Run test shard
       shell: msys2 {0}
-      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help ${{ matrix.flags }}
+      run: ./db48x.exe -H -I -w 25000 -r 100 -Dall ${{ matrix.flags }}
 
   test-color-simulator-windows:
     name: Test Windows DB50x - ${{ matrix.name }}
@@ -753,7 +753,7 @@ jobs:
 
     - name: Run test shard
       shell: msys2 {0}
-      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help ${{ matrix.flags }}
+      run: ./db50x.exe -H -I -w 25000 -r 100 -Dall ${{ matrix.flags }}
 
   test-simulator-macos:
     name: Test macOS DB48x - ${{ matrix.name }}
@@ -797,7 +797,7 @@ jobs:
       run: chmod +x db48x.app/Contents/MacOS/db48x
 
     - name: Run test shard
-      run: ./db48x.app/Contents/MacOS/db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db48x.app/Contents/MacOS/db48x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-color-simulator-macos:
     name: Test macOS DB50x - ${{ matrix.name }}
@@ -841,7 +841,7 @@ jobs:
       run: chmod +x db50x.app/Contents/MacOS/db50x
 
     - name: Run test shard
-      run: ./db50x.app/Contents/MacOS/db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db50x.app/Contents/MacOS/db50x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-simulator-linux:
     name: Test Ubuntu DB48x - ${{ matrix.name }}
@@ -894,7 +894,7 @@ jobs:
       run: chmod +x db48x
 
     - name: Run test shard
-      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db48x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-color-simulator-linux:
     name: Test Ubuntu DB50x - ${{ matrix.name }}
@@ -947,7 +947,7 @@ jobs:
       run: chmod +x db50x
 
     - name: Run test shard
-      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db50x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-simulator-linux-fedora:
     name: Test Fedora DB48x - ${{ matrix.name }}
@@ -1019,7 +1019,7 @@ jobs:
       run: chmod +x db48x
 
     - name: Run test shard
-      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db48x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-color-simulator-linux-fedora:
     name: Test Fedora DB50x - ${{ matrix.name }}
@@ -1091,7 +1091,7 @@ jobs:
       run: chmod +x db50x
 
     - name: Run test shard
-      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db50x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-simulator-linux-arch:
     name: Test Arch DB48x - ${{ matrix.name }}
@@ -1162,7 +1162,7 @@ jobs:
       run: chmod +x db48x
 
     - name: Run test shard
-      run: ./db48x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db48x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   test-color-simulator-linux-arch:
     name: Test Arch DB50x - ${{ matrix.name }}
@@ -1233,7 +1233,7 @@ jobs:
       run: chmod +x db50x
 
     - name: Run test shard
-      run: ./db50x -H -I -w 20000 -r 50 ${{ matrix.flags }}
+      run: ./db50x -H -I -w 20000 -r 50 -Dall ${{ matrix.flags }}
 
   build-wasm:
     name: WASM simulator
