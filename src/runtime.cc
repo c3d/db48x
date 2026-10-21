@@ -168,8 +168,11 @@ void runtime::reset()
 {
     memory((byte *) LowMem, (byte_p) HighMem - (byte_p) LowMem);
     runtime_invariants check;
-}
 
+    // Invalidate all GCSafe pointers, e.g. decimal cache
+    for (gcptr *p = GCSafe; p; p = p->next)
+        p->safe = nullptr;
+}
 
 
 

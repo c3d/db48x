@@ -3871,7 +3871,7 @@ decimal::ccache &decimal::constants()
         new(cst) ccache;
     }
     size_t precision = Settings.Precision();
-    if (cst->precision != precision)
+    if (cst->precision != precision || !cst->pi || !cst->e)
     {
         record(decimal, "Switched constants precision from %u to %u",
                cst->precision, precision);
