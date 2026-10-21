@@ -482,6 +482,7 @@ help/$(NAME).md: $(HELP_SOURCES)
 	$(PRINT_COMMAND) cp doc/*.png help/ 2>/dev/null || true
 	$(PRINT_COMMAND) mkdir -p help/img
 	$(PRINT_COMMAND) rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
+	$(PRINT_COMMAND) python3 tools/bmp-pack.py help/img/*.bmp
 
 doc/8-menus-tree-%.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
 	$(PRINT_GENERATE) python3 tools/gen-menu-doc.py --model $*
