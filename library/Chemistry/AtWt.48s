@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ AtWt — the standard atomic weight of an element, as an interval
+@@ Input : Z, symbol or name.  Output: Ar°, interval a…b (CIAAW 2024)
+@@ The CIAAW gives either an interval [a, b] or a value v(U); both mean
+@@ that the atomic weight of normal materials lies from a to b, or from
+@@ v−U to v+U. Use AtWtσ for a value with a standard uncertainty.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → x
+  «
+    x ⓁElmData 4 GET
+    IF DUP "—" == THEN
+      DROP "AtWt: no standard atomic weight" DoError
+    END
+  »
+»

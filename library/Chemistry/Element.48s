@@ -1,0 +1,25 @@
+«
+@@ ============================================================
+@@ Element — a chemical element, as a tagged list
+@@ Input : the atomic number Z, the symbol ("Fe") or the name ("Iron")
+@@ Output: { Z: Symbol: Name: Ar°: Abridged: … Configuration: }, without the
+@@         missing values; A, the mass number of the most stable isotope,
+@@         only when there is no standard atomic weight.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  ⓁElmData
+  { "Z" "Symbol" "Name" "Ar°" "Abridged" "A" "Group" "Period" "Family" "State"
+    "Tmelt" "Tboil" "Density" "Electronegativity" "Ionization" "Configuration"
+    "Isotope" "Fraction" "Most stable" "Isotope mass" }
+  → r t
+  «
+    @ + would drop the tags: push the tagged values, then gather them
+    0
+    1 20 FOR i
+      r i GET
+      IF DUP "—" == THEN DROP ELSE t i GET →Tag SWAP 1 + END
+    NEXT
+    →LIST
+  »
+»

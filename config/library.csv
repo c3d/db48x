@@ -700,3 +700,16 @@
 	"PolarFit",	"="
 	"ClimbVxVy",	"="
 	"TORoll",	"="
+
+"Chemistry"
+
+"Chemistry/Elements"
+
+	"PerTbl",	"=/library/Chemistry/PerTbl.48s"
+	"Element",	"=/library/Chemistry/Element.48s"
+	"ElmData",	"=/library/Chemistry/ElmData.48s"
+	"AtWt",	"=/library/Chemistry/AtWt.48s"
+	"AtWtσ",	"=/library/Chemistry/AtWtSigma.48s"
+	"MolarMass",	"=/library/Chemistry/MolarMass.48s"
+	"MolarMassσ",	"=/library/Chemistry/MolarMassSigma.48s"
+	"Formula",	"=/library/Chemistry/Formula.48s"
