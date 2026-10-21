@@ -713,7 +713,7 @@ static algebraic_p check_quotient_patterns(algebraic_r value,
                 {
                     if (val->is_fraction())
                     {
-                        fraction_p frac = fraction_p(+val);
+                        fraction_g frac = fraction_p(+val);
                         numer           = bignum::smaller(frac->numerator());
                         denom           = bignum::smaller(frac->denominator());
                         record(quotient, "Fraction %t = %t/%t", +val, +numer, +denom);

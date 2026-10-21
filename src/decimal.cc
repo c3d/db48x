@@ -875,8 +875,10 @@ decimal_p decimal::from_fraction(fraction_p value)
     id type = value->type();
     if (type == ID_big_fraction || type == ID_neg_big_fraction)
         return from_big_fraction(big_fraction_p(value));
-    decimal_g num = decimal::make(value->numerator_value());
-    decimal_g den = decimal::make(value->denominator_value());
+    ularge nv = value->numerator_value();
+    ularge dv = value->denominator_value();
+    decimal_g num = decimal::make(nv);
+    decimal_g den = decimal::make(dv);
     if (type == ID_neg_fraction)
         num = -num;
     return num / den;
@@ -889,8 +891,10 @@ decimal_p decimal::from_big_fraction(big_fraction_p value)
 //   Build a decimal number from a big fraction
 // ------------------------------------------------------------------------
 {
-    decimal_g num = decimal::from_bignum(value->numerator());
-    decimal_g den = decimal::from_bignum(value->denominator());
+    bignum_g n = value->numerator();
+    bignum_g d = value->denominator();
+    decimal_g num = decimal::from_bignum(n);
+    decimal_g den = decimal::from_bignum(d);
     return num / den;
 }
 
