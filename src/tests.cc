@@ -3769,6 +3769,16 @@ void tests::decimal_display_formats()
         .test(CLEAR, "NoTrailingDecimals 500.", ENTER).expect("500.0000")
         .test(CLEAR, "TrailingDecimals 500.", ENTER).expect("500.0000");
 
+    step("FIX 0 with digit separators (#1836)")
+        .test(CLEAR, "0 FIX", ENTER).noerror()
+        .test(CLEAR, "12345678.", ENTER).expect("12 345 678.")
+        .test(CLEAR, "1234.", ENTER).expect("1 234.")
+        .test(CLEAR, "123.", ENTER).expect("123.");
+    step("FIX 1 with digit separators (#1836)")
+        .test(CLEAR, "1 FIX", ENTER).noerror()
+        .test(CLEAR, "12345678.", ENTER).expect("12 345 678.0")
+        .test(CLEAR, "1234.", ENTER).expect("1 234.0");
+
     step("Reset defaults");
     test(CLEAR, LSHIFT, O, F1, KEY3, LSHIFT, F5).noerror();
 

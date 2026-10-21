@@ -541,7 +541,7 @@ RENDER_BODY(decimal)
 
             // Insert spacing on the left of the decimal mark
             bool more = (midx < nkigits || decade) || !sigmode || decpos > 0;
-            if (sep-- == 0 && more && decimals > 1)
+            if (sep-- == 0 && more && (decpos > 1 || decimals > 1))
             {
                 if (decpos)
                 {
