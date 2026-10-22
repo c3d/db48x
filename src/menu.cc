@@ -1283,6 +1283,7 @@ MENU(SolverMenu,
 
      "Multi",                   ID_MultiSolverMenu,
      "Finance",                 ID_FinanceSolverMenu,
+     "CashFlow",                ID_CashFlowMenu,
      "Plot",                    ID_PlotMenu,
      "Eqns",                    ID_EquationsMenu,
      SolverImprecision::label,   ID_SolverImprecision,
