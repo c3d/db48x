@@ -267,7 +267,69 @@ static algebraic_p guess_distance(algebraic_r value, algebraic_r guess)
 }
 
 
-algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
+static bool solver_guess_changes(object_p guess)
+// ----------------------------------------------------------------------------
+//   Check if a guess has an uncertainty or bounds, without allocating
+// ----------------------------------------------------------------------------
+{
+    if (guess)
+        if (unit_p u = guess->as<unit>())
+            guess = u->value();
+    if (!guess)
+        return false;
+    object::id ty = guess->type();
+    return (ty == object::ID_uncertain ||
+            ty == object::ID_range     ||
+            ty == object::ID_drange    ||
+            ty == object::ID_prange);
+}
+
+
+static algebraic_p solver_guess(algebraic_r guess)
+// ----------------------------------------------------------------------------
+//   A guess with an uncertainty starts from its average, bounds bracket it
+// ----------------------------------------------------------------------------
+//   The solving menu takes the value of the variable as a guess, and that
+//   value may be a measurement such as 3.29±σ0.01_mm. Bounds, a…b, a±b or
+//   a±p%, are stored as their low and high values, and give the same
+//   bracket as a list { low high }. Other guesses are returned unchanged.
+{
+    if (!solver_guess_changes(guess))
+        return guess;
+    algebraic_g value = guess;
+    unit_g      u     = unit::get(value);
+    if (u)
+        value = u->value();
+    if (!value)
+        return guess;
+
+    object::id ty = value->type();
+    if (ty == object::ID_uncertain)
+    {
+        uncertain_g uv  = uncertain_p(+value);
+        algebraic_g avg = uv->average();
+        return u ? unit::simple(avg, u->uexpr()) : +avg;
+    }
+    if (ty == object::ID_range ||
+        ty == object::ID_drange ||
+        ty == object::ID_prange)
+    {
+        range_g     r  = range_p(+value);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (u)
+        {
+            lo = unit::simple(lo, u->uexpr());
+            hi = unit::simple(hi, u->uexpr());
+        }
+        if (lo && hi)
+            return list::make(object::ID_list, lo, hi);
+    }
+    return guess;
+}
+
+
+algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess0)
 // ----------------------------------------------------------------------------
 //   Solve for a single variable, symbolically if possible, then numerically
 // ----------------------------------------------------------------------------
@@ -277,6 +339,9 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 //   verified solution closest to the guess wins. In case of a tie, the
 //   symbolic solution, which may be exact, is preferred.
 {
+    algebraic_g guess = solver_guess(guess0);
+    if (!guess)
+        return nullptr;
     algebraic_g sym;
     if (Settings.SymbolicSolver())
     {
@@ -930,6 +995,24 @@ algebraic_p Root::solve(algebraic_g &eq,
         var = varl;
     if (list_p guessl = guess->as_quoted<list, array>())
         guess = guessl;
+
+    // Guesses with an uncertainty or bounds, e.g. from the solving menu
+    if (list_g guesses = guess->as_array_or_list())
+    {
+        bool changes = false;
+        for (object_p item : *guesses)
+            if (solver_guess_changes(item))
+                changes = true;
+        if (changes)
+            if (list_p normalized = list::map(solver_guess, guesses, 1))
+                guess = normalized;
+    }
+    else
+    {
+        guess = solver_guess(guess);
+    }
+    if (!guess)
+        return nullptr;
 
     // Check if we have a list of variables or equations to solve for
     if (eq->is_array_or_list() || var->is_array_or_list())
