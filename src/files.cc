@@ -875,6 +875,11 @@ bool files::store_grob(text_p name, grob_p value) const
 }
 
 
+// Private BMP compression code ('XBP1') used by tools/bmp-pack.py for the
+// help images: each row is XORed with the row above, then PackBits-coded
+static const uint32_t BMP_XOR_PACKBITS = 0x31504258;
+
+
 grob_p files::recall_grob(text_p name) const
 // ----------------------------------------------------------------------------
 //  Recall graphic object from a BMP file
@@ -886,12 +891,13 @@ grob_p files::recall_grob(text_p name) const
 
     if (ok)
         ok = f.read((char *) &b, sizeof(b));
+    bool packed = ok && b.info.compression == BMP_XOR_PACKBITS;
     if (ok)
         ok = (b.sig[0] == 'B' && b.sig[1] == 'M' &&
               b.hdrSize == sizeof(bmp_info_hdr) &&
               b.info.planes == 1 &&
               b.info.bitsPerPixel == 1 &&
-              b.info.compression == 0 &&
+              (b.info.compression == 0 || packed) &&
               (b.info.numColors == 2 || b.info.numColors == 0));
 
     char palette[8] = { 0 };
@@ -914,14 +920,51 @@ grob_p files::recall_grob(text_p name) const
 
             ok = int(width) == b.info.width && int(height) == b.info.height;
             char ignore;
-            for (uint r = height; r --> 0 && ok; )
+            if (packed)
             {
-                byte *scan = (byte *) pixels + dstride * r;
-                char *dst = (char *) scan + dstride;
-                for (uint c = 0; c < dstride && ok; c++)
-                    ok = f.read(--dst, 1);
-                for (uint c = dstride; c < sstride; c++)
-                    ok = f.read(&ignore, 1);
+                // Decode on the fly: row holds the previous row, XORed in
+                // place with the next one; a PackBits run may span rows
+                byte row[256] = { 0 };
+                uint run    = 0;
+                bool repeat = false;
+                char value  = 0;
+                ok = ok && sstride <= sizeof(row) && dstride <= sstride;
+                for (uint r = height; r --> 0 && ok; )
+                {
+                    for (uint c = 0; c < sstride && ok; c++)
+                    {
+                        if (!run)
+                        {
+                            char header = 0;
+                            ok = f.read(&header, 1);
+                            byte h = byte(header);
+                            repeat = h >= 128;
+                            run = repeat ? 257 - h : h + 1;
+                            if (ok && repeat)
+                                ok = f.read(&value, 1);
+                        }
+                        if (ok && !repeat)
+                            ok = f.read(&value, 1);
+                        run--;
+                        row[c] ^= byte(value);
+                    }
+                    byte *scan = (byte *) pixels + dstride * r;
+                    byte *dst = scan + dstride;
+                    for (uint c = 0; c < dstride; c++)
+                        *--dst = row[c];
+                }
+            }
+            else
+            {
+                for (uint r = height; r --> 0 && ok; )
+                {
+                    byte *scan = (byte *) pixels + dstride * r;
+                    char *dst = (char *) scan + dstride;
+                    for (uint c = 0; c < dstride && ok; c++)
+                        ok = f.read(--dst, 1);
+                    for (uint c = dstride; c < sstride; c++)
+                        ok = f.read(&ignore, 1);
+                }
             }
         }
 
