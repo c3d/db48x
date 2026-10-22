@@ -19,6 +19,9 @@
 @@   Conj_years:2.7089  Conj_dVtot:12.7982  Opp_return_d:290  Opp_TEI:5.9004  Opp_entry:5.4416
 @@   Conjunction 2.71 yr / 12.80 km/s ; opposition Venus return, Earth entry only 5.44 km/s.
 @@ ============================================================
+ @ EXIT inside a solver stops the run with an error: restore the settings,
+ @ drop the intermediate values, then pass the error on
+ DEPTH → dep « IFERR
  1 'AstronTXPrecision' STO
  2459030 2459075 500 ⓁRTPlan → rC «
    2459920 2459980 ⓁRTPlanOpp → rO «
@@ -35,6 +38,11 @@
      »
    »
  »
+ THEN
+   DEPTH dep - DROPN
+   savP Precision  IF savH THEN HFP ELSE SFP END
+   ErrorMessage DoError
+ END »
 savP Precision  IF savH THEN HFP ELSE SFP END
  »
 »
