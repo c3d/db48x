@@ -14,7 +14,7 @@
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
   @ The measurements
-  '500±0.5_mm' →Num 'L' Sto
+  500_mm 0.5_mm 1 { } ⓁBound→σ 'L' Sto
   25±σ0.02_mm 'b' Sto
   3±σ0.02_mm 'h' Sto
   0.5±σ0.001_kg 'm' Sto
