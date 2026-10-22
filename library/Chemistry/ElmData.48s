@@ -1,0 +1,39 @@
+«
+@@ ============================================================
+@@ ElmData — the record of a chemical element, for programs
+@@ Input : the atomic number Z, the symbol ("Fe") or the name ("Iron")
+@@ Output: { Z "Symbol" "Name" Ar° Abridged A Group Period "Family" "State"
+@@           Tmelt Tboil Density Electronegativity Ionization "Configuration"
+@@           "Isotope" Fraction "Most stable" IsotopeMass }
+@@ Ar° is the standard atomic weight interval of the CIAAW (2024), Abridged the
+@@ abridged value; "—" marks a missing value. The data are read from one of
+@@ twelve small files, library/Chemistry/ElmD01.48s … ElmD12.48s.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → x
+  «
+    0
+    IF x TypeName "text" == THEN
+      "/library/Chemistry/ElmNames.48s" RCL Explode DROP
+      → s n
+      «
+        1 118 FOR i
+          IF s i GET x == n i GET x == OR THEN DROP i END
+        NEXT
+      »
+    ELSE
+      DROP x IP R→I
+    END
+    → z
+    «
+      IF z 1 < z 118 > OR THEN "ElmData: unknown element" DoError END
+      z 1 - 10 / IP 1 +
+      → f
+      «
+        "/library/Chemistry/ElmD" IF f 10 < THEN "0" + END f →Text + ".48s" +
+        RCL z 1 - 10 MOD 1 + GET
+      »
+    »
+  »
+»

@@ -1,0 +1,98 @@
+«
+@@ ============================================================
+@@ Formula — the composition of a chemical formula
+@@ Input : a formula as a text: "H2SO4", "Ca3(PO4)2", "CuSO4·5H2O"
+@@         (parentheses may be nested; · . or * before a hydrate)
+@@ Output: { { "Symbol" count } … }, each element once, in order of
+@@         first appearance
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → fstr
+  «
+    fstr SIZE { } { } 0 1 1
+    → nlen terms gstk hpos hcoef ipos
+    «
+      WHILE ipos nlen ≤ REPEAT
+        fstr ipos ipos SUB DUP NUM
+        → chr1 code1
+        «
+          CASE
+            code1 65 ≥ code1 90 ≤ AND THEN
+              @ A symbol: one capital, maybe one small letter, then a count
+              chr1
+              IF ipos nlen < THEN
+                IF fstr ipos 1 + DUP SUB NUM DUP 97 ≥ SWAP 122 ≤ AND THEN
+                  fstr ipos 1 + DUP SUB + ipos 1 + 'ipos' STO
+                END
+              END
+              0 → num1 «
+          WHILE IF ipos nlen < THEN fstr ipos 1 + DUP SUB NUM DUP 48 ≥ SWAP 57 ≤ AND ELSE 0 END
+          REPEAT num1 10 * fstr ipos 1 + DUP SUB STR→ + 'num1' STO ipos 1 + 'ipos' STO END
+          IF num1 0 == THEN 1 ELSE num1 END »
+              2 →LIST 1 →LIST terms SWAP + 'terms' STO
+            END
+            code1 40 == THEN terms SIZE 1 →LIST gstk + 'gstk' STO END
+            code1 41 == THEN
+              IF gstk SIZE 0 == THEN "Formula: ) without (" DoError END
+              gstk 1 GET gstk TAIL 'gstk' STO
+              0 → num1 «
+          WHILE IF ipos nlen < THEN fstr ipos 1 + DUP SUB NUM DUP 48 ≥ SWAP 57 ≤ AND ELSE 0 END
+          REPEAT num1 10 * fstr ipos 1 + DUP SUB STR→ + 'num1' STO ipos 1 + 'ipos' STO END
+          IF num1 0 == THEN 1 ELSE num1 END »
+              → gpos gmul « IF gpos terms SIZE < THEN
+            gpos 1 + terms SIZE FOR jx
+              terms jx terms jx GET DUP 2 GET gmul * 2 SWAP PUT PUT 'terms' STO
+            NEXT
+          END »
+            END
+            code1 183 == code1 46 == OR code1 42 == OR THEN
+              @ A hydrate: the coefficient applies up to the next one
+              IF hpos terms SIZE < THEN
+            hpos 1 + terms SIZE FOR jx
+              terms jx terms jx GET DUP 2 GET hcoef * 2 SWAP PUT PUT 'terms' STO
+            NEXT
+          END
+              0 → num1 «
+          WHILE IF ipos nlen < THEN fstr ipos 1 + DUP SUB NUM DUP 48 ≥ SWAP 57 ≤ AND ELSE 0 END
+          REPEAT num1 10 * fstr ipos 1 + DUP SUB STR→ + 'num1' STO ipos 1 + 'ipos' STO END
+          IF num1 0 == THEN 1 ELSE num1 END » 'hcoef' STO terms SIZE 'hpos' STO
+            END
+            code1 32 == THEN END
+            "Formula: unexpected " chr1 + DoError
+          END
+        »
+        ipos 1 + 'ipos' STO
+      END
+      IF gstk SIZE 0 > THEN "Formula: ( without )" DoError END
+      IF hpos terms SIZE < THEN
+            hpos 1 + terms SIZE FOR jx
+              terms jx terms jx GET DUP 2 GET hcoef * 2 SWAP PUT PUT 'terms' STO
+            NEXT
+          END
+      IF terms SIZE 0 == THEN "Formula: empty formula" DoError END
+      @ Each element once: same element, same atomic weight
+      { }
+      → accum
+      «
+        1 terms SIZE FOR jx
+          terms jx GET 0
+          → term1 found
+          «
+            IF accum SIZE 0 > THEN
+              1 accum SIZE FOR qx
+                IF accum qx GET 1 GET term1 1 GET == THEN qx 'found' STO END
+              NEXT
+            END
+            IF found 0 > THEN
+              accum found accum found GET DUP 2 GET term1 2 GET + 2 SWAP PUT PUT 'accum' STO
+            ELSE
+              accum term1 1 →LIST + 'accum' STO
+            END
+          »
+        NEXT
+        accum
+      »
+    »
+  »
+»

@@ -1,0 +1,10 @@
+{
+  { 111 "Rg" "Roentgenium" "—" "—" 282 11 7 "Transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 5f14 6d9 (predicted)" "—" "—" "²⁸²Rg" 282.169 }
+  { 112 "Cn" "Copernicium" "—" "—" 286 12 7 "Transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 5f14 6d10 (predicted)" "—" "—" "²⁸⁶Cn" 286.179 }
+  { 113 "Nh" "Nihonium" "—" "—" 286 13 7 "Post-transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]5f14 6d10 7s2 7p1 (predicted)" "—" "—" "²⁸⁶Nh" 286.182 }
+  { 114 "Fl" "Flerovium" "—" "—" 290 14 7 "Post-transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 7p2 5f14 6d10 (predicted)" "—" "—" "²⁹⁰Fl" 290.192 }
+  { 115 "Mc" "Moscovium" "—" "—" 290 15 7 "Post-transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 7p3 5f14 6d10 (predicted)" "—" "—" "²⁹⁰Mc" 290.196 }
+  { 116 "Lv" "Livermorium" "—" "—" 293 16 7 "Post-transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 7p4 5f14 6d10 (predicted)" "—" "—" "²⁹³Lv" 293.205 }
+  { 117 "Ts" "Tennessine" "—" "—" 294 17 7 "Halogen" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 7p5 5f14 6d10 (predicted)" "—" "—" "²⁹⁴Ts" 294.211 }
+  { 118 "Og" "Oganesson" "—" "—" 295 18 7 "Noble gas" "Gas (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 7p6 5f14 6d10 (predicted)" "—" "—" "²⁹⁵Og" 295.216 }
+}

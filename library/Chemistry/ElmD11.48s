@@ -1,0 +1,12 @@
+{
+  { 101 "Md" "Mendelevium" "—" "—" 258 "—" 7 "Actinide" "Solid" 1100_K "—" "—" 1.3 6.58±σ0.07_eV "[Rn]7s2 5f13" "—" "—" "²⁵⁸Md" 258.09843 }
+  { 102 "No" "Nobelium" "—" "—" 259 "—" 7 "Actinide" "Solid" 1100_K "—" "—" 1.3 6.62621±σ0.00005_eV "[Rn]7s2 5f14" "—" "—" "²⁵⁹No" 259.10100 }
+  { 103 "Lr" "Lawrencium" "—" "—" 266 3 7 "Actinide" "Solid" 1900_K "—" "—" 1.3 4.96±σ0.05_eV "[Rn]7s2 5f14 6d1" "—" "—" "²⁶⁶Lr" 266.120 }
+  { 104 "Rf" "Rutherfordium" "—" "—" 267 4 7 "Transition metal" "Solid" "—" "—" "—" "—" 6.02±σ0.04_eV "[Rn]7s2 5f14 6d2" "—" "—" "²⁶⁷Rf" 267.122 }
+  { 105 "Db" "Dubnium" "—" "—" 268 5 7 "Transition metal" "Solid" "—" "—" "—" "—" 6.8±σ0.5_eV "[Rn]7s2 5f14 6d3" "—" "—" "²⁶⁸Db" 268.126 }
+  { 106 "Sg" "Seaborgium" "—" "—" 269 6 7 "Transition metal" "Solid" "—" "—" "—" "—" 7.8±σ0.5_eV "[Rn]7s2 5f14 6d4" "—" "—" "²⁶⁹Sg" 269.128 }
+  { 107 "Bh" "Bohrium" "—" "—" 270 7 7 "Transition metal" "Solid" "—" "—" "—" "—" 7.7±σ0.5_eV "[Rn]7s2 5f14 6d5" "—" "—" "²⁷⁰Bh" 270.133 }
+  { 108 "Hs" "Hassium" "—" "—" 269 8 7 "Transition metal" "Solid" "—" "—" "—" "—" 7.6±σ0.5_eV "[Rn]7s2 5f14 6d6" "—" "—" "²⁶⁹Hs" 269.1336 }
+  { 109 "Mt" "Meitnerium" "—" "—" 277 9 7 "Transition metal" "Solid" "—" "—" "—" "—" "—" "[Rn]7s2 5f14 6d7 (calculated)" "—" "—" "²⁷⁷Mt" 277.154 }
+  { 110 "Ds" "Darmstadtium" "—" "—" 282 10 7 "Transition metal" "Solid (expected)" "—" "—" "—" "—" "—" "[Rn]7s2 5f14 6d8 (predicted)" "—" "—" "²⁸²Ds" 282.166 }
+}

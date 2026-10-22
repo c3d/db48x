@@ -1,0 +1,19 @@
+«
+@@ ============================================================
+@@ AtWtσ — the standard atomic weight as a value and a standard uncertainty
+@@ Input : Z, symbol or name.  Output: m±σu
+@@ The CIAAW interval a…b taken as a uniform (rectangular) distribution,
+@@ as recommended by Possolo et al., Pure Appl. Chem. 90 (2018) 395:
+@@ m = (a+b)/2, u = (b−a)/(2√3).
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → x
+  «
+    x ⓁAtWt Range→
+    → a b
+    «
+      a b + 2 /  b a - 2 / 3 √ /  →σRange
+    »
+  »
+»

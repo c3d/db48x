@@ -1,0 +1,23 @@
+«
+@@ ============================================================
+@@ MolarMass — the molar mass of a chemical formula, as an interval
+@@ Input : a formula as a text: "H2SO4", "Ca(OH)2", "CuSO4·5H2O"
+@@ Output: M in g/mol, the sum of the standard atomic weights of its
+@@         atoms (CIAAW 2024) times Mu = 1 g/mol (to 3.5E-10)
+@@ The bounds of the intervals add up: M lies between the sums.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  ⓁFormula
+  → flist
+  «
+    @ No accumulator before the first element: an unknown symbol leaves no 0
+    flist 1 GET 1 GET ⓁAtWt flist 1 GET 2 GET *
+    IF flist SIZE 1 > THEN
+      2 flist SIZE FOR jx
+        flist jx GET 1 GET ⓁAtWt flist jx GET 2 GET * +
+      NEXT
+    END
+    1_(g/mol) *
+  »
+»
