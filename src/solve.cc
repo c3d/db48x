@@ -1671,8 +1671,10 @@ bool SolvingMenu::build(menu_info &mi, list_p expr, bool withcmds)
         }
     }
 
-    // Add markers
-    for (uint k = withcmds ? 1 : 0; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
+    // Add markers, except on EvalEq, NextEq and Eq▶, which are only on the
+    // first page: on the next pages, the first key is a variable as well
+    uint first = withcmds && !skip ? 1 : 0;
+    for (uint k = first; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
     {
         ui.marker(k + 0 * ui.NUM_SOFTKEYS, U'▶', true);
         ui.marker(k + 1 * ui.NUM_SOFTKEYS, U'?', false);
