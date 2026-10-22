@@ -3907,7 +3907,7 @@ a=-36000_km  ecc=1.1823  ν0=15_°  ν=120_°
 Speed remaining at infinity on a hyperbolic escape: `vinf²=Vbo²−Vesc²`, with local escape
 speed `Vesc=√(2·ⒸGM♁/r)` and `r=ⒸReq♁+H`.
 
-![Hyperbolic excess velocity v∞](img/HyperbolicVelocityV∞.bmp)
+![Hyperbolic excess velocity v∞](img/HyperbolicVelocityVinf.bmp)
 
 * To calculate: `[r_km;Vesc_m/s;vinf_m/s]` from `H`, `Vbo`:
 ```rpl
