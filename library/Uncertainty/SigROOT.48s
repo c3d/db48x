@@ -33,12 +33,13 @@
       «
         1 srtvars Size For srti
           @ An unknown is not an input, even if it holds an uncertain value
+          @ Names compare in capitals: m and M are the same variable
           0 1 srtnames 1 Get Size 1 Get For srtj
-            srtnames 1 Get srtj Get →Text srtvars srti Get →Text == Or
+            srtnames 1 Get srtj Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtvars srti Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == Or
           Next
           @ ... and a variable of the equations
           0 1 srteqv 1 Get Size 1 Get For srtj
-            srteqv 1 Get srtj Get →Text srtvars srti Get →Text == Or
+            srteqv 1 Get srtj Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtvars srti Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == Or
           Next
           Swap Not And
           If Then
@@ -140,10 +141,10 @@
                     If srtr0 TypeName "list" == Then
                       0
                       1 srtr0 Size For srtm
-                        srtr0 srtm Get 1 Get →Text srtin srti Get 1 Get →Text ==
-                        srtr0 srtm Get 2 Get →Text srtin srtk Get 1 Get →Text == And
-                        srtr0 srtm Get 1 Get →Text srtin srtk Get 1 Get →Text ==
-                        srtr0 srtm Get 2 Get →Text srtin srti Get 1 Get →Text == And Or
+                        srtr0 srtm Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtin srti Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop ==
+                        srtr0 srtm Get 2 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtin srtk Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == And
+                        srtr0 srtm Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtin srtk Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop ==
+                        srtr0 srtm Get 2 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop srtin srti Get 1 Get →Text "" Swap 1 Over Size For ucx Dup ucx ucx Sub Num Dup 97 ≥ Over 122 ≤ And If Then 32 - End Chr Rot Swap + Swap Next Drop == And Or
                         If Then Drop srtr0 srtm Get 3 Get End
                       Next
                     Else
