@@ -21,6 +21,75 @@ result for presentation.
 Tools for measured values and their uncertainties, whether written as bounds
 (`a…b`, `a±b`, `a±p%`) or as a standard deviation (`a±σb`).
 
+**Two kinds of values.** A value only known to lie between bounds is written
+`a…b`, `a±b` or `a±p%`: nothing is assumed about where it lies inside. A
+measured value with a standard uncertainty is written `a±σb`: `b` is a
+standard deviation, and the true value lies outside `±σ` about one time in
+three. DB48X keeps the two kinds apart, and its arithmetic does not mix them.
+
+**Bounds: interval arithmetic.** On the stack, an operation on bounds gives
+the bounds of the result:
+
+```rpl
+9…11 2…3 *
+@ Expecting 18…33
+```
+
+Each operand is taken as independent, even when it is the same value: `x−x`
+gives `−2…2` for `x` in `3…5`, not 0. For a function where a variable comes
+back more than once, ΔRf (one variable) and ΔRFxjxi
+(several) search the true lowest and highest values instead:
+
+```rpl
+'x-x' 3…5 ⓁΔRf
+@ Expecting 0…0
+```
+
+**Standard uncertainties: quadratic sum.** On the stack, an operation on
+`a±σb` values combines their standard uncertainties in quadrature, as the GUM
+does for independent inputs:
+
+```rpl
+10±σ1 12±σ1 +
+@ Expecting 22±σ1.41421 35623 7
+```
+
+A correlation between the two values is given by the variable `ρ`, from −1 to
+1. Purge it afterwards, or it weighs on every later calculation:
+
+```rpl
+1 'ρ' STO 10±σ1 12±σ1 + 'ρ' PURGE
+@ Expecting 22±σ2.
+```
+
+The same value used twice is still taken as two independent values: `x·x`
+gives `100±σ14.1` for `x = 10±σ1`, where the uncertainty is 20.
+σRf and σRFxjxi differentiate the function instead:
+
+```rpl
+'x*x' 10±σ1 ⓁσRf
+@ Expecting 100±σ20.
+```
+
+The quadratic sum is a first-order approximation: for a strongly non-linear
+model, or to get a coverage interval directly, use
+MCPropagate.
+
+**From one kind to the other.** A bound is not a standard deviation. To use a
+bound as a standard uncertainty, a law must be chosen: Bound→σ
+does it, here with the rectangular law, which divides the half-width by √3
+(GUM 4.3.7):
+
+```rpl
+10 1 1 { } ⓁBound→σ
+@ Expecting 10±σ0.57735 02691 9
+```
+
+[Cycling](#cycling) only changes how a value is written, and tags as
+non-equivalent the step that would turn one kind into the other.
+
+**The tools of the section:**
+
 * [Rounding](#roundinglibrary) — present a result with the digits its
   uncertainty justifies: [SciRngRnd](#scirngrnd), and as text
   [SciRngText](#scirngtext) (`12.35±0.10`) or
@@ -41,6 +110,9 @@ Tools for measured values and their uncertainties, whether written as bounds
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
+* Demonstrations, in LIB → Demo → Uncertainty: [DemoΔConcord](#demoΔconcord),
+  [DemoσConcord](#demoσconcord), [DemoExmnF2D](#demoexmnf2d) and
+  [DemoPendulum](#demopendulum), a new case at each press.
 
 Correlations are given by two global variables. `ρij` holds one coefficient
 for all the pairs, or the full correlation matrix, for the functions of
@@ -416,7 +488,7 @@ The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
 
 **3)** Random pairs make a good exercise. This draws two intervals between −100 and
 100 and compares them; run it several times, or press DemoΔConcord in
-Applications/Demos:
+LIB → Demo → Uncertainty:
 
 ```rpl
 -100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
@@ -467,7 +539,7 @@ also weigh on the arithmetic of every uncertain value.
 
 **3)** Random measurements make a good exercise too. This draws two measurements of
 the same true value 10, with standard deviations between 0.5 and 2; run it
-several times, or press DemoσConcord in Applications/Demos. About one run in
+several times, or press DemoσConcord in LIB → Demo → Uncertainty. About one run in
 twenty gives p < 0.05, although both measure the same thing:
 
 ```rpl
@@ -1343,25 +1415,25 @@ Wilson's Proposition for interval implementation in the RPL environment
 
 * [GUMS1](#gums1library): the four examples of Supplement 1 to the GUM
   (JCGM 101:2008), by the propagation formula and by Monte Carlo.
-* [Demos](#demoslibrary): commands of the section run on random inputs, a new
-  case at each press.
 * [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
   Type B evaluation of the measurements to the Monte Carlo method.
-* [EqDemos](#eqdemoslibrary): equations of the Equation Library with uncertain
-  inputs, by the Monte Carlo method and by the propagation formula.
 * [Labs](#labslibrary): laboratory exercises on equations of your own, added to
   the Equation Library through `config/equations.csv`.
+
+The demonstrations of the section, [Demos](#demoslibrary) and
+[EqDemos](#eqdemoslibrary), are in LIB → Demo → Uncertainty.
 
 
 ## DemosLibrary
 
-Demonstrations: each key runs a command of the section on inputs drawn at
-random, so that every press shows a new case. Seed the generator with RDZ to
+Demonstrations, in LIB → Demo → Uncertainty: each key runs a command of the
+section on inputs drawn at random, so that every press shows a new case. Seed the generator with RDZ to
 replay the same sequence.
 
-* DemoΔConcord: two bounded intervals, compared by ΔConcord;
-* DemoσConcord: two measurements of the same quantity, compared by σConcord.
-* DemoExmnF2D: a narrow peak at random, examined by ExmnF2D.
+* [DemoΔConcord](#demoΔconcord): two bounded intervals, compared by ΔConcord;
+* [DemoσConcord](#demoσconcord): two measurements of the same quantity,
+  compared by σConcord;
+* [DemoExmnF2D](#demoexmnf2d): a narrow peak at random, examined by ExmnF2D.
 
 
 ## DemoΔConcord
@@ -2222,7 +2294,8 @@ error Eₙ of ISO 13528 and the validation comparison of ASME V&V 20.
 
 ## EqDemosLibrary
 
-Equations of the Equation Library with uncertain inputs.
+Equations of the Equation Library with uncertain inputs, in LIB → Demo →
+Uncertainty.
 Each input is drawn from a law, a normal law for a measured value, a
 rectangular law for a quantity only known to lie within bounds, and the
 result is drawn many times: its histogram shows the law of the result, which
@@ -2230,8 +2303,8 @@ the propagation formula of σRFxjxi sums up in two numbers. An
 input given as a range, like an amplitude between 60° and 80°, becomes in this
 way an input of the equation.
 
-* DemoPendulum: the period of the simple pendulum, for small and for large
-  amplitudes.
+* [DemoPendulum](#demopendulum): the period of the simple pendulum, for
+  small and for large amplitudes.
 
 
 ## DemoPendulum

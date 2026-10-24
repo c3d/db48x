@@ -73,8 +73,10 @@ the Args entries accept.
 Eleven tests built on the Student, chi-square and Fisher distributions, in three
 submenus: [StudentTests](#studenttestslibrary) compares means, [Chi2Tests](#chi2testslibrary) handles counts and
 variances, [FisherTests](#fishertestslibrary) compares variances and runs the analysis of
-variance. A fourth submenu, [TestDemos](#testdemoslibrary), runs a test
-on random samples, to see the risk α and the power at work.
+variance. Two demonstrations, in LIB → Demo →
+StatTests, run a test on random samples, to see the risk α and the power at
+work: [DemoTTest1](#demottest1) and [DemoTPower](#demotpower) (see
+[TestDemos](#testdemoslibrary)).
 
 Every entry returns the statistic, its degrees of freedom and the p-value,
 tagged, and **no verdict**. The rule is short, and its two halves are not
@@ -588,13 +590,14 @@ How to read this p-value, and why α = 0.05 is a choice rather than a law: see [
 
 ## TestDemosLibrary
 
-Demonstrations of a test on random samples: each press draws a new sample of
+Demonstrations of a test on random samples, in LIB → Demo → StatTests: each
+press draws a new sample of
 ten values from a normal law of standard deviation 1, and tests its mean with
 TTest1 against μ₀ = 10. Seed the generator with RDZ to replay a sample.
 
-* DemoTTest1: the true mean is 10, so H₀ is true; the test still rejects it
+* [DemoTTest1](#demottest1): the true mean is 10, so H₀ is true; the test still rejects it
   about one time in twenty — the risk α of a false alarm.
-* DemoTPower: the true mean is 10.5, so H₀ is false; the test detects it only
+* [DemoTPower](#demotpower): the true mean is 10.5, so H₀ is false; the test detects it only
   about three times in ten — its power, with ten values and a shift of half a
   standard deviation.
 

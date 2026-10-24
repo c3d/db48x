@@ -31,6 +31,9 @@ and the atmospheres of three planets. It has three submenus:
 * [Planet Atmospheres](#planet-atmosphereslibrary): temperature, pressure and
   density versus altitude on the Earth, Mars and Venus.
 
+Four short example programs, [AstroExamples](#astroexampleslibrary), are in
+LIB → Demo → Astronomy.
+
 ## Ephemeris Orbital ElementsLibrary
 
 Orbital elements from a Julian Day, as vectors `[a e I L ϖ Ω]`:
@@ -109,8 +112,8 @@ design of interplanetary trajectories. It has two submenus:
 
 ## AstroExamplesLibrary
 
-Four short programs showing how to build your own RPL program from the
-astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
+Four short programs, in LIB → Demo → Astronomy, showing how to build your
+own RPL program from the astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
 computes a value for today's date, displays it and leaves it tagged on the
 stack. They are meant to be read and adapted.
 
