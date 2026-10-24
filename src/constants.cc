@@ -2517,6 +2517,10 @@ static const cstring basic_constants[] =
     "ρH2O",     "[ 1.8E5_Ω·m "            // ultra-pure water at 25°C; 18 MΩ·cm
                 "  0.2E5_Ω·m "
                 "  'ROUND(ⓈρH2O/ⒸρH2O;-2)' ]",
+    // *Water ionization constant pKw at 25°C, 0.1 MPa - Calculation from [M27]
+    "pKwH2O",    "[ 13.994 "
+                "  0.03 "
+                "  'ROUND(ⓈpKwH2O/ⒸpKwH2O;-2)' ]",
 
     // ========================================================================
     //   C. SOLIDS (at T = 293.15 K = 20°C, P = 101.325 kPa)
@@ -2531,6 +2535,13 @@ static const cstring basic_constants[] =
     // ------------------------------------------------------------------------
     //   C1. Materials for optical fibers and waveguides
     // ------------------------------------------------------------------------
+
+    "Materials/Acetic Acid",     nullptr,
+
+    // *Acetic acid pKa at 25°C, zero ionic strength - Measurement [M28]
+    "pKaAcetic", "[ 4.756 "
+                "  0.002 "
+                "  'ROUND(ⓈpKaAcetic/ⒸpKaAcetic;-2)' ]",
 
     "Materials/Silicon",     nullptr,
 
@@ -2745,6 +2756,22 @@ static const cstring basic_constants[] =
     "cpAl",     "[ 902._J/(kg*K) "
                 "  2._J/(kg*K) "
                 "  'ROUND(ⓈcpAl/ⒸcpAl;-2)' ]",
+    // *Aluminium thermal conductivity at 300 K - Measurement [M12]
+    "kAl",       "[ 237._W/(m*K) "
+                "  4._W/(m*K) "
+                "  'ROUND(ⓈkAl/ⒸkAl;-2)' ]",
+    // *Aluminium electrical resistivity at 300 K - Measurement [M22]
+    "ρAl",       "[ 2.733E-8_Ω·m "
+                "  0.016E-8_Ω·m "
+                "  'ROUND(ⓈρAl/ⒸρAl;-2)' ]",
+    // *Aluminium temperature coefficient of resistivity at 300 K - Calculation from [M22]
+    "αρAl",      "[ 0.004213_K⁻¹ "
+                "  0.000074_K⁻¹ "
+                "  'ROUND(ⓈαρAl/ⒸαρAl;-2)' ]",
+    // *Aluminium mean linear expansion 20-100°C - Measurement [M26]
+    "αLAl",      "[ 23.8E-6_K⁻¹ "
+                "  0.14E-6_K⁻¹ "
+                "  'ROUND(ⓈαLAl/ⒸαLAl;-2)' ]",
 
     "Materials/Cu Metal",     nullptr,
 
@@ -2756,6 +2783,30 @@ static const cstring basic_constants[] =
     "cpCu",     "[ 385._J/(kg*K) "
                 "  1._J/(kg*K) "
                 "  'ROUND(ⓈcpCu/ⒸcpCu;-2)' ]",
+    // *Copper Young modulus (polycrystal, annealed) - Measurement [M20]
+    "ECu",       "[ 123.5_GPa "
+                "  0.7_GPa "
+                "  'ROUND(ⓈECu/ⒸECu;-2)' ]",
+    // *Copper Poisson ratio (polycrystal, annealed) - Measurement [M20]
+    "νCu",       "[ 0.350 "
+                "  0.009 "
+                "  'ROUND(ⓈνCu/ⒸνCu;-2)' ]",
+    // *Copper thermal conductivity at 300 K - Measurement [M12]
+    "kCu",       "[ 401._W/(m*K) "
+                "  5._W/(m*K) "
+                "  'ROUND(ⓈkCu/ⒸkCu;-2)' ]",
+    // *Copper electrical resistivity at 300 K - Measurement [M23]
+    "ρCu",       "[ 1.725E-8_Ω·m "
+                "  0.005E-8_Ω·m "
+                "  'ROUND(ⓈρCu/ⒸρCu;-2)' ]",
+    // *Copper temperature coefficient of resistivity at 300 K - Calculation from [M23]
+    "αρCu",      "[ 0.003919_K⁻¹ "
+                "  0.000043_K⁻¹ "
+                "  'ROUND(ⓈαρCu/ⒸαρCu;-2)' ]",
+    // *Copper mean linear expansion 25-100°C - Measurement [M26]
+    "αLCu",      "[ 16.8E-6_K⁻¹ "
+                "  0.10E-6_K⁻¹ "
+                "  'ROUND(ⓈαLCu/ⒸαLCu;-2)' ]",
 
     "Materials/Fe Metal",     nullptr,
 
@@ -2767,6 +2818,84 @@ static const cstring basic_constants[] =
     "cpFe",     "[ 450._J/(kg*K) "
                 "  2._J/(kg*K) "
                 "  'ROUND(ⓈcpFe/ⒸcpFe;-2)' ]",
+    // *Iron Young modulus (polycrystal) - Measurement [M21]
+    "EFe",       "[ 205._GPa "
+                "  12._GPa "
+                "  'ROUND(ⓈEFe/ⒸEFe;-2)' ]",
+    // *Iron Poisson ratio (polycrystal) - Measurement [M21]
+    "νFe",       "[ 0.282 "
+                "  0.019 "
+                "  'ROUND(ⓈνFe/ⒸνFe;-2)' ]",
+    // *Iron thermal conductivity at 300 K - Measurement [M12]
+    "kFe",       "[ 80.2_W/(m*K) "
+                "  1.4_W/(m*K) "
+                "  'ROUND(ⓈkFe/ⒸkFe;-2)' ]",
+    // *Iron electrical resistivity at 300 K - Measurement [M24]
+    "ρFe",       "[ 10.50E-8_Ω·m "
+                "  0.12E-8_Ω·m "
+                "  'ROUND(ⓈρFe/ⒸρFe;-2)' ]",
+    // *Iron temperature coefficient of resistivity at 300 K - Calculation from [M24]
+    "αρFe",      "[ 0.005241_K⁻¹ "
+                "  0.000142_K⁻¹ "
+                "  'ROUND(ⓈαρFe/ⒸαρFe;-2)' ]",
+    // *Iron mean linear expansion 20-100°C - Measurement [M26]
+    "αLFe",      "[ 12.2E-6_K⁻¹ "
+                "  0.07E-6_K⁻¹ "
+                "  'ROUND(ⓈαLFe/ⒸαLFe;-2)' ]",
+
+    "Materials/Al Alloy",     nullptr,
+
+    // *Aluminium alloy 6061 Young modulus - Typical value [M25], uncertainty estimated
+    "EAlAlloy",  "[ 68.3_GPa "
+                "  0.8_GPa "
+                "  'ROUND(ⓈEAlAlloy/ⒸEAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 Poisson ratio - Typical value [M25], uncertainty estimated
+    "νAlAlloy",  "[ 0.33 "
+                "  0.006 "
+                "  'ROUND(ⓈνAlAlloy/ⒸνAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 density - Typical value [M25], uncertainty estimated
+    "ρvAlAlloy", "[ 2713._kg/m³ "
+                "  8._kg/m³ "
+                "  'ROUND(ⓈρvAlAlloy/ⒸρvAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 specific heat at 21°C - Read on figure [M25], uncertainty estimated
+    "cpAlAlloy", "[ 900._J/(kg*K) "
+                "  16._J/(kg*K) "
+                "  'ROUND(ⓈcpAlAlloy/ⒸcpAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061-T6 thermal conductivity at 21°C - Read on figure [M25], uncertainty estimated
+    "kAlAlloy",  "[ 156._W/(m*K) "
+                "  3._W/(m*K) "
+                "  'ROUND(ⓈkAlAlloy/ⒸkAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 linear expansion at 21°C - Read on figure [M25], uncertainty estimated
+    "αLAlAlloy", "[ 22.7E-6_K⁻¹ "
+                "  0.4E-6_K⁻¹ "
+                "  'ROUND(ⓈαLAlAlloy/ⒸαLAlAlloy;-2)' ]",
+
+    "Materials/Carbon Steel",     nullptr,
+
+    // *Carbon steel AISI 1025 Young modulus - Typical value [M25], uncertainty estimated
+    "ESteel",    "[ 200._GPa "
+                "  2.3_GPa "
+                "  'ROUND(ⓈESteel/ⒸESteel;-2)' ]",
+    // *Carbon steel AISI 1025 Poisson ratio - Typical value [M25], uncertainty estimated
+    "νSteel",    "[ 0.32 "
+                "  0.006 "
+                "  'ROUND(ⓈνSteel/ⒸνSteel;-2)' ]",
+    // *Carbon steel AISI 1025 density - Typical value [M25], uncertainty estimated
+    "ρvSteel",   "[ 7861._kg/m³ "
+                "  23._kg/m³ "
+                "  'ROUND(ⓈρvSteel/ⒸρvSteel;-2)' ]",
+    // *Carbon steel AISI 1025 specific heat 50-100°C - Typical value [M25], uncertainty estimated
+    "cpSteel",   "[ 486._J/(kg*K) "
+                "  6._J/(kg*K) "
+                "  'ROUND(ⓈcpSteel/ⒸcpSteel;-2)' ]",
+    // *Carbon steel AISI 1025 thermal conductivity at 0°C - Typical value [M25], uncertainty estimated
+    "kSteel",    "[ 51.9_W/(m*K) "
+                "  0.6_W/(m*K) "
+                "  'ROUND(ⓈkSteel/ⒸkSteel;-2)' ]",
+    // *Carbon steel AISI 1025 mean linear expansion 21-66°C - Read on figure [M25], uncertainty estimated
+    "αLSteel",   "[ 10.8E-6_K⁻¹ "
+                "  0.19E-6_K⁻¹ "
+                "  'ROUND(ⓈαLSteel/ⒸαLSteel;-2)' ]",
 
     // ------------------------------------------------------------------------
     //  Computing
