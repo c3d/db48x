@@ -536,8 +536,15 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
                width(), height());
 
         // Mark every pixel as dirty so the RPL thread redraws everything.
-        SimScreen::invalidate();
-        key_push(0);
+        // Not on the first activation, at start: the layout is not final
+        // yet, and the top rows of the stack would stay under the header.
+        static bool started = false;
+        if (started)
+        {
+            SimScreen::invalidate();
+            key_push(0);
+        }
+        started = true;
     }
     else if ((state == Qt::ApplicationSuspended ||
               state == Qt::ApplicationHidden) &&
