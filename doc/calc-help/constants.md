@@ -36,6 +36,12 @@ The constant value can be a single value, as above, or an array containing:
 * relative uncertainty;
 * optionally a label (defaults to the value).
 
+The standard uncertainty follows the GUM (JCGM 100:2008). Where the source gives
+a standard deviation or a standard error, it is used as given. Where it gives an
+accuracy as ± bounds, the bounds are taken as those of a rectangular
+distribution, whose standard uncertainty is the half-width divided by √3
+(GUM 4.3.7). The description of each constant says which applies.
+
 ```
 "Sample"
 
@@ -3255,10 +3261,40 @@ quantifies how strongly a material opposes the flow of electric current.
 [Materials 4](#materials-4) [Materials 2](#materials-2)
 
 
+
+### pKwH2O constant
+
+Ionization constant of water
+
+Calculation. `pKw = −log₁₀ Kw` of liquid water at `25 °C` and `0.1 MPa`,
+`13.994`, from equations (2) to (4) of the source with the density
+`0.997047 g/cm³` (IAPWS-95); the calculation reproduces the test values of its
+table 2 to `1E-7`. Its table 3 gives `13.99`, and the former formulation of
+2007 gave `13.995`. The source states that measured values do not generally
+deviate from the formulation by more than `0.05` in the liquid at moderate
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is `0.05/√3`. In pure water at `25 °C`, `pH = pKw/2 ≈ 7.00`.
+[Materials 27](#materials-27), section 5 and table 3
+
 ## C. SOLIDS (at `T = 293.15 K = 20°C`, `StdP = 101.325 kPa`)
   Parameters: `ρv`, `n`, `cp`, `ε`, `ρ*`, `Ed*`  * when relevant
 
 ## C1. Materials for optical fibers and waveguides
+
+## Acetic Acid constants
+
+Acetic acid, CH₃COOH, the weak acid of vinegar.
+
+### pKaAcetic constant
+
+Acidity constant of acetic acid
+
+Measured. `pKa` of acetic acid at `25 °C` and zero ionic strength, `4.756`,
+the value selected by the source with its best evaluation code, A, an
+estimated uncertainty of `±0.003`: that bound is taken as a rectangular
+distribution, whose standard uncertainty is `0.003/√3`. In a solution of
+concentration `C`, it gives `[H⁺]` with `Ka = 10^-pKa`; see `WeakAcid` in the
+Uncertainty library. [Materials 28](#materials-28), table 7.2, p. 238
 
 ## Silicon constants
 
@@ -3625,6 +3661,49 @@ Specific heat of aluminium
 
 Measured. Specific heat of pure aluminium at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
+### kAl constant
+
+Thermal conductivity of aluminium
+
+Measured. Recommended value for well-annealed, high-purity aluminium at
+`300 K`, `237 W/(m·K)`, given by the source to within ±3 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±3 %/√3. Alloys conduct markedly less. [Materials 12](#materials-12), p. 302
+
+
+### ρAl constant
+
+Electrical resistivity of aluminium
+
+Measured. Recommended value for well-annealed aluminium of purity 99.99 % or
+higher at `300 K`, `2.733E-8 Ω·m` (`2.650E-8 Ω·m` at `293 K`), corrected for
+thermal expansion. The source gives it to within ±1 % below `400 K`: that bound
+is taken as a rectangular distribution, whose standard uncertainty is
+±1 %/√3. [Materials 22](#materials-22), table 1, p. 1133
+
+
+### αρAl constant
+
+Temperature coefficient of the electrical resistivity of aluminium
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.004213 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `400 K` of
+the source. Its standard uncertainty, `0.000074 K⁻¹` (1.8 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 22](#materials-22), table 1, p. 1133
+
+### αLAl constant
+
+Linear thermal expansion of aluminium
+
+Measured. Mean coefficient of linear expansion of the pure metal from `20` to `100 °C`,
+`23.8E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
+
 ## Cu Metal constants
 
 Metal
@@ -3641,6 +3720,67 @@ thermal and electrical conductivity in engineering. [Materials 12](#materials-12
 Specific heat of copper
 
 Measured. Specific heat of copper at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
+
+
+### ECu constant
+
+Young modulus of copper
+
+Measured. Average of the room-temperature measurements on annealed
+polycrystalline copper, `123.5 GPa`; its uncertainty is the standard error of
+that average, as given by the source: the spread from one specimen to another
+is larger. [Materials 20](#materials-20), table 10, p. 923
+
+### νCu constant
+
+Poisson ratio of copper
+
+Measured. Average for annealed polycrystalline copper at room temperature,
+`0.350`, with the standard error of that average. [Materials 20](#materials-20), table 10, p. 923
+
+### kCu constant
+
+Thermal conductivity of copper
+
+Measured. Recommended value for well-annealed, high-purity copper at
+`300 K`, `401 W/(m·K)`, given by the source to within ±2 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±2 %/√3. Alloys conduct markedly less. [Materials 12](#materials-12), p. 332
+
+
+### ρCu constant
+
+Electrical resistivity of copper
+
+Measured. Recommended total resistivity of annealed copper of purity 99.999 %
+or higher at `300 K`, `1.725E-8 Ω·m` (`1.678E-8 Ω·m` at `293 K`), corrected
+for thermal expansion. The source gives it to within ±0.5 % from `250 K` to
+`350 K`: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±0.5 %/√3. Commercial annealed copper (the IACS standard) is
+slightly more resistive, `1.7241E-8 Ω·m` at `20 °C`. [Materials 23](#materials-23), table 2, p. 1161
+
+
+### αρCu constant
+
+Temperature coefficient of the electrical resistivity of copper
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.003919 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `350 K` of
+the source. Its standard uncertainty, `0.000043 K⁻¹` (1.1 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 23](#materials-23), table 2, p. 1161
+
+### αLCu constant
+
+Linear thermal expansion of copper
+
+Measured. Mean coefficient of linear expansion of the pure metal from `25` to `100 °C`,
+`16.8E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
 
 ## Fe Metal constants
 
@@ -3660,6 +3800,182 @@ Specific heat of iron (alpha phase, BCC)
 Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
 [Materials 12](#materials-12) [Materials 2](#materials-2)
 
+
+
+### EFe constant
+
+Young modulus of iron
+
+Measured. Best value for polycrystalline iron, `205 GPa`; its uncertainty is
+the standard deviation given by the source, which includes the variations
+between specimens and methods: cold work lowers E, and annealed iron is nearer
+`212 GPa`. [Materials 21](#materials-21), table 8, p. 569
+
+### νFe constant
+
+Poisson ratio of iron
+
+Measured. Best value for polycrystalline iron, `0.282`, with the standard
+deviation given by the source, which includes irons and steels of various
+compositions. [Materials 21](#materials-21), table 17, p. 582
+
+### kFe constant
+
+Thermal conductivity of iron
+
+Measured. Recommended value for well-annealed, high-purity iron at
+`300 K`, `80.2 W/(m·K)`, given by the source to within ±3 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±3 %/√3. Alloys conduct markedly less. [Materials 12](#materials-12), p. 354
+
+
+### ρFe constant
+
+Electrical resistivity of iron
+
+Measured. Recommended value for the NBS electrolytic iron reference material
+at `300 K`, `10.50E-8 Ω·m` for a residual resistivity ratio of 22.5 (`10.46E-8`
+to `10.56E-8 Ω·m` from the purest to the least pure specimens), corrected for
+thermal expansion. The source states its high-temperature data accurate to
+about 1 to 2 %: ±2 % is taken as the bounds of a rectangular distribution,
+whose standard uncertainty is ±2 %/√3. [Materials 24](#materials-24), table 4.1, p. 55
+
+
+
+### αρFe constant
+
+Temperature coefficient of the electrical resistivity of iron
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.005241 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `400 K` of
+the source. Its standard uncertainty, `0.000142 K⁻¹` (2.7 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 24](#materials-24), table 4.1, p. 55
+
+### αLFe constant
+
+Linear thermal expansion of iron
+
+Measured. Mean coefficient of linear expansion of the pure metal from `20` to `100 °C`,
+`12.2E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
+
+## Al Alloy constants
+
+Aluminium alloy 6061, the most common general-purpose aluminium alloy for bars,
+tubes and profiles; 6061 is its standard designation (Aluminum Association).
+
+### EAlAlloy constant
+
+Young modulus of aluminium alloy 6061
+
+Typical value for rolled, drawn or extruded 6061, `68.3 GPa` (`9.9×10³ ksi`).
+The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+### νAlAlloy constant
+
+Poisson ratio of aluminium alloy 6061
+
+Typical value for 6061, `0.33`. The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+
+### ρvAlAlloy constant
+
+Density of aluminium alloy 6061
+
+Typical value, `2713 kg/m³` (`0.098 lb/in³`). The source gives a typical value without uncertainty: ±0.5 % is our
+estimate, taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+### cpAlAlloy constant
+
+Specific heat of aluminium alloy 6061
+
+`900 J/(kg·K)` (`0.215 Btu/(lb·°F)`) at `21 °C`. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+### kAlAlloy constant
+
+Thermal conductivity of aluminium alloy 6061
+
+`156 W/(m·K)` (`90 Btu/(h·ft·°F)`) for the T6 temper at `21 °C`, well below the
+`237 W/(m·K)` of pure aluminium. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+### αLAlAlloy constant
+
+Linear thermal expansion of aluminium alloy 6061
+
+`22.7E-6 K⁻¹` (`12.6E-6 /°F`) near `21 °C`. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+## Carbon Steel constants
+
+Carbon steel AISI 1025, a mild steel for sheet, tubing and bar; AISI 1025 is its
+standard designation (AISI-SAE), about 0.25 % carbon.
+
+### ESteel constant
+
+Young modulus of carbon steel
+
+Typical value for annealed or normalized AISI 1025 carbon steel, `200 GPa`
+(`29.0×10³ ksi`). The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### νSteel constant
+
+Poisson ratio of carbon steel
+
+Typical value for AISI 1025 carbon steel, `0.32`. The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+
+### ρvSteel constant
+
+Density of carbon steel
+
+Typical value for AISI 1025, `7861 kg/m³` (`0.284 lb/in³`). The source gives a typical value without uncertainty: ±0.5 % is our
+estimate, taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### cpSteel constant
+
+Specific heat of carbon steel
+
+Mean value for AISI 1025 from `50` to `100 °C`, `486 J/(kg·K)`
+(`0.116 Btu/(lb·°F)`). The source gives a typical value without uncertainty: ±2 % is our estimate,
+taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### kSteel constant
+
+Thermal conductivity of carbon steel
+
+Value for AISI 1025 at `0 °C`, `51.9 W/(m·K)` (`30.0 Btu/(h·ft·°F)`). The source gives a typical value without uncertainty: ±2 % is our estimate,
+taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### αLSteel constant
+
+Linear thermal expansion of carbon steel
+
+Mean value for AISI 1025 from `21` to `66 °C`, `10.8E-6 K⁻¹` (`6.0E-6 /°F`).
+Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 2.2.1.0, p. 2-9
 
 ## Dates constants
 
@@ -3959,3 +4275,39 @@ Luke, K., Okawachi, Y., Lamont, M.R.E., Gaeta, A.L., & Lipson, M. (2015). "Broad
 ### Materials 19
 
 NIST Materials Measurement Laboratory (2024). Materials Properties Database. [Source](https://trc.nist.gov) — Accessed: March 2026
+
+### Materials 20
+
+Ledbetter, H.M., & Naimon, E.R. (1974). "Elastic Properties of Metals and Alloys. II. Copper". J. Phys. Chem. Ref. Data, 3(4), 897–935. DOI: 10.1063/1.3253150
+
+### Materials 21
+
+Ledbetter, H.M., & Reed, R.P. (1973). "Elastic Properties of Metals and Alloys, I. Iron, Nickel, and Iron-Nickel Alloys". J. Phys. Chem. Ref. Data, 2(3), 531–618. DOI: 10.1063/1.3253127
+
+### Materials 22
+
+Desai, P.D., James, H.M., & Ho, C.Y. (1984). "Electrical Resistivity of Aluminum and Manganese". J. Phys. Chem. Ref. Data, 13(4), 1131–1172. DOI: 10.1063/1.555725
+
+### Materials 23
+
+Matula, R.A. (1979). "Electrical resistivity of copper, gold, palladium, and silver". J. Phys. Chem. Ref. Data, 8(4), 1147–1298. DOI: 10.1063/1.555614
+
+### Materials 24
+
+Hust, J.G., & Lankford, A.B. (1984). "Update of Thermal Conductivity and Electrical Resistivity of Electrolytic Iron, Tungsten, and Stainless Steel". NBS Special Publication 260-90, National Bureau of Standards, Boulder. [Source](https://www.nist.gov/system/files/documents/2016/10/06/SP260-90.PDF)
+
+### Materials 25
+
+Department of Defense (2003). MIL-HDBK-5J, "Metallic Materials and Elements for Aerospace Vehicle Structures", 31 January 2003 (equivalent to MMPDS-01). [Source](https://everyspec.com/MIL-HDBK/MIL-HDBK-0001-0099/MIL_HDBK_5J_139/)
+
+### Materials 26
+
+Hidnert, P., & Souder, W. (1950). "Thermal Expansion of Solids". Circular of the National Bureau of Standards 486, Washington. [Source](https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular486.pdf)
+
+### Materials 27
+
+IAPWS (2024). R11-24, "Revised Release on the Ionization Constant of H₂O". International Association for the Properties of Water and Steam, 29 June 2024. [Source](https://iapws.org/relguide/Ionization.html)
+
+### Materials 28
+
+Goldberg, R.N., Kishore, N., & Lennen, R.M. (2002). "Thermodynamic Quantities for the Ionization Reactions of Buffers". J. Phys. Chem. Ref. Data, 31(2), 231–370. DOI: 10.1063/1.1416902
