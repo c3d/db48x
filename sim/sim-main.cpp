@@ -597,6 +597,32 @@ int main(int argc, char *argv[])
             stamp.close();
         }
     }
+    // Up to 0.9.21, the files lived in the private AppDataLocation. Bring the
+    // saved states over, once, so that an update keeps the user's stack,
+    // variables and programs instead of starting again from the demo state.
+    QString oldFiles =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString moved = files + "/.state-migrated";
+    if (oldFiles != files && !QFile::exists(moved))
+    {
+        QDir oldState(oldFiles + "/state");
+        if (oldState.exists())
+        {
+            QDir().mkpath(files + "/state");
+            const QStringList states =
+                oldState.entryList(QStringList() << "*.48S" << "*.48s",
+                                   QDir::Files);
+            for (const QString &name : states)
+            {
+                QString to = files + "/state/" + name;
+                if (!QFile::exists(to))
+                    QFile::copy(oldState.filePath(name), to);
+            }
+        }
+        QFile mark(moved);
+        if (mark.open(QIODevice::WriteOnly))
+            mark.close();
+    }
 #else // !ANDROID
     // On a desktop the data directory is created by us alone, so its absence
     // still is the right signal, and the version changes at every commit.
