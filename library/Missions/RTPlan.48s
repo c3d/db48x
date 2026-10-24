@@ -1,4 +1,12 @@
 «
+ @ Check the arguments before touching any setting: 3 real numbers
+ IF DEPTH 3 < THEN 0 ELSE
+   1 1 3 FOR jj jj 1 + PICK TypeName → tn
+     « 0 { "integer" "neg_integer" "bignum" "neg_bignum" "fraction" "neg_fraction" "big_fraction" "neg_big_fraction" "decimal" "neg_decimal" "hwfloat" "hwdouble" }
+       1 12 START DUP HEAD tn == ROT OR SWAP TAIL NEXT DROP » AND
+   NEXT
+ END
+ IF NOT THEN "RTPlan needs t1lo t1hi stay (JD JD days), e.g. 2459030 2459075 500" DoError END
  'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH
  « HFP 15 Precision
 @@ ============================================================

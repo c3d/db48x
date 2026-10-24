@@ -57,6 +57,10 @@ the stack, Continue lets it finish and restore your settings. If you Kill it
 instead, the hardware floating point mode and the 15 digits stay on: clear the
 stack and restore your own settings, for instance with SFP 24 Precision.
 
+Without three numbers on the stack, RTPlan stops at once with a message that
+recalls its arguments and gives an example, leaving the stack and the settings
+unchanged.
+
 `t1lo t1hi stay` → `{ t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot }`
 
 ```rpl
@@ -82,6 +86,10 @@ press EXIT. If the program is only suspended, its intermediate values left on
 the stack, Continue lets it finish and restore your settings. If you Kill it
 instead, the hardware floating point mode and the 15 digits stay on: clear the
 stack and restore your own settings, for instance with SFP 24 Precision.
+
+Without two numbers on the stack, RTPlanOpp stops at once with a message that
+recalls its arguments and gives an example, leaving the stack and the settings
+unchanged.
 
 `t3lo t3hi` → `{ t3 tv t4 ΔVTEI matchErr turnReq turnMax tof }`
 

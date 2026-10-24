@@ -18,6 +18,14 @@
 @@ points of the refinement only combine them: 98 Lambert solutions instead of
 @@ 686, and the same result to the last digit, about six times faster.
 @@ ============================================================
+ @ Check the arguments before touching any setting: 2 real numbers
+ IF DEPTH 2 < THEN 0 ELSE
+   1 1 2 FOR jj jj 1 + PICK TypeName → tn
+     « 0 { "integer" "neg_integer" "bignum" "neg_bignum" "fraction" "neg_fraction" "big_fraction" "neg_big_fraction" "decimal" "neg_decimal" "hwfloat" "hwdouble" }
+       1 12 START DUP HEAD tn == ROT OR SWAP TAIL NEXT DROP » AND
+   NEXT
+ END
+ IF NOT THEN "RTPlanOpp needs t3lo t3hi (JD JD), e.g. 2459920 2459980" DoError END
  → t3lo t3hi
  « 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH « HFP 15 Precision DEG
    @ EXIT inside a solver stops the run with an error: restore the settings,
