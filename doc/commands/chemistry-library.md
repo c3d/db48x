@@ -91,15 +91,22 @@ none), and its family.
 
 * `8`, `4`, `6`, `2`, or `▲` and `▼`: move the cursor, skipping the empty cells;
 * `5`: show all the data of the element, as Element does, with its
-  molar mass; any key but `EXIT` comes back to the table;
+  molar mass; any key but EXIT comes back to the table;
 * `ENTER`: leave the table, with the element under the cursor on the stack;
   the table stays on the screen until the next key.
 
-As during any Wait, `EXIT` suspends the program: Continue resumes it, and
-leaves the table.
+EXIT, or the Back gesture of a phone, cannot be caught by a program: as
+during any Wait, it suspends PerTbl. The table, or the card, stays on the
+screen, and a red mark in the status bar shows the suspended program; keys
+typed then go to the stack, and the next instruction of the program may show
+at the top of the screen. To leave, press Continue, in the Debug menu: PerTbl
+ends, from the table as from a card, whose drawing stays on the screen until
+the next key. Kill, in the same menu, also ends
+it, without the element on the stack.
 
 A list of key positions in level 1 is played first, then the keyboard takes
-over. This makes it possible to start on a given element, or to replay a
+over. Only a list of numbers is taken: the list that Element, or an earlier
+call to PerTbl, left in level 1 stays on the stack. This makes it possible to start on a given element, or to replay a
 demonstration. Key positions are given as `rc`: row and column on the
 keyboard, for example `61` for `▼` and `64` for `6`.
 
