@@ -1038,7 +1038,9 @@ measured value of the Rydberg constant `R∞`. [CODATA](#codata)
 
 Mercury gravitational parameter
 
-It is measured by radio tracking of spacecraft (Mariner 10, MESSENGER). [Reference 4](#reference-4)
+It is measured by radio tracking of spacecraft (Mariner 10, MESSENGER). DE440 publishes no uncertainty: the standard uncertainty, 0.0012 km³/s², is the
+one of the MESS160A gravity field in the Planetary Data System.
+[Reference 4](#reference-4) [Reference 39](#reference-39)
 
 ### M☿ constant
 
@@ -1058,15 +1060,15 @@ It is measured by radar altimetry and spacecraft imaging. [Reference 22](#refere
 
 Mercury polar radius
 
-Mercury's polar radius is also measured, since Mercury being essentially
-spherical; equatorial and polar radii are equal within measurement precision. [Reference 22](#reference-22)
+Mercury's polar radius is measured by MESSENGER laser altimetry and radio occultations
+(best-fit ellipsoid of Perry et al. 2015). It is about 2.3 km smaller than the equatorial radius. [Reference 22](#reference-22)
 
 ### f☿ constant
 
 Mercury oblateness
 
 Mercury's oblateness is calculated from its equatorial and polar radii measurement.
-Due to Mercury's near-spherical shape, this value is effectively zero. [Reference 22](#reference-22)
+Mercury is nearly spherical: its oblateness is about 0.001. [Reference 22](#reference-22)
 
 ### ρv☿ constant
 
@@ -1119,7 +1121,11 @@ Mercury semi-major axis
 
 Mercury's orbital semi-major axis is a measured quantity. It is half the length
 of the longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e☿ constant
 
@@ -1127,14 +1133,22 @@ Mercury orbital eccentricity
 
 Mercury's orbital eccentricity is a measured quantity, it is the largest of
 all major planets. When different from 0, it is a measure of how much a
-planet's elliptical path deviates from a perfect circle. [Reference 23](#reference-23)
+planet's elliptical path deviates from a perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i☿ constant
 
 Mercury orbital inclination
 
 Mercury's orbital inclination with respect to the ecliptic plane is a measured
-angle. [Reference 23](#reference-23)
+angle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω☿ constant
 
@@ -1142,7 +1156,11 @@ Mercury longitude of ascending node
 
 Mercury's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Mercury crosses
-northward through Earth's orbital plane. [Reference 23](#reference-23)
+northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω☿ constant
 
@@ -1150,7 +1168,11 @@ Mercury argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
-Sun), measured in the direction of motion. [Reference 23](#reference-23)
+Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb☿ constant
 
@@ -1182,7 +1204,9 @@ perihelion roughly four times per year. [Reference 27](#reference-27)
 Venus gravitational parameter
 
 Venus's gravitational parameter, measured by radio tracking of spacecraft
-(Magellan, Venus Express). [Reference 4](#reference-4)
+(Magellan, Venus Express). DE440 publishes no uncertainty: the standard uncertainty, 0.0064 km³/s², is the
+one of the MGN180U gravity field in the Planetary Data System.
+[Reference 4](#reference-4) [Reference 39](#reference-39)
 
 ### M♀ constant
 
@@ -1265,20 +1289,31 @@ Venus semi-major axis
 
 Measured. Venus's orbital semi-major axis is half the length of the longest
 diameter of the elliptical orbit, which is also the average distance from one
-of the radii to the orbit. [Reference 23](#reference-23)
+of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♀ constant
 
 Venus orbital eccentricity
 
-Measured. Venus's orbital eccentricity, nearly circular (therefore, near 0). [Reference 23](#reference-23)
+Measured. Venus's orbital eccentricity, nearly circular (therefore, near 0).
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♀ constant
 
 Venus orbital inclination
 
 Venus's orbital inclination with respect to the ecliptic plane is a measured angle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
 [Reference 23](#reference-23)
+
 
 ### Ω♀ constant
 
@@ -1286,7 +1321,11 @@ Venus longitude of ascending node
 
 Venus's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Venus crosses northward
-through Earth's orbital plane. [Reference 23](#reference-23)
+through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♀ constant
 
@@ -1294,7 +1333,11 @@ Venus argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the Sun),
-measured in the direction of motion. [Reference 23](#reference-23)
+measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♀ constant
 
@@ -1325,7 +1368,19 @@ computation is carried out in Julian Day Number and converted to a date with
 Earth gravitational parameter
 
 Exact nominal value (IAU 2015). Earth's gravitational parameter. An exact nominal
-value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
+
+### GMs♁ constant
+
+Earth-Moon system gravitational parameter
+
+Measured. Gravitational parameter of the Earth and the Moon together, the sum of
+the values of the JPL planetary ephemeris DE440 (398600.435507 and
+4902.800118 km³/s²). Use it far from the Earth, beyond the orbit of the Moon:
+sphere of influence, Lagrange points of the Sun-Earth system, heliocentric
+orbits. Near the Earth, use `GM♁`. The standard uncertainty is the one of the
+Earth's GM in the IERS Conventions, 0.0008 km³/s².
+[Reference 4](#reference-4) [Reference 44](#reference-44)
 
 ### M♁ constant
 
@@ -1333,21 +1388,21 @@ Earth mass
 
 Earth's mass, derived from the gravitational parameter `GM♁` and the measured
 gravitational constant `G` as `GM♁/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [IAU 2015 Resolution B3](#iau-2015-resolution-b3) [Reference 5](#reference-5)
 
 ### Req♁ constant
 
 Earth equatorial radius
 
 Exact nominal value (IAU 2015). Earth's equatorial radius. An exact nominal value
-defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Rp♁ constant
 
 Earth polar radius
 
 Exact nominal value (IAU 2015). Earth's polar radius. An exact nominal value
-defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### f♁ constant
 
@@ -1356,50 +1411,54 @@ Earth oblateness
 Calculated from nominal value. Earth's oblateness, reflecting its equatorial
 bulge due to rotation. Calculated from `Req♁` and `Rp♁`. When greater than 0, it
 describes how much a celestial body deviates from a perfect sphere, forming an
-"oblate spheroid". [Particle Data Group 2023](#particle-data-group-2023)
+"oblate spheroid". [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### ρv♁ constant
 
 Earth mean density
 
 Calculated from nominal value. Earth's mean density, calculated from its gravitational
-parameter and volume. [Particle Data Group 2023](#particle-data-group-2023)
+parameter and volume. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### g♁ constant
 
 Earth surface gravity
 
 Calculated from nominal value. Earth's surface gravity at the equator, calculated
-from `GM♁` and `Req♁`. [Particle Data Group 2023](#particle-data-group-2023)
+from `GM♁` and `Req♁`. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Ve♁ constant
 
 Earth escape velocity
 
 Calculated from nominal value, it is valid at the equatorial surface. It is the
-minimum speed needed to break free from Earth's gravitational pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
+minimum speed needed to break free from Earth's gravitational pull and never return. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Prot♁ constant
 
 Earth sidereal rotation period
 
-Measured. Earth's sidereal rotation period (one sidereal day), the time for one
-rotation relative to the fixed stars. [Reference 24](#reference-24)
+Earth's sidereal rotation period, the time for one rotation relative to the
+fixed stars (the stellar day). It is 86400 s divided by the rate of the Earth
+rotation angle, 1.00273781191135448 turns per UT1 day. The sidereal day of
+astronomers, 86164.0905 s, is measured from the equinox, which precesses: it is
+8.4 ms shorter. The uncertainty reflects the variations of the length of the
+day, of the order of a millisecond. [Reference 44](#reference-44)
 
 ### ωrot♁ constant
 
 Earth rotation angular velocity
 
 Earth's sidereal rotation angular velocity, computed as `2π/Prot♁` from the
-sidereal rotation period. The unit is radians per second (`r/s`). [Reference 24](#reference-24)
+sidereal rotation period. The unit is radians per second (`r/s`). [Reference 44](#reference-44)
 
 ### ϵ♁ constant
 
 Earth axial tilt
 
-Measured. Earth's axial tilt (obliquity of the ecliptic), the primary driver of the
-seasons. It is the angle of the planet's rotational axis relative to its orbital plane.
-[Reference 24](#reference-24)
+Earth's axial tilt (obliquity of the ecliptic at J2000, 84381.406″), the primary
+driver of the seasons. It is the angle of the planet's rotational axis relative
+to its orbital plane. [Reference 43](#reference-43)
 
 ### a♁ constant
 
@@ -1408,13 +1467,17 @@ Earth semi-major axis
 Exact nominal value (1 AU by definition). Earth's orbital semi-major axis, defined
 as exactly 1 astronomical unit (AU). It is half the length of the longest diameter
 of the elliptical orbit, which is also the average distance from one of the radii
-to the orbit. [Particle Data Group 2023](#particle-data-group-2023)
+to the orbit. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### e♁ constant
 
 Earth orbital eccentricity
 
-Measured. Earth's orbital eccentricity (low since the orbit is nearly circular) . [Reference 23](#reference-23)
+Measured. Earth's orbital eccentricity (low since the orbit is nearly circular) .
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♁ constant
 
@@ -1425,7 +1488,11 @@ Measured (reference plane constant
 near zero relative to the J2000.0 ecliptic plane).
 The Earth's orbital inclination is often defined by convention with respect to
 the reference plane (effectively zero) as being the ecliptic plane (in such case
-this angle is zero). [Reference 23](#reference-23)
+this angle is zero).
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♁ constant
 
@@ -1433,7 +1500,11 @@ Earth longitude of ascending node
 
 Earth’s longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where the Earth crosses
-northward through Earth's orbital plane. [Reference 23](#reference-23)
+northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♁ constant
 
@@ -1441,7 +1512,11 @@ Earth argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
-Sun), measured in the direction of motion. [Reference 23](#reference-23)
+Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♁ constant
 
@@ -1553,13 +1628,16 @@ gravitational constant `G` as `GM☽/G`. The relative uncertainty is carried as
 
 Moon equatorial radius
 
-Measured. Moon's equatorial radius, measured by laser altimetry (LRO mission). [Reference 22](#reference-22)
+Measured. Moon's equatorial radius, measured by laser altimetry (LRO mission).
+The source gives no uncertainty: the one shown is one unit of the last digit.
+[Reference 28](#reference-28)
 
 ### Rp☽ constant
 
 Moon polar radius
 
-Measured. Moon's polar radius. [Reference 22](#reference-22)
+Measured. Moon's polar radius. The source gives no uncertainty: the one shown
+is one unit of the last digit. [Reference 28](#reference-28)
 
 ### f☽ constant
 
@@ -1568,7 +1646,7 @@ Moon oblateness
 Calculated from measurement. Moon's oblateness, reflecting its slight equatorial
 bulge. Calculated from `Req☽` and `Rp☽`. When greater than 0, it describes how
 much a celestial body deviates from a perfect sphere, forming an "oblate spheroid".
-[Reference 22](#reference-22)
+[Reference 28](#reference-28)
 
 ### ρv☽ constant
 
@@ -1612,8 +1690,10 @@ orbital mean motion. The unit is radians per second (`r/s`). [Reference 22](#ref
 
 Moon axial tilt
 
-Measured. Moon's axial tilt is the angle of the planet's rotational axis
-relative to its orbital plane. [Reference 22](#reference-22)
+Measured. Moon's axial tilt is the angle of its rotational axis relative to
+the ecliptic. By Cassini's laws, the axis, the normal to the orbit and the
+normal to the ecliptic stay in one plane: relative to its own orbit, the tilt
+is about 6.7°. [Reference 22](#reference-22)
 
 ### a☽ constant
 
@@ -1621,7 +1701,11 @@ Moon semi-major axis
 
 Measured. Moon's orbital semi-major axis (mean Earth-Moon distance). It is half
 the length of the longest diameter of the elliptical orbit, which is also the
-average distance from one of the radii to the orbit. [Reference 25](#reference-25)
+average distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 45](#reference-45)
+
 
 ### e☽ constant
 
@@ -1630,29 +1714,46 @@ Moon orbital eccentricity
 Measured. Moon's orbital eccentricity. The Moon's elliptical orbit causes
 noticeable variation in its apparent size (supermoon and micromoon effects).
 When different from 0, it is a measure of how much the moon's elliptical path
-deviates from a perfect circle. [Reference 25](#reference-25)
+deviates from a perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 45](#reference-45)
+
 
 ### i☽ constant
 
 Moon orbital inclination
 
 Moon's orbital inclination is a measured angle with respect to the ecliptic
-plane. [Reference 25](#reference-25)
+plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 28](#reference-28)
+
 
 ### Ω☽ constant
 
 Moon longitude of ascending node
 
-Moon's longitude of the ascending node is a measured angle quantifying the
-horizontal orientation of the orbit. It represents where the Moon crosses
-northward through Earth's orbital plane.. [Reference 25](#reference-25)
+Mean longitude of the ascending node of the lunar orbit at J2000,
+Ω = 125.0445479° − 1934.1362891°·T (T in Julian centuries from J2000). The
+node regresses by 19.34° per year, one turn in 18.61 years, so the value is
+only valid near J2000. The uncertainty is the rounding to the last digit, a
+bound of a uniform distribution divided by √3.
+[Reference 27](#reference-27)
+
 
 ### ω☽ constant
 
 Moon argument of perigee
 
-Measured. Moon's argument of perigee. It is the most recent point in its
-orbit when it was closest to the Earth. [Reference 25](#reference-25)
+Mean argument of perigee of the lunar orbit at J2000, the mean longitude of
+perigee ϖ = 83.3532465° + 4069.0137287°·T minus the longitude of the node Ω.
+The perigee advances by 40.69° per year, one turn in 8.85 years, so the value
+is only valid near J2000. The uncertainty is the rounding to the last digit, a
+bound of a uniform distribution divided by √3.
+[Reference 27](#reference-27)
+
 
 ### Porb☽ constant
 
@@ -1691,8 +1792,22 @@ perigee, and must not be used to check this value. [Reference 27](#reference-27)
 
 Mars gravitational parameter
 
-Measured. Mars system gravitational parameter, including the contribution of
-its moons Phobos and Deimos, measured by spacecraft radio tracking. [Reference 4](#reference-4)
+Measured. Gravitational parameter of Mars alone, without Phobos and Deimos, from
+the JPL MAR097 satellite ephemeris. It is the one to use near the planet
+(orbits, captures, flybys) and the one from which the mass, density, surface
+gravity and escape velocity are derived. For heliocentric trajectories, use the
+system value `GMs♂`. [Reference 37](#reference-37)
+
+### GMs♂ constant
+
+Mars system gravitational parameter
+
+Measured. Gravitational parameter of Mars together with Phobos and Deimos, as
+used by the JPL planetary ephemeris DE440 for the motion around the Sun. Use it
+far from the planet, for heliocentric trajectories; near the planet, use `GM♂`.
+DE440 publishes no uncertainty: the standard uncertainty is the one of the
+planet alone in the MAR097 satellite ephemeris. [Reference 4](#reference-4)
+[Reference 37](#reference-37)
 
 ### M♂ constant
 
@@ -1700,7 +1815,7 @@ Mars mass
 
 Mars's mass, derived from the gravitational parameter `GM♂` and the measured
 gravitational constant `G` as `GM♂/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 37](#reference-37) [Reference 5](#reference-5)
 
 ### Req♂ constant
 
@@ -1726,14 +1841,14 @@ celestial body deviates from a perfect sphere, forming an "oblate spheroid". [Re
 Mars mean density
 
 Calculated from measurement. Mars's mean density, intermediate between rocky
-and metallic compositions. [Reference 4](#reference-4) [Reference 22](#reference-22)
+and metallic compositions. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### g♂ constant
 
 Mars surface gravity
 
 Calculated from measurement. Mars's surface gravity, approximately 38% of
-Earth's. [Reference 4](#reference-4) [Reference 22](#reference-22)
+Earth's. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Ve♂ constant
 
@@ -1741,7 +1856,7 @@ Mars escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface. It is the
 minimum speed needed to break free from Mars's gravitational pull and never
-return. [Reference 4](#reference-4) [Reference 22](#reference-22)
+return. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Prot♂ constant
 
@@ -1771,7 +1886,11 @@ Mars semi-major axis
 
 Measured. Mars's orbital semi-major axis is half the length of the longest
 diameter of the elliptical orbit, which is also the average distance from
-one of the radii to the orbit. [Reference 23](#reference-23)
+one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♂ constant
 
@@ -1779,21 +1898,33 @@ Mars orbital eccentricity
 
 Measured. Mars's orbital eccentricity, significantly larger than Earth's.
 When different from 0, it is a measure of how much a planet's elliptical
-path deviates from a perfect circle. [Reference 23](#reference-23)
+path deviates from a perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♂ constant
 
 Mars orbital inclination
 
 Mars's orbital inclination is a measured angle with respect to the ecliptic
-plane. [Reference 23](#reference-23)
+plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♂ constant
 
 Mars longitude of ascending node
 Mars's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Mars crosses
-northward through Earth's orbital plane. [Reference 23](#reference-23)
+northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♂ constant
 
@@ -1801,7 +1932,11 @@ Mars argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
-Sun), measured in the direction of motion. [Reference 23](#reference-23)
+Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♂ constant
 
@@ -1832,7 +1967,18 @@ computation is carried out in Julian Day Number and converted to a date with
 Jupiter gravitational parameter
 
 Exact nominal value (IAU 2015). Jupiter system gravitational parameter.
-An exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+An exact nominal value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
+
+### GMs♃ constant
+
+Jupiter system gravitational parameter
+
+Measured. Gravitational parameter of Jupiter together with the Galilean moons,
+as used by the JPL planetary ephemeris DE440 for the motion around the Sun. Use
+it far from the planet, for heliocentric trajectories; near the planet, use
+`GM♃`. DE440 publishes no uncertainty: the standard uncertainty is the one of
+the planet alone in the JUP365 satellite ephemeris. [Reference 4](#reference-4)
+[Reference 37](#reference-37)
 
 ### M♃ constant
 
@@ -1840,21 +1986,21 @@ Jupiter mass
 
 Jupiter's mass, derived from the gravitational parameter `GM♃` and the measured
 gravitational constant `G` as `GM♃/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [IAU 2015 Resolution B3](#iau-2015-resolution-b3) [Reference 5](#reference-5)
 
 ### Req♃ constant
 
 Jupiter equatorial radius
 
 Exact nominal value (IAU 2015). Jupiter's equatorial radius. An exact
-nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+nominal value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Rp♃ constant
 
 Jupiter polar radius
 
 Exact nominal value (IAU 2015). Jupiter's polar radius. An exact nominal
-value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### f♃ constant
 
@@ -1863,21 +2009,21 @@ Jupiter oblateness
 Calculated from nominal value. It is the largest of any planet due to its
 rapid rotation and gaseous composition. When greater than 0, it describes
 how much a celestial body deviates from a perfect sphere, forming an
-"oblate spheroid". [Particle Data Group 2023](#particle-data-group-2023)
+"oblate spheroid". [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### ρv♃ constant
 
 Jupiter mean density
 
 Calculated from nominal value. Jupiter's mean density, lower than water
-due to its gaseous composition. [Particle Data Group 2023](#particle-data-group-2023)
+due to its gaseous composition. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### g♃ constant
 
 Jupiter surface gravity
 
 Calculated from nominal value. Jupiter's surface gravity at the 1-bar
-pressure level. [Particle Data Group 2023](#particle-data-group-2023)
+pressure level. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Ve♃ constant
 
@@ -1885,7 +2031,7 @@ Jupiter escape velocity
 
 Calculated from nominal value, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Jupiter's gravitational
-pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
+pull and never return. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Prot♃ constant
 
@@ -1916,7 +2062,11 @@ Jupiter semi-major axis
 
 Measured. Jupiter's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♃ constant
 
@@ -1924,14 +2074,22 @@ Jupiter orbital eccentricity
 
 Measured. Jupiter's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
-perfect circle. [Reference 23](#reference-23)
+perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♃ constant
 
 Jupiter orbital inclination
 
 Jupiter's orbital inclination is a measured angle with respect to the
-ecliptic plane. [Reference 23](#reference-23)
+ecliptic plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♃ constant
 
@@ -1939,7 +2097,11 @@ Jupiter longitude of ascending node
 
 Jupiter's longitude of the ascending node is a measured angle
 quantifying the horizontal orientation of the orbit. It represents
-where Jupiter crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
+where Jupiter crosses northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♃ constant
 
@@ -1947,7 +2109,11 @@ Jupiter argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
-point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
+point to the Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♃ constant
 
@@ -1976,8 +2142,22 @@ computation is carried out in Julian Day Number and converted to a date with
 
 Saturn gravitational parameter
 
-Measured. Saturn system gravitational parameter, measured by radio
-tracking of the Cassini spacecraft. [Reference 4](#reference-4)
+Measured. Gravitational parameter of Saturn alone, without Titan and the other
+moons, from the JPL SAT441 satellite ephemeris. It is the one to use near the
+planet (orbits, captures, flybys) and the one from which the mass, density,
+surface gravity and escape velocity are derived. For heliocentric trajectories,
+use the system value `GMs♄`. [Reference 37](#reference-37)
+
+### GMs♄ constant
+
+Saturn system gravitational parameter
+
+Measured. Gravitational parameter of Saturn together with Titan and the other
+moons, as used by the JPL planetary ephemeris DE440 for the motion around the
+Sun. Use it far from the planet, for heliocentric trajectories; near the planet,
+use `GM♄`. DE440 publishes no uncertainty: the standard uncertainty is the one
+of the planet alone in the SAT441 satellite ephemeris. 
+[Reference 4](#reference-4) [Reference 37](#reference-37)
 
 ### M♄ constant
 
@@ -1985,7 +2165,7 @@ Saturn mass
 
 Saturn's mass, derived from the gravitational parameter `GM♄` and the measured
 gravitational constant `G` as `GM♄/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 37](#reference-37) [Reference 5](#reference-5)
 
 ### Req♄ constant
 
@@ -2014,14 +2194,14 @@ Saturn mean density
 Calculated from measurement. Saturn's mean density, the lowest of any
 planet constant
 
-less than that of water. [Reference 4](#reference-4) [Reference 22](#reference-22)
+less than that of water. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### g♄ constant
 
 Saturn surface gravity
 
 Calculated from measurement. Saturn's surface gravity at the 1-bar
-pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pressure level. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Ve♄ constant
 
@@ -2029,15 +2209,19 @@ Saturn escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Saturn's gravitational
-pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pull and never return. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Prot♄ constant
 
 Saturn sidereal rotation period
 
 Measured. Saturn's sidereal rotation period is the true time it takes
-to spin 360° on its axis (System III, based on Cassini radio
-measurements). [Reference 22](#reference-22)
+to spin 360° on its axis. The period of Saturn's radio emissions changed by
+several minutes between Voyager and Cassini and does not follow the interior.
+This value, 10 h 33 min 38 s, comes from the waves that Saturn's interior
+excites in the C ring. The source gives +1 min 52 s / −1 min 19 s as a 90 %
+interval; the standard uncertainty is its mean half-width divided by 1.645.
+[Reference 40](#reference-40)
 
 ### ωrot♄ constant
 
@@ -2060,7 +2244,11 @@ Saturn semi-major axis
 
 Measured. Saturn's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♄ constant
 
@@ -2068,14 +2256,22 @@ Saturn orbital eccentricity
 
 Measured. Saturn's orbital eccentricity. When different from 0, it is
 a measure of how much a planet's elliptical path deviates from a perfect
-circle. [Reference 23](#reference-23)
+circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♄ constant
 
 Saturn orbital inclination
 
 Saturn's orbital inclination is a measured angle with respect to the
-ecliptic plane. [Reference 23](#reference-23)
+ecliptic plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♄ constant
 
@@ -2083,7 +2279,11 @@ Saturn longitude of ascending node
 
 Saturn's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Saturn
-crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
+crosses northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♄ constant
 
@@ -2091,7 +2291,11 @@ Saturn argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
-point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
+point to the Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♄ constant
 
@@ -2120,8 +2324,22 @@ computation is carried out in Julian Day Number and converted to a date with
 
 Uranus gravitational parameter
 
-Measured. Uranus system gravitational parameter, measured by Voyager
-2 radio tracking. [Reference 4](#reference-4)
+Measured. Gravitational parameter of Uranus alone, without its moons, from the
+JPL URA111 satellite ephemeris. It is the one to use near the planet (orbits,
+captures, flybys) and the one from which the mass, density, surface gravity and
+escape velocity are derived. For heliocentric trajectories, use the system value
+`GMs⛢`. [Reference 37](#reference-37)
+
+### GMs⛢ constant
+
+Uranus system gravitational parameter
+
+Measured. Gravitational parameter of Uranus together with its moons, as used by
+the JPL planetary ephemeris DE440 for the motion around the Sun. Use it far from
+the planet, for heliocentric trajectories; near the planet, use `GM⛢`. DE440
+publishes no uncertainty: the standard uncertainty is the one of the planet
+alone in the URA111 satellite ephemeris. [Reference 4](#reference-4) 
+[Reference 37](#reference-37)
 
 ### M⛢ constant
 
@@ -2129,7 +2347,7 @@ Uranus mass
 
 Uranus's mass, derived from the gravitational parameter `GM⛢` and the measured
 gravitational constant `G` as `GM⛢/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 37](#reference-37) [Reference 5](#reference-5)
 
 ### Req⛢ constant
 
@@ -2157,14 +2375,14 @@ spheroid". [Reference 22](#reference-22)
 Uranus mean density
 
 Calculated from measurement. Uranus's mean density, characteristic of
-an ice giant. [Reference 4](#reference-4) [Reference 22](#reference-22)
+an ice giant. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### g⛢ constant
 
 Uranus surface gravity
 
 Calculated from measurement. Uranus's surface gravity at the 1-bar
-pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pressure level. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Ve⛢ constant
 
@@ -2172,15 +2390,17 @@ Uranus escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Uranus's gravitational
-pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pull and never return. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Prot⛢ constant
 
 Uranus sidereal rotation period
 
 Measured. Uranus's sidereal rotation period is the true time it takes
-to spin 360° on its axis. Uranus rotates retrograde relative to its
-orbital motion. [Reference 22](#reference-22)
+to spin 360° on its axis, 17.247864 ± 0.000010 h, from ten years of Hubble
+observations of its aurorae, which follow the magnetic poles. It is 28 s longer
+than the Voyager 2 value of 1986, 17.24 ± 0.01 h. Uranus rotates retrograde
+relative to its orbital motion. [Reference 41](#reference-41)
 
 ### ωrot⛢ constant
 
@@ -2205,7 +2425,11 @@ Uranus semi-major axis
 
 Measured. Uranus's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e⛢ constant
 
@@ -2213,14 +2437,22 @@ Uranus orbital eccentricity
 
 Measured. Uranus's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
-perfect circle. [Reference 23](#reference-23)
+perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i⛢ constant
 
 Uranus orbital inclination
 
 Uranus's orbital inclination is a measured angle with respect to the
-ecliptic plane. [Reference 23](#reference-23)
+ecliptic plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω⛢ constant
 
@@ -2228,7 +2460,11 @@ Uranus longitude of ascending node
 
 Uranus's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Uranus
-crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
+crosses northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω⛢ constant
 
@@ -2236,7 +2472,11 @@ Uranus argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
-point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
+point to the Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb⛢ constant
 
@@ -2267,8 +2507,22 @@ the past. [Reference 27](#reference-27)
 
 Neptune gravitational parameter
 
-Measured. Neptune system gravitational parameter, measured by Voyager
-2 radio tracking and Hubble Space Telescope astrometry of Triton. [Reference 4](#reference-4)
+Measured. Gravitational parameter of Neptune alone, without Triton, from the JPL
+NEP097 satellite ephemeris. It is the one to use near the planet (orbits,
+captures, flybys) and the one from which the mass, density, surface gravity and
+escape velocity are derived. For heliocentric trajectories, use the system value
+`GMs♆`. [Reference 37](#reference-37)
+
+### GMs♆ constant
+
+Neptune system gravitational parameter
+
+Measured. Gravitational parameter of Neptune together with Triton, as used by
+the JPL planetary ephemeris DE440 for the motion around the Sun. Use it far from
+the planet, for heliocentric trajectories; near the planet, use `GM♆`. DE440
+publishes no uncertainty: the standard uncertainty is the one of the planet
+alone in the NEP097 satellite ephemeris. [Reference 4](#reference-4) 
+[Reference 37](#reference-37)
 
 ### M♆ constant
 
@@ -2276,7 +2530,7 @@ Neptune mass
 
 Neptune's mass, derived from the gravitational parameter `GM♆` and the measured
 gravitational constant `G` as `GM♆/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 37](#reference-37) [Reference 5](#reference-5)
 
 ### Req♆ constant
 
@@ -2304,14 +2558,14 @@ much a celestial body deviates from a perfect sphere, forming an
 Neptune mean density
 
 Calculated from measurement. Neptune's mean density, characteristic of
-an ice giant. [Reference 4](#reference-4) [Reference 22](#reference-22)
+an ice giant. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### g♆ constant
 
 Neptune surface gravity
 
 Calculated from measurement. Neptune's surface gravity at the 1-bar
-pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pressure level. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Ve♆ constant
 
@@ -2319,15 +2573,19 @@ Neptune escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface. It
 is the minimum speed needed to break free from Neptune's gravitational
-pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
+pull and never return. [Reference 37](#reference-37) [Reference 22](#reference-22)
 
 ### Prot♆ constant
 
 Neptune sidereal rotation period
 
 Measured. Neptune's sidereal rotation period is the true time it takes
-to spin 360° on its axis (System III, from Voyager 2 radio measurements).
-[Reference 22](#reference-22)
+to spin 360° on its axis, 16.11 ± 0.05 h from the periodicity of the radio
+emissions observed by Voyager 2 in 1989 (System III). It is the only
+measurement of the rotation of the interior. Two long-lived cloud features give
+15.96630 ± 0.00003 h (Karkoschka 2011), the period adopted by the IAU for
+cartography; it is not known which of the two follows the interior.
+[Reference 42](#reference-42) [Reference 22](#reference-22)
 
 ### ωrot♆ constant
 
@@ -2349,7 +2607,11 @@ Neptune semi-major axis
 
 Measured. Neptune's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♆ constant
 
@@ -2357,14 +2619,22 @@ Neptune orbital eccentricity
 
 Measured. Neptune's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
-perfect circle. [Reference 23](#reference-23)
+perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♆ constant
 
 Neptune orbital inclination
 
 Neptune's orbital inclination is a measured angle with respect to
-the ecliptic plane. [Reference 23](#reference-23)
+the ecliptic plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♆ constant
 
@@ -2372,7 +2642,11 @@ Neptune longitude of ascending node
 
 Neptune's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Neptune
-crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
+crosses northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♆ constant
 
@@ -2380,7 +2654,11 @@ Neptune argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
-point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
+point to the Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♆ constant
 
@@ -2412,8 +2690,22 @@ returns it unchanged, giving the useful upcoming date. [Reference 4](#reference-
 
 Pluto gravitational parameter
 
-Measured. Pluto system gravitational parameter, measured by New Horizons
-radio tracking. [Reference 4](#reference-4)
+Measured. Gravitational parameter of Pluto alone, without Charon, from the JPL
+PLU060 satellite ephemeris. It is the one to use near the planet (orbits,
+captures, flybys) and the one from which the mass, density, surface gravity and
+escape velocity are derived. For heliocentric trajectories, use the system value
+`GMs♇`. [Reference 37](#reference-37)
+
+### GMs♇ constant
+
+Pluto system gravitational parameter
+
+Measured. Gravitational parameter of Pluto together with Charon, as used by the
+JPL planetary ephemeris DE440 for the motion around the Sun. Use it far from the
+planet, for heliocentric trajectories; near the planet, use `GM♇`. DE440
+publishes no uncertainty: the standard uncertainty combines those of Pluto (0.4
+km³/s²) and Charon (0.3 km³/s²) in the PLU060 satellite ephemeris. 
+[Reference 4](#reference-4) [Reference 37](#reference-37)
 
 ### M♇ constant
 
@@ -2421,20 +2713,22 @@ Pluto mass
 
 Pluto's mass, derived from the gravitational parameter `GM♇` and the measured
 gravitational constant `G` as `GM♇/G`. The relative uncertainty is carried as
-`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 37](#reference-37) [Reference 5](#reference-5)
 
 ### Req♇ constant
 
 Pluto equatorial radius
 
 Measured. Pluto's equatorial radius, measured by New Horizons occultation
-and imaging. [Reference 26](#reference-26)
+and imaging. The source gives 1188.3 ± 1.6 km at two standard deviations;
+the standard uncertainty is half of it. [Reference 26](#reference-26)
 
 ### Rp♇ constant
 
 Pluto polar radius
 
-Measured. Pluto's polar radius. Pluto is essentially spherical. [Reference 26](#reference-26)
+Measured. Pluto's polar radius. Pluto is essentially spherical: the source
+finds no measurable oblateness (less than 0.6 %). [Reference 26](#reference-26)
 
 ### f♇ constant
 
@@ -2448,13 +2742,13 @@ effectively zero. [Reference 26](#reference-26)
 Pluto mean density
 
 Calculated from measurement. Pluto's mean density, consistent with
-a mixture of rock and ice. [Reference 4](#reference-4) [Reference 26](#reference-26)
+a mixture of rock and ice. [Reference 37](#reference-37) [Reference 26](#reference-26)
 
 ### g♇ constant
 
 Pluto surface gravity
 
-Calculated from measurement. Pluto's surface gravity. [Reference 4](#reference-4) [Reference 26](#reference-26)
+Calculated from measurement. Pluto's surface gravity. [Reference 37](#reference-37) [Reference 26](#reference-26)
 
 ### Ve♇ constant
 
@@ -2462,15 +2756,15 @@ Pluto escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Pluto's gravitational
-pull and never return. [Reference 4](#reference-4) [Reference 26](#reference-26)
+pull and never return. [Reference 37](#reference-37) [Reference 26](#reference-26)
 
 ### Prot♇ constant
 
 Pluto sidereal rotation period
 
 Measured. Pluto's sidereal rotation period is the true time it takes to
-spin 360° on its axis. Pluto rotates retrograde and is tidally locked to
-its moon Charon. [Reference 26](#reference-26)
+spin 360° on its axis, 360°/|Ẇ| from the recommended rotation rate. Pluto
+rotates retrograde and is tidally locked to its moon Charon. [Reference 22](#reference-22)
 
 ### ωrot♇ constant
 
@@ -2485,8 +2779,10 @@ the uncertainty uses the positive magnitude. The unit is radians per second
 
 Pluto axial tilt
 
-Measured. Pluto's axial tilt is the angle of the planet's rotational
-axis relative to its orbital plane. [Reference 26](#reference-26)
+Pluto's axial tilt is the angle of the planet's rotational axis relative to
+its orbital plane. It is computed from the recommended direction of the north
+pole of rotation (α₀ = 132.993°, δ₀ = −6.163°) and the orbit of Pluto.
+[Reference 22](#reference-22)
 
 ### a♇ constant
 
@@ -2494,7 +2790,11 @@ Pluto semi-major axis
 
 Measured. Pluto's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
-distance from one of the radii to the orbit. [Reference 23](#reference-23)
+distance from one of the radii to the orbit.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### e♇ constant
 
@@ -2502,14 +2802,22 @@ Pluto orbital eccentricity
 
 Measured. Pluto's orbital eccentricity, large enough to bring it inside
 Neptune's orbit near perihelion. When different from 0, it is a measure
-of how much a planet's elliptical path deviates from a perfect circle. [Reference 23](#reference-23)
+of how much a planet's elliptical path deviates from a perfect circle.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### i♇ constant
 
 Pluto orbital inclination
 
 Pluto's orbital inclination is a measured angle with respect to the ecliptic
-plane, ir is the highest of any solar system body traditionally listed. [Reference 23](#reference-23)
+plane, ir is the highest of any solar system body traditionally listed.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Ω♇ constant
 
@@ -2517,7 +2825,11 @@ Pluto longitude of ascending node
 
 Pluto's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Pluto crosses
-northward through Earth's orbital plane. [Reference 23](#reference-23)
+northward through Earth's orbital plane.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### ω♇ constant
 
@@ -2525,7 +2837,11 @@ Pluto argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
-Sun), measured in the direction of motion. [Reference 23](#reference-23)
+Sun), measured in the direction of motion.
+The source gives no uncertainty: the value is taken as exact to ± one unit of its last digit, a bound
+of a uniform distribution, whose standard uncertainty is that bound divided by √3.
+[Reference 23](#reference-23)
+
 
 ### Porb♇ constant
 
@@ -2556,33 +2872,37 @@ decades in the past. [Reference 4](#reference-4)
 Solar mass
 
 It is derived from the exact nominal solar gravitational parameter
-`GM☉` and the measured gravitational constant `G`. [Particle Data Group 2024](#particle-data-group-2024) [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
+`GM☉` and the measured gravitational constant `G`. [Particle Data Group 2024](#particle-data-group-2024) [IAU 2015 Resolution B3](#iau-2015-resolution-b3) [Reference 5](#reference-5)
 
 ### GM☉ constant
 
 Solar gravitational parameter
 
 It is an exact nominal value defined by the International Astronomical
-Union (IAU 2015 Resolution B3). [Particle Data Group 2023](#particle-data-group-2023)
+Union (IAU 2015 Resolution B3). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### L☉ constant
 
 Solar luminosity
 
-It is an exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+It is an exact nominal value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Req☉ constant
 
 Solar equatorial radius
 
-It is an exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+It is an exact nominal value defined by the IAU (2015). [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Rp☉ constant
 
 Solar polar radius
 
-It is measured by helioseismology and limb-darkening observations.
-[Reference 18](#reference-18) [Reference 19](#reference-19)
+The Sun is very slightly flattened by its rotation: its equatorial radius
+exceeds its polar radius by 7.2 ± 0.5 milliarcseconds seen from Earth, that is
+5.22 ± 0.36 km, as measured by the HMI instrument of the Solar Dynamics
+Observatory. The polar radius is the nominal radius `Req☉` minus that
+difference.
+[IAU 2015 Resolution B3](#iau-2015-resolution-b3) [Reference 38](#reference-38)
 
 ### f☉ constant
 
@@ -2590,23 +2910,24 @@ Solar oblateness
 
 The Solar oblateness (or flattening) is calculated from the nominal
 equatorial radius and the polar radius measurement as
-`f☉=1−Rp☉/Req☉`. Its uncertainty is inherited from Jupiter `♃Rp☉`.
-When greater than 0, it describes how much a celestial body deviates
-from a perfect sphere, forming an "oblate spheroid". [Reference 18](#reference-18) [Reference 19](#reference-19)
+`f☉=1−Rp☉/Req☉`. Its uncertainty comes from the measured difference
+between the two radii, about 7 %. When greater than 0, it describes how much
+a celestial body deviates from a perfect sphere, forming an "oblate spheroid".
+[IAU 2015 Resolution B3](#iau-2015-resolution-b3) [Reference 38](#reference-38)
 
 ### ρv☉ constant
 
 Solar mean density
 
 It is calculated from the nominal gravitational parameter `GM☉`, the
-gravitational constant `G`, and the solar radii measurement. [Particle Data Group 2023](#particle-data-group-2023)
+gravitational constant `G`, and the solar radii measurement. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### g☉ constant
 
 Solar surface gravity
 
 The Solar surface gravity at the equator is calculated from `GM☉`
-and the measurement of the equatorial radius `Req☉`. [Particle Data Group 2023](#particle-data-group-2023)
+and the measurement of the equatorial radius `Req☉`. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Ve☉ constant
 
@@ -2614,7 +2935,7 @@ Solar escape velocity
 
 The Solar escape velocity at the equatorial surface is calculated from
 `GM☉` and the measurement of solar radii. It is the minimum speed needed
-to break free from Sun's gravitational pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
+to break free from Sun's gravitational pull and never return. [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 ### Prot☉ constant
 
@@ -2649,7 +2970,9 @@ Hubble constant
 
 It is the measured current rate of expansion of the universe, expressed
 in `km/(s·Mpc)`. Its value is measured from observations of the cosmic
-microwave background and Type Ia supernovae. [Planck 2020](#planck-2020)
+microwave background and Type Ia supernovae.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### ωb constant
 
@@ -2657,14 +2980,18 @@ Baryon density parameter
 
 It is the measured physical density of baryonic matter (ordinary matter)
 in the universe, measured from the cosmic microwave background power
-spectrum. [Planck 2020](#planck-2020)
+spectrum.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### ωc constant
 
 Dark matter density parameter
 
 It is the measured physical density of cold dark matter in the universe,
-measured from the cosmic microwave background power spectrum. [Planck 2020](#planck-2020)
+measured from the cosmic microwave background power spectrum.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### 100θ* constant
 
@@ -2672,7 +2999,9 @@ CMB acoustic scale
 
 The CMB Acoustic scale corresponds to the measure of one hundred times
 the angular size of the sound horizon at recombination, measured from
-the position of the first acoustic peak in the CMB power spectrum. [Planck 2020](#planck-2020)
+the position of the first acoustic peak in the CMB power spectrum.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### τr constant
 
@@ -2680,7 +3009,9 @@ Reionization optical depth
 
 It is the measured integrated optical depth to Thomson scattering from
 the epoch of reionization, measured from the CMB polarization spectrum.
-[Planck 2020](#planck-2020)
+
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### ns constant
 
@@ -2688,7 +3019,9 @@ Scalar spectral index
 
 It is the measured tilt of the primordial power spectrum of density
 fluctuations, where ns=1 corresponds to a scale-invariant Harrison-
-Zel'dovich spectrum. [Planck 2020](#planck-2020)
+Zel'dovich spectrum.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### (ln(10¹⁰As)) constant
 
@@ -2696,7 +3029,9 @@ Power spectrum amplitude
 
 Measured amplitude of the primordial power spectrum. The logarithm
 of the scalar power spectrum amplitude, normalized at a pivot scale
-of `0.05 Mpc⁻¹`. [Planck 2020](#planck-2020)
+of `0.05 Mpc⁻¹`.
+Planck 2018, base-ΛCDM, TT,TE,EE+lowE+lensing; the uncertainty is the 68 %
+interval, one standard deviation. [Planck 2020](#planck-2020)
 
 ### MG constant
 
@@ -2704,7 +3039,10 @@ Milky Way total mass
 
 Measured total mass of the Milky Way galaxy, including baryonic
 and dark matter components, estimated from stellar kinematics and
-satellite galaxy dynamics. [Reference 8](#reference-8) [Reference 9](#reference-9) [Reference 10](#reference-10)
+satellite galaxy dynamics.
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 8](#reference-8) [Reference 9](#reference-9) [Reference 10](#reference-10)
 
 ### fDMG constant
 
@@ -2712,38 +3050,48 @@ Milky Way dark matter fraction
 
 Measured fraction of dark matter in the Milky Way galaxy. Estimated
 from rotation curves, satellite dynamics, and gravitational lensing.
-[Reference 9](#reference-9) [Reference 32](#reference-32)
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 9](#reference-9) [Reference 32](#reference-32)
 
 ### RG constant
 
 Milky Way disk radius
 
 Measure of the equatorial radius of the Milky Way galaxy's disk,
-estimated from star count surveys and kinematic models. [Reference 8](#reference-8) [Reference 9](#reference-9)
+estimated from star count surveys and kinematic models.
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 8](#reference-8) [Reference 9](#reference-9)
 
 ### D●SgrA* constant
 
 Distance to Sgr A*
 
-Measured distance from the Sun to the black hole Sagittarius A* at
-the Galactic centre, measured by stellar orbit monitoring with the
-GRAVITY instrument. [Reference 6](#reference-6) [Reference 7](#reference-7)
+Distance from the Sun to the black hole Sagittarius A* at the Galactic
+centre, 8277 pc, from the orbits of the stars around it measured with the
+GRAVITY instrument. The uncertainty combines the statistical (9 pc) and
+systematic (30 pc) ones. [Reference 6](#reference-6)
+
 
 ### R●SgrA* constant
 
 Sgr A* Schwarzschild radius
 
-Measured Schwarzschild radius of the black hole Sagittarius A*, derived
-from its mass measurement by the Event Horizon Telescope collaboration.
-[Reference 7](#reference-7)
+Schwarzschild radius of the black hole Sagittarius A*, 2GM/c², computed from
+its mass `M●SgrA*`. It agrees with the size of the shadow imaged by the Event
+Horizon Telescope. [Reference 6](#reference-6) [Reference 7](#reference-7)
+
 
 ### M●SgrA* constant
 
 Sgr A* black hole mass
 
-Measured mass of the supermassive black hole Sagittarius A* at the
-Galactic centre, measured from the orbits of stars in its immediate vicinity.
-[Reference 7](#reference-7)
+Mass of the supermassive black hole Sagittarius A* at the Galactic centre,
+from the orbits of the stars in its immediate vicinity, in the same analysis as
+its distance `D●SgrA*`. The uncertainty combines the statistical
+(0.012×10⁶ M☉) and systematic (0.040×10⁶ M☉) ones. [Reference 6](#reference-6)
+
 
 ### MNGC224 constant
 
@@ -2751,21 +3099,30 @@ Andromeda galaxy total mass
 
 Measure of the total mass of the Andromeda galaxy (M31, NGC 224), including
 dark matter, estimated from satellite galaxy kinematics and gravitational
-timing arguments. [Reference 35](#reference-35) [Reference 36](#reference-36)
+timing arguments.
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 35](#reference-35) [Reference 36](#reference-36)
 
 ### fDMNGC224 constant
 
 Andromeda dark matter fraction
 
 Measured fraction of dark matter in the Andromeda galaxy (M31), estimated
-from dynamical modelling of its halo. [Reference 31](#reference-31) [Reference 35](#reference-35)
+from dynamical modelling of its halo.
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 31](#reference-31) [Reference 35](#reference-35)
 
 ### RNGC224 constant
 
 Andromeda galaxy disk radius
 
 Measurement of the mean equatorial radius of the Andromeda galaxy (M31),
-estimated from stellar population surveys. [Reference 34](#reference-34)
+estimated from stellar population surveys.
+The value is an estimate across several studies, which do not all agree;
+its uncertainty is the spread of these estimates, not a measured standard
+deviation. [Reference 34](#reference-34)
 
 ### DNGC224 constant
 
@@ -2779,17 +3136,21 @@ giant branch. [Reference 29](#reference-29)
 
 Vega gravitational parameter
 
-Measurement of the gravitational parameter of the star Vega (mass times
-gravitational constant `G`). Measured by interferometry and spectral
-analysis. [Reference 13](#reference-13) [Reference 14](#reference-14)
+Gravitational parameter of the star Vega, its mass times the gravitational
+constant `G`. The mass, 2.135 ± 0.074 solar masses, comes from a model of the
+rapidly rotating star fitted to its spectrum and to interferometry; it is
+multiplied by the nominal solar value `GM☉`.
+[Reference 13](#reference-13) [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
+
 
 ### L★Vega constant
 
 Vega luminosity
 
-Measured luminosity of the star Vega, used as a photometric reference
-standard in stellar astronomy. [Reference 13](#reference-13) [Reference 14](#reference-14)
-
+Luminosity of the star Vega, used as a photometric reference standard in
+stellar astronomy: log L = 1.6034 ± 0.0049 in solar units, that is 40.12 ± 0.45
+times the nominal solar luminosity `L☉`.
+[Reference 13](#reference-13) [IAU 2015 Resolution B3](#iau-2015-resolution-b3)
 
 
 ## Materials constants
@@ -3755,9 +4116,9 @@ Planck Collaboration (2020). "Planck 2018 results. VI. Cosmological parameters".
 
 Particle Data Group (2024). "Review of Particle Physics — Astrophysical Constants". Physical Review D, 110, 030001. DOI: 10.1103/PhysRevD.110.030001
 
-### Particle Data Group 2023
+### IAU 2015 Resolution B3
 
-Particle Data Group 2023 Prša, A., et al. (2016). "Nominal values for selected solar and planetary quantities: IAU 2015 Resolution B3". The Astronomical Journal, 152(2), 41. arXiv:1605.09788 — DOI: 10.3847/0004-6256/152/2/41
+Prša, A., et al. (2016). "Nominal values for selected solar and planetary quantities: IAU 2015 Resolution B3". The Astronomical Journal, 152(2), 41. arXiv:1605.09788 — DOI: 10.3847/0004-6256/152/2/41
 
 ### WGS-84
 
@@ -3775,7 +4136,7 @@ Tiesinga, E., et al. (2021). "CODATA recommended values of the fundamental physi
 
 ### Reference 6
 
-GRAVITY Collaboration (2021). "Mass distribution in the Galactic Center based on interferometric astrometry of multiple stellar orbits". Astronomy & Astrophysics, 647, A59. arXiv:2012.02169 — DOI: 10.1051/0004-6361/202040208
+GRAVITY Collaboration (2022). "The mass distribution in the Galactic Centre from interferometric astrometry of multiple stellar orbits". Astronomy & Astrophysics. arXiv:2112.07478 — DOI: 10.1051/0004-6361/202142465 — Mass and distance of Sgr A*, source for `M●SgrA*`, `D●SgrA*` and `R●SgrA*`.
 
 ### Reference 7
 
@@ -3795,7 +4156,7 @@ Posti, L., & Helmi, A. (2019). "Mass and shape of the Milky Way's dark matter ha
 
 ### Reference 13
 
-Yoon, J., et al. (2010). "A New View of Vega's Composition, Mass, and Age". The Astrophysical Journal, 708(1), 71–79. arXiv:0910.3124 — DOI: 10.1088/0004-637X/708/1/71
+Yoon, J., et al. (2010). "A New View of Vega's Composition, Mass, and Age". The Astrophysical Journal, 708(1), 71–79. DOI: 10.1088/0004-637X/708/1/71
 
 ### Reference 14
 
@@ -3824,6 +4185,42 @@ Watkins, L.L., Evans, N.W., & An, J.H. (2010). Monthly Notices of the Royal Astr
 ### Reference 36
 
 Zhang, X., Chen, B., Chen, P., Sun, J., & Tian, Z. (2024). Monthly Notices of the Royal Astronomical Society, 528, 2653. DOI: 10.1093/mnras/stae025 — Updated dynamical mass of the Andromeda galaxy, corroborating `MNGC224`.
+
+### Reference 37
+
+Jacobson, R.A., et al. JPL Solar System Dynamics — Planetary Satellite Physical Parameters, GM of the planets alone from the satellite ephemerides MAR097, JUP365, SAT441, URA111, NEP097 and PLU060. [Source](https://ssd.jpl.nasa.gov/sats/phys_par/) Accessed: October 2026.
+
+### Reference 38
+
+Kuhn, J.R., Bush, R., Emilio, M., & Scholl, I.F. (2012). "The Precise Solar Shape and Its Variability". Science, 337(6102), 1638–1640. DOI: 10.1126/science.1223231 — Equator-to-pole difference of the solar radius, 7.2 ± 0.5 mas, source for `Rp☉` and `f☉`.
+
+### Reference 39
+
+NASA Planetary Data System, Geosciences Node. Header records of the gravity fields JGMESS_160A (Konopliv et al. 2020, MESSENGER: GM☿ = 22031.86869 ± 0.00120 km³/s²) and SHGJ180U (Konopliv et al. 1999, Magellan: GM♀ = 324858.59208 ± 0.00638 km³/s²). [Source](https://pds-geosciences.wustl.edu/) Accessed: October 2026.
+
+### Reference 40
+
+Mankovich, C., Marley, M.S., Fortney, J.J., & Movshovitz, N. (2019). "Cassini Ring Seismology as a Probe of Saturn's Interior. I. Rigid Rotation". The Astrophysical Journal, 871(1), 1. arXiv:1805.10286 — DOI: 10.3847/1538-4357/aaf798 — Rotation period of Saturn's interior, source for `Prot♄`.
+
+### Reference 41
+
+Lamy, L., Prangé, R., Berthier, J., et al. (2025). "A new rotation period and longitude system for Uranus". Nature Astronomy, 9(5). DOI: 10.1038/s41550-025-02492-z — Source for `Prot⛢`.
+
+### Reference 42
+
+Warwick, J.W., et al. (1989). "Voyager Planetary Radio Astronomy at Neptune". Science, 246(4936), 1498–1501. DOI: 10.1126/science.246.4936.1498 — Radio rotation period of Neptune, 16.11 ± 0.05 h, source for `Prot♆`.
+
+### Reference 43
+
+Capitaine, N., Wallace, P.T., & Chapront, J. (2003). "Expressions for IAU 2000 precession quantities". Astronomy & Astrophysics, 412, 567–586. DOI: 10.1051/0004-6361:20031539 — Obliquity of the ecliptic at J2000, ε₀ = 84381.406″, adopted by IAU 2006 Resolution B1; source for `ϵ♁`.
+
+### Reference 44
+
+Petit, G., & Luzum, B. (eds.) (2010). IERS Conventions (2010). IERS Technical Note No. 36. Verlag des Bundesamts für Kartographie und Geodäsie, Frankfurt am Main. — Earth rotation angle, 1.00273781191135448 turns per UT1 day; source for `Prot♁` and `ωrot♁`.
+
+### Reference 45
+
+Wieczorek, M.A., Jolliff, B.L., Khan, A., et al. (2006). "The constitution and structure of the lunar interior". Reviews in Mineralogy and Geochemistry, 60(1), 221–364. DOI: 10.2138/rmg.2006.60.3 — Mean semi-major axis and eccentricity of the lunar orbit, source for `a☽` and `e☽`.
 
 ### Particle physics data
 
@@ -3868,7 +4265,7 @@ NASA JPL Solar System Dynamics — Horizons On-Line Ephemeris System. URL: https
 
 ### Reference 24
 
-Seidelmann, P.K., & Fukushima, T. (1992). "Why new time scales?" Astronomy & Astrophysics, 265(2), 833–838.
+McCarthy, D.D., & Seidelmann, P.K. (2009). Time: From Earth Rotation to Atomic Physics. Wiley-VCH, Weinheim. ISBN: 978-3-527-40780-4 — Julian, Gregorian and tropical years; the mean tropical year at J2000, 365.2421896698 days, follows the planetary theory of Laskar (1986), Astronomy & Astrophysics, 157, 59–70.
 
 ### Reference 25
 

@@ -303,7 +303,7 @@ hyperbola into a capture orbit (set `r_a = r_p` for circular capture).
 
 ```rpl
 2.5_km/s 3689_km 3689_km ⒸGM♂ ⓁTrToOrbi     @ (circular capture)
-@ Expecting { 2 021.27352 7 m/s 5 428.58216 969 m/s 3 407.30864 269 m/s }
+@ Expecting { 2 021.27350 47 m/s 5 428.58206 003 m/s 3 407.30855 533 m/s }
 ```
 
 ## LambertU
@@ -466,7 +466,7 @@ is `Δv = 2·v∞/e`, maximal near `v∞ ≈ √(μ/r_p)`.
 
 ```rpl
 5_km/s 3500_km ⒸGM♂ ⓁGAssist     @ (Mars flyby, 3500 km periapsis)
-@ Expecting { 38.36994 72818 ° 3 286.18963 813 m/s 3.04303 80170 3 }
+@ Expecting { 38.36994 59092 ° 3 286.18952 5 m/s 3.04303 81217 9 }
 ```
 
 ---

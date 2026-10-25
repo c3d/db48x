@@ -3550,7 +3550,7 @@ speed (geostationary if inclination = 0).
 * To calculate: `[r_km;H_km;v_m/s]` (Orbital radius; Altitude; Circular velocity) from 1 known variable:
 ```rpl
 P=ⒸProt♁
-@ Expecting [ r=42 164.16815 02 km H=35 786.06815 02 km v=3 074.65999 204 m/s ]
+@ Expecting [ r=42 164.17089 06 km H=35 786.07089 06 km v=3 074.65989 213 m/s ]
 'ROOT(ⒺGeosynchronous Orbit;[r;H;v];[1_km;1_km;1_m/s])'
 ```
 
@@ -3604,12 +3604,13 @@ H=200_km
 
 #### Earth’s Sphere Of Influence
 
-`Rsoi=Dsp·(Mp/Ms)^(2/5)`, using the GM ratio `ⒸGM♁/ⒸGM☉` (G cancels → no G-uncertainty).
+`Rsoi=Dsp·(Mp/Ms)^(2/5)`, using the GM ratio `ⒸGMs♁/ⒸGM☉` (G cancels → no G-uncertainty).
+The sphere extends beyond the Moon, so the mass is the one of the Earth-Moon system.
 Same formula for a moon (moon↔planet, planet↔Sun).
 
 * To calculate: `[Rsoi_km]` (Sphere-of-influence radius) from constants only:
 ```rpl
-@ Expecting [ Rsoi=924 646.75636 9 km ]
+@ Expecting [ Rsoi=929 179.38758 7 km ]
 'ROOT(ⒺEarth’s Sphere Of Influence;[Rsoi];[1_km])'
 ```
 
@@ -3952,7 +3953,7 @@ m/s — hence disposal above GEO rather than deorbit.
 * To calculate: `[rgeo_km;dHmin_km;rgrave_km;atx_km;vcg_m/s;vp_m/s;vgr_m/s;va_m/s;ΔV1_m/s;ΔV2_m/s;ΔVtot_m/s]` from `CR`, `AtoM`:
 ```rpl
 CR=1.3  AtoM=0.015
-@ Expecting [ rgeo=42 164.16815 02 km dHmin=254.5 km rgrave=42 418.66815 02 km atx=42 291.41815 02 km vcg=3 074.65999 204 m/s vp=3 079.28216 642 m/s vgr=3 065.42257 097 m/s va=3 060.80734 518 m/s ΔV1=4.62217 43810 9 m/s ΔV2=4.61522 57856 1 m/s ΔVtot=9.23740 01667 m/s ]
+@ Expecting [ rgeo=42 164.17089 06 km dHmin=254.5 km rgrave=42 418.67089 06 km atx=42 291.42089 06 km vcg=3 074.65989 213 m/s vp=3 079.28206 606 m/s vgr=3 065.42247 195 m/s va=3 060.80724 661 m/s ΔV1=4.62217 39316 1 m/s ΔV2=4.61522 53372 6 m/s ΔVtot=9.23739 92688 7 m/s ]
 'ROOT(ⒺGEO Graveyard Disposal;[rgeo;dHmin;rgrave;atx;vcg;vp;vgr;va;ΔV1;ΔV2;ΔVtot];[1_km;1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
 ```
 
@@ -4005,23 +4006,24 @@ H=700_km  ecc=0
 #### Collinear Lagrange Points
 
 Sun-Earth L1/L2 from the rotating-frame equilibrium (Sun gravity + Earth gravity =
-centrifugal). `rapp=Ⓒa♁·(ⒸGM♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved implicitly. JWST sits at L2.
+centrifugal). `rapp=Ⓒa♁·(ⒸGMs♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved implicitly. JWST sits at L2.
+At 1.5 million km the Moon is inside, so the second mass is the Earth-Moon system.
 
 * To calculate: `[rapp_km;rL2_km;rL1_km]` (constants only):
 ```rpl
-@ Expecting [ rapp=1 496 558.48134 km rL2=1 501 531.72084 km rL1=1 491 550.96228 km ]
+@ Expecting [ rapp=1 502 669.44742 km rL2=1 507 683.31143 km rL1=1 497 620.87809 km ]
 'ROOT(ⒺCollinear Lagrange Points;[rapp;rL2;rL1];[1_km;1500000_km;1500000_km])'
 ```
 
 #### JWST at Sun Earth L2
 
-L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGM♁))` (≈1 yr, so
+L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGMs♁))` (≈1 yr, so
 it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body periodic orbit.
 
 * To calculate: `[dSunL2_km;PL2_s;VL2_m/s]` from `rL2`:
 ```rpl
-rL2=1501531.72084_km
-@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s ]
+rL2=1507683.31143_km
+@ Expecting [ dSunL2=151 105 554.011 km PL2=31 558 148.0452 s VL2=30 084.91485 11 m/s ]
 'ROOT(ⒺJWST at Sun Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
 ```
 
@@ -4231,7 +4233,7 @@ closest approach `rp=a(1−ecc)`, turn angle `dturn=2·asin(1/ecc)`.
 * To calculate: `[bimp_km;a_km;ecc;rp_km;dturn_°]` from `vinf`, `dmiss`, `gam`:
 ```rpl
 vinf=2438.2_m/s  dmiss=18500_km  gam=150.451_°
-@ Expecting [ bimp=9 123.60278 285 km a=-7 204.31927 146 km ecc=1.61362 55894 7 rp=4 420.75465 968 km dturn=76.59173 79349 ° ]
+@ Expecting [ bimp=9 123.60278 285 km a=-7 204.31890 205 km ecc=1.61362 56404 3 rp=4 420.75480 016 km dturn=76.59173 5077 ° ]
 'ROOT(ⒺArrival Hyperbola;[bimp;a;ecc;rp;dturn];[1_km;1_km;1_1;1_km;1_°])'
 ```
 
@@ -4261,7 +4263,7 @@ Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → dep
 * To calculate: `[atx_au;VcsA_m/s;VtxA_m/s;vinfD_m/s;VcsB_m/s;VtxB_m/s;vinfA_m/s;r0_km;Vo_m/s;TMI_m/s;Varr_m/s;MOI_m/s;dVtot_m/s;TOF_s]` from `rA`, `rB`, `Hp`, `rm`:
 ```rpl
 rA='Ⓒa♁'  rB='Ⓒa♂'  Hp=200_km  'ⒸReq♂+500_km' →NUM 'rm' STO
-@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VtxA=32 729.38296 23 m/s vinfD=2 944.69113 264 m/s VcsB=24 129.38801 33 m/s VtxB=21 480.49129 1 m/s vinfA=2 648.89672 221 m/s r0=6 578.1 km Vo=11 395.67184 31 m/s TMI=3 611.38861 055 m/s Varr=5 385.28963 704 m/s MOI=2 069.81903 47 m/s dVtot=5 681.20764 526 m/s TOF=22 366 007.4343 s ]
+@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VtxA=32 729.38296 23 m/s vinfD=2 944.69113 264 m/s VcsB=24 129.38801 33 m/s VtxB=21 480.49129 1 m/s vinfA=2 648.89672 221 m/s r0=6 578.1 km Vo=11 395.67184 31 m/s TMI=3 611.38861 055 m/s Varr=5 385.28953 237 m/s MOI=2 069.81901 504 m/s dVtot=5 681.20762 56 m/s TOF=22 366 007.4343 s ]
 'ROOT(ⒺPatched Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
@@ -4354,7 +4356,7 @@ apoapsis reaches a moon (`rapo`): `MOIsat=Vhyp−Vcap`. Very elliptic capture �
 * To calculate: `[aES_au;vinfSa_m/s;Vhyp_m/s;acap_km;Vcap_m/s;MOIsat_m/s]` from `rEar`, `rSa`, `rp`, `rapo`:
 ```rpl
 rEar='Ⓒa♁'  rSa='Ⓒa♄'  'ⒸReq♄+2000_km' →NUM 'rp' STO  rapo=1221870_km
-@ Expecting [ aES=5.29127 80886 9 au vinfSa=5 438.86510 887 m/s Vhyp=35 329.92349 79 m/s acap=642 069 km Vcap=34 051.88845 62 m/s MOIsat=1 278.03504 169 m/s ]
+@ Expecting [ aES=5.29127 80886 9 au vinfSa=5 438.86510 887 m/s Vhyp=35 325.66008 74 m/s acap=642 069 km Vcap=34 047.67951 76 m/s MOIsat=1 277.98056 975 m/s ]
 'ROOT(ⒺSaturn Injection Orbit;[aES;vinfSa;Vhyp;acap;Vcap;MOIsat];[1_au;1_m/s;1_m/s;1_km;1_m/s;1_m/s])'
 ```
 
@@ -4377,7 +4379,7 @@ In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea
 * To calculate: `[atxS_km;Vpark_m/s;dv1_m/s;Vmoon_m/s;dv2_m/s;dVtot_m/s;TOF_s]` from `rp`, `rmoon`:
 ```rpl
 'ⒸReq♄+2000_km' →NUM 'rp' STO  rmoon=1221870_km
-@ Expecting [ atxS=642 069 km Vpark=24 684.22817 m/s dv1=9 367.66028 623 m/s Vmoon=5 572.36440 777 m/s dv2=3 837.03823 527 m/s dVtot=13 204.69852 15 m/s TOF=262 403.97839 8 s ]
+@ Expecting [ atxS=642 069 km Vpark=24 681.17710 87 m/s dv1=9 366.50240 899 m/s Vmoon=5 571.67564 305 m/s dv2=3 836.56396 325 m/s dVtot=13 203.06637 22 m/s TOF=262 436.41650 4 s ]
 'ROOT(ⒺPath to Saturn Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
@@ -4391,7 +4393,7 @@ parking orbit `rp`. Symmetric to the outbound leg.
 * To calculate: `[atx_au;vinfMars_m/s;vinfEar_m/s;Vo_m/s;TEI_m/s;TOF_s]` from `rMars`, `rEar`, `rp`:
 ```rpl
 rMars='Ⓒa♂'  rEar='Ⓒa♁'  'ⒸReq♂+500_km' →NUM 'rp' STO
-@ Expecting [ atx=1.26183 97204 9 au vinfMars=2 648.89672 221 m/s vinfEar=2 944.69113 264 m/s Vo=5 385.28963 704 m/s TEI=2 069.81903 47 m/s TOF=22 366 007.4343 s ]
+@ Expecting [ atx=1.26183 97204 9 au vinfMars=2 648.89672 221 m/s vinfEar=2 944.69113 264 m/s Vo=5 385.28953 237 m/s TEI=2 069.81901 504 m/s TOF=22 366 007.4343 s ]
 'ROOT(ⒺFrom Mars to Earth;[atx;vinfMars;vinfEar;Vo;TEI;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
@@ -4406,7 +4408,7 @@ arrival — hypersonic entry, peak-g, then terminal descent — as at Jezero cra
 * To calculate: `[gmars_m/s^2;amax_m/s^2;amaxg;vterm_m/s]` from `Ventry`, `fpa`, `Hs`, `ρa`, `Cd`, `Ad`, `msat`, `rmars`:
 ```rpl
 Ventry=6000_m/s  fpa=12_°  Hs=11.1_km  ρa=0.015_kg/m³  Cd=1.5  Ad=10_m↑2  msat=1000_kg  rmars='(ⒸReq♂^2*ⒸRp♂)^(1/3)'
-@ Expecting [ gmars=3.72782 18628 2 m/s↑2 amax=124.03205 9402 m/s↑2 amaxg=12.64775 01901 vterm=182.03349 7841 m/s ]
+@ Expecting [ gmars=3.72782 16716 7 m/s↑2 amax=124.03205 9402 m/s↑2 amaxg=12.64775 01901 vterm=182.03349 3174 m/s ]
 'ROOT(ⒺMars Landing;[gmars;amax;amaxg;vterm];[1_m/s^2;1_m/s^2;1_1;1_m/s])'
 ```
 
@@ -4432,8 +4434,8 @@ Waiting at Sun-Earth L2 (`dSunL2`,`VL2`), then intercepting a newly-found object
 
 * To calculate: `[dSunL2_km;PL2_s;VL2_m/s;vobj_m/s;vt_m/s;vr_m/s;fpa_°;vfly_m/s]` from `rL2`, `aobj`, `eobj`, `rX`:
 ```rpl
-rL2=1501531.72084_km  aobj=2_au  eobj=0.6  rX='Ⓒa♁'
-@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s vobj=36 478.64856 44 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° vfly=14 430.10703 61 m/s ]
+rL2=1507683.31143_km  aobj=2_au  eobj=0.6  rX='Ⓒa♁'
+@ Expecting [ dSunL2=151 105 554.011 km PL2=31 558 148.0452 s VL2=30 084.91485 11 m/s vobj=36 478.64856 44 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° vfly=14 429.80021 62 m/s ]
 'ROOT(ⒺComet Interceptor;[dSunL2;PL2;VL2;vobj;vt;vr;fpa;vfly];[1_km;1_s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_m/s])'
 ```
 

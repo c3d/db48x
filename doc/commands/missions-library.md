@@ -175,7 +175,7 @@ ascent 4.1, Earth entry 0 km/s), with parking orbits LEO 6678 km and Mars 3689 k
 
 ```rpl
 { 2459055.670 2459260.585 508.514 2459769.099 2460045.086 6.31705 6.48113 12.79819 } ⓁMissionΔV     @ AscentEarth 9.4, TMI 3.81, MOI 2.07, EDL 0.6,
-@ Expecting 8_TOTAL:22.48135 24918D
+@ Expecting 8_TOTAL:22.48135 24571D
 @ AscentMars 4.1, TEI 2.50, Entry 0. A typical chemical Mars round-trip budget.
 ```
 

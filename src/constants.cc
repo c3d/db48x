@@ -1219,9 +1219,9 @@ static const cstring basic_constants[] =
 
     "Astronomy/Mercury",     nullptr,
 
-    // *Mercury gravitational parameter - Measurement [4]
+    // *Mercury gravitational parameter - Measurement [4] [39]
     "GM☿",      "[ 2.2031868551E13_m³/s² "
-                "  0.0000000091E13_m³/s² "
+                "  0.00000012E13_m³/s² "
                 "  'ROUND(ⓈGM☿/ⒸGM☿;-2)' "
                 "  2.203E13_m³/s² ]",
     // *Mercury mass - Calculation from GM and G
@@ -1230,19 +1230,19 @@ static const cstring basic_constants[] =
                 "  'ⓇG' "
                 "  3.301E23_kg ]",
     // *Mercury equatorial radius - Measurement [22]
-    "Req☿",     "[ 2439.7_km "
-                "  0.1_km "
+    "Req☿",     "[ 2440.53_km "
+                "  0.04_km "
                 "  'ROUND(ⓈReq☿/ⒸReq☿;-2)' "
-                "  2440._km ]",
+                "  2441._km ]",
     // *Mercury polar radius - Measurement [22]
-    "Rp☿",      "[ 2439.7_km "
-                "  0.1_km "
+    "Rp☿",      "[ 2438.26_km "
+                "  0.04_km "
                 "  'ROUND(ⓈRp☿/ⒸRp☿;-2)' "
-                "  2440._km ]",
+                "  2438._km ]",
     // *Mercury oblateness - Calculation from measurement [22]
     "f☿",       "[ 'ROUND(1-ⒸRp☿/ⒸReq☿;XPON(UVAL(Ⓡf☿*(1-ⒸRp☿/ⒸReq☿)))-XPON(1-ⒸRp☿/ⒸReq☿)-2)' "
                 "  'ROUND(Ⓡf☿*Ⓒf☿;-2)' "
-                "  'ⓇRp☿+ⓇReq☿' ]",
+                "  'ⒸRp☿/(ⒸReq☿-ⒸRp☿)·(ⓇRp☿+ⓇReq☿)' ]",
     // *Mercury mean density - Calculation from measurement [4] [22]
     "ρv☿",       "[ 'ROUND(CONVERT(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿);1_kg/m³);XPON(UVAL(Ⓡρv☿*ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-XPON(UVAL(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☿*Ⓒρv☿);-2);1_kg/m³)' "
@@ -1257,8 +1257,8 @@ static const cstring basic_constants[] =
     "Ve☿",      "[ 'ROUND(CONVERT(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3));1_m/s);XPON(UVAL(ⓇVe☿*√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3))))-XPON(UVAL(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☿*ⒸVe☿);-2);1_m/s)' "
                 "  0.02 ]",
-    // *Mercury sidereal rotation period - Measurement [22]
-    "Prot☿",    "[ 5067014.4_s "
+    // *Mercury sidereal rotation period - Calculation from rotation rate [22]
+    "Prot☿",    "[ 5067027.0_s "
                 "  0.1_s "
                 "  'ROUND(ⓈProt☿/ⒸProt☿;-2)' "
                 "  5.067E6_s ]",
@@ -1276,28 +1276,28 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ☿/Ⓒϵ☿;-2)' ]",
     // *Mercury semi-major axis - Measurement [23]
     "a☿",       "[ 57909050_km "
-                "  10_km "
+                "  5.8_km "
                 "  'ROUND(Ⓢa☿/Ⓒa☿;-2)' "
                 "  5.791E7_km ]",
 
     // ------------------------------------------------------------------------
     // *Mercury orbital eccentricity - Measurement [23]
     "e☿",       "[ 0.205630 "
-                "  0.000001 "
+                "  0.00000058 "
                 "  'ROUND(Ⓢe☿/Ⓒe☿;-2)' "
                 "  0.2056 ]",
     // *Mercury orbital inclination - Measurement [23]
     "i☿",       "[ 7.005_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi☿/Ⓒi☿;-2)' ]",
     // *Mercury longitude of ascending node - Measurement [23]
     "Ω☿",       "[ 48.331_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ☿/ⒸΩ☿;-2)' "
                 "  48.33_° ]",
     // *Mercury argument of perihelion - Measurement [23]
     "ω☿",       "[ 29.124_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω☿/Ⓒω☿;-2)' "
                 "  29.12_° ]",
     // *Mercury time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1306,9 +1306,9 @@ static const cstring basic_constants[] =
 
     "Astronomy/Venus",     nullptr,
 
-    // *Venus gravitational parameter - Measurement [4]
+    // *Venus gravitational parameter - Measurement [4] [39]
     "GM♀",      "[ 3.24858592E14_m³/s² "
-                "  0.00000012E14_m³/s² "
+                "  0.000000064E14_m³/s² "
                 "  'ROUND(ⓈGM♀/ⒸGM♀;-2)' "
                 "  3.249E14_m³/s² ]",
     // *Venus mass - Calculation from GM and G
@@ -1318,12 +1318,12 @@ static const cstring basic_constants[] =
                 "  4.867E24_kg ]",
     // *Venus equatorial radius - Measurement [22]
     "Req♀",     "[ 6051.8_km "
-                "  0.1_km "
+                "  1.0_km "
                 "  'ROUND(ⓈReq♀/ⒸReq♀;-2)' "
                 "  6052._km ]",
     // *Venus polar radius - Measurement [22]
     "Rp♀",      "[ 6051.8_km "
-                "  0.1_km "
+                "  1.0_km "
                 "  'ROUND(ⓈRp♀/ⒸRp♀;-2)' "
                 "  6052._km ]",
     // *Venus oblateness - Calculation from measurement [22]
@@ -1344,8 +1344,8 @@ static const cstring basic_constants[] =
     "Ve♀",      "[ 'ROUND(CONVERT(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♀*√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♀*ⒸVe♀);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♀+(2/3·(2·ⓇReq♀+ⓇRp♀)))' ]",
-    // *Venus sidereal rotation period - Measurement [22]
-    "Prot♀",    "[ 20996772.8_s "
+    // *Venus sidereal rotation period - Calculation from rotation rate [22]
+    "Prot♀",    "[ 20996797.0_s "
                 "  8.64_s "
                 "  'ROUND(ⓈProt♀/ⒸProt♀;-2)' "
                 "  2.100E7_s ]",
@@ -1364,28 +1364,28 @@ static const cstring basic_constants[] =
                 "  177.4_° ]",
     // *Venus semi-major axis - Measurement [23]
     "a♀",       "[ 108208000_km "
-                "  10_km "
+                "  5.8_km "
                 "  'ROUND(Ⓢa♀/Ⓒa♀;-2)' "
                 "  1.082E8_km ]",
 
     // ------------------------------------------------------------------------
     // *Venus orbital eccentricity - Measurement [23]
     "e♀",       "[ 0.006772 "
-                "  0.000001 "
+                "  0.00000058 "
                 "  'ROUND(Ⓢe♀/Ⓒe♀;-2)' ]",
     // *Venus orbital inclination - Measurement [23]
     "i♀",       "[ 3.39458_° "
-                "  0.00001_° "
+                "  0.0000058_° "
                 "  'ROUND(Ⓢi♀/Ⓒi♀;-2)' "
                 "  3.395_° ]",
     // *Venus longitude of ascending node - Measurement [23]
     "Ω♀",       "[ 76.680_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♀/ⒸΩ♀;-2)' "
                 "  76.68_° ]",
     // *Venus argument of perihelion - Measurement [23]
     "ω♀",       "[ 54.884_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♀/Ⓒω♀;-2)' "
                 "  54.88_° ]",
     // *Venus time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1398,6 +1398,11 @@ static const cstring basic_constants[] =
     "GM♁",      "[ 3.986004E14_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Earth-Moon system gravitational parameter - Measurement [4]
+    "GMs♁",     "[ 4.03503235625E14_m³/s² "
+                "  0.000000008E14_m³/s² "
+                "  'ROUND(ⓈGMs♁/ⒸGMs♁;-2)' "
+                "  4.035E14_m³/s² ]",
     // *Earth mass - Calculation from GM and G
     "M♁",       "[ 'ROUND(CONVERT(ⒸGM♁/ⒸG;1_kg);XPON(UVAL(ⒸGM♁/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♁/ⒸG))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇM♁*ⒸM♁);-2);1_kg)' "
@@ -1429,9 +1434,9 @@ static const cstring basic_constants[] =
     "Ve♁",      "[ 'ROUND(CONVERT(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♁*√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♁*ⒸVe♁);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♁+(2/3·(2·ⓇReq♁+ⓇRp♁)))' ]",
-    // *Earth sidereal rotation period - Measurement [24]
-    "Prot♁",    "[ 86164.0905_s "
-                "  0.0001_s "
+    // *Earth sidereal rotation period (stellar day) - Calculation from the Earth rotation angle [44]
+    "Prot♁",    "[ 86164.0989_s "
+                "  0.001_s "
                 "  'ROUND(ⓈProt♁/ⒸProt♁;-2)' "
                 "  8.616E4_s ]",
     // *Earth orbital period - Computed [27]
@@ -1442,7 +1447,7 @@ static const cstring basic_constants[] =
     "ωrot♁",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♁;1_r/s);XPON(UVAL(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♁))-2)' "
                 "  'CONVERT(ROUND(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁;-2);1_r/s)' "
                 "  'ⓇProt♁' ]",
-    // *Earth axial tilt - Measurement [24]
+    // *Earth axial tilt - Obliquity of the ecliptic at J2000, IAU 2006 [43]
     "ϵ♁",       "[ 23.4393_° "
                 "  0.0001_° "
                 "  'ROUND(Ⓢϵ♁/Ⓒϵ♁;-2)' "
@@ -1456,21 +1461,21 @@ static const cstring basic_constants[] =
     // ------------------------------------------------------------------------
     // *Earth orbital eccentricity - Measurement [23]
     "e♁",       "[ 0.0167086 "
-                "  0.0000001 "
+                "  0.000000058 "
                 "  'ROUND(Ⓢe♁/Ⓒe♁;-2)' "
                 "  0.01671 ]",
     // *Earth orbital inclination - Measurement [23]
     "i♁",       "[ 0.00005_° "
-                "  0.00001_° "
+                "  0.0000058_° "
                 "  'ROUND(Ⓢi♁/Ⓒi♁;-2)' ]",
     // *Earth longitude of ascending node - Measurement [23]
     "Ω♁",       "[ 348.74_° "
-                "  0.01_° "
+                "  0.0058_° "
                 "  'ROUND(ⓈΩ♁/ⒸΩ♁;-2)' "
                 "  348.7_° ]",
     // *Earth argument of perihelion - Measurement [23]
     "ω♁",       "[ 114.20783_° "
-                "  0.00001_° "
+                "  0.0000058_° "
                 "  'ROUND(Ⓢω♁/Ⓒω♁;-2)' "
                 "  114.2_° ]",
     // *Earth time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1507,7 +1512,7 @@ static const cstring basic_constants[] =
     // ------------------------------------------------------------------------
     // Calendar and astronomical years
     // *Tropical year (equinox to equinox, J2000) - seasonal year [24]
-    "Ytrop♁",   "[ 365.24219_d "
+    "Ytrop♁",   "[ 365.2421897_d "
                 "  0_d "
                 "  0 ]",
     // *Julian year - exact, defines the light-year [24]
@@ -1531,20 +1536,20 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(ⓇM☽*ⒸM☽);-2);1_kg)' "
                 "  'ⓇG' "
                 "  7.346E22_kg ]",
-    // *Moon equatorial radius - Measurement [22]
+    // *Moon equatorial radius - Measurement [28]
     "Req☽",     "[ 1738.1_km "
                 "  0.1_km "
                 "  'ROUND(ⓈReq☽/ⒸReq☽;-2)' "
                 "  1738._km ]",
-    // *Moon polar radius - Measurement [22]
+    // *Moon polar radius - Measurement [28]
     "Rp☽",      "[ 1736.0_km "
                 "  0.1_km "
                 "  'ROUND(ⓈRp☽/ⒸRp☽;-2)' "
                 "  1736._km ]",
-    // *Moon oblateness - Calculation from measurement [22]
+    // *Moon oblateness - Calculation from measurement [28]
     "f☽",       "[ 'ROUND(1-ⒸRp☽/ⒸReq☽;XPON(UVAL(Ⓡf☽*(1-ⒸRp☽/ⒸReq☽)))-XPON(1-ⒸRp☽/ⒸReq☽)-2)' "
                 "  'ROUND(Ⓡf☽*Ⓒf☽;-2)' "
-                "  'ⓇRp☽+ⓇReq☽' ]",
+                "  'ⒸRp☽/(ⒸReq☽-ⒸRp☽)·(ⓇRp☽+ⓇReq☽)' ]",
     // *Moon mean density - Calculation from measurement [4] [22]
     "ρv☽",       "[ 'ROUND(CONVERT(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽);1_kg/m³);XPON(UVAL(Ⓡρv☽*ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-XPON(UVAL(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☽*Ⓒρv☽);-2);1_kg/m³)' "
@@ -1577,29 +1582,29 @@ static const cstring basic_constants[] =
                 "  0.0001_° "
                 "  'ROUND(Ⓢϵ☽/Ⓒϵ☽;-2)' "
                 "  1.542_° ]",
-    // *Moon semi-major axis - Measurement [25]
+    // *Moon semi-major axis - Measurement [45]
     "a☽",       "[ 384399_km "
-                "  1_km "
+                "  0.58_km "
                 "  'ROUND(Ⓢa☽/Ⓒa☽;-2)' "
                 "  3.844E5_km ]",
 
     // ------------------------------------------------------------------------
-    // *Moon orbital eccentricity - Measurement [25]
+    // *Moon orbital eccentricity - Measurement [45]
     "e☽",       "[ 0.0549 "
-                "  0.0001 "
+                "  0.000058 "
                 "  'ROUND(Ⓢe☽/Ⓒe☽;-2)' ]",
-    // *Moon orbital inclination - Measurement [25]
+    // *Moon orbital inclination - Measurement [28]
     "i☽",       "[ 5.145_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi☽/Ⓒi☽;-2)' ]",
-    // *Moon longitude of ascending node - Measurement [25]
-    "Ω☽",       "[ 125.08_° "
-                "  0.01_° "
+    // *Moon longitude of the mean ascending node at J2000 - Calculation [27]
+    "Ω☽",       "[ 125.0445_° "
+                "  0.000058_° "
                 "  'ROUND(ⓈΩ☽/ⒸΩ☽;-2)' "
                 "  125.1_° ]",
-    // *Moon argument of perigee - Measurement [25]
-    "ω☽",       "[ 318.15_° "
-                "  0.01_° "
+    // *Moon mean argument of perigee at J2000 - Calculation [27]
+    "ω☽",       "[ 318.3087_° "
+                "  0.000058_° "
                 "  'ROUND(Ⓢω☽/Ⓒω☽;-2)' "
                 "  318.2_° ]",
     // *Moon time of perigee passage - PeriSel (full Meeus ch.50); unc = ch.50
@@ -1610,10 +1615,15 @@ static const cstring basic_constants[] =
 
     "Astronomy/Mars",     nullptr,
 
-    // *Mars gravitational parameter - Measurement [4]
-    "GM♂",      "[ 4.28283758161E13_m³/s² "
-                "  0.00000000091E13_m³/s² "
+    // *Mars gravitational parameter (planet alone) - Measurement [37]
+    "GM♂",      "[ 4.282837362E13_m³/s² "
+                "  0.00000008E13_m³/s² "
                 "  'ROUND(ⓈGM♂/ⒸGM♂;-2)' "
+                "  4.283E13_m³/s² ]",
+    // *Mars system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs♂",     "[ 4.2828375816E13_m³/s² "
+                "  0.00000008E13_m³/s² "
+                "  'ROUND(ⓈGMs♂/ⒸGMs♂;-2)' "
                 "  4.283E13_m³/s² ]",
     // *Mars mass - Calculation from GM and G
     "M♂",       "[ 'ROUND(CONVERT(ⒸGM♂/ⒸG;1_kg);XPON(UVAL(ⒸGM♂/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♂/ⒸG))-2)' "
@@ -1633,7 +1643,7 @@ static const cstring basic_constants[] =
     // *Mars oblateness - Calculation from measurement [22]
     "f♂",       "[ 'ROUND(1-ⒸRp♂/ⒸReq♂;XPON(UVAL(Ⓡf♂*(1-ⒸRp♂/ⒸReq♂)))-XPON(1-ⒸRp♂/ⒸReq♂)-2)' "
                 "  'ROUND(Ⓡf♂*Ⓒf♂;-2)' "
-                "  'ⓇRp♂+ⓇReq♂' ]",
+                "  'ⒸRp♂/(ⒸReq♂-ⒸRp♂)·(ⓇRp♂+ⓇReq♂)' ]",
     // *Mars mean density - Calculation from measurement [4] [22]
     "ρv♂",       "[ 'ROUND(CONVERT(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂);1_kg/m³);XPON(UVAL(Ⓡρv♂*ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-XPON(UVAL(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♂*Ⓒρv♂);-2);1_kg/m³)' "
@@ -1667,27 +1677,27 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ♂/Ⓒϵ♂;-2)' ]",
     // *Mars semi-major axis - Measurement [23]
     "a♂",       "[ 227939200_km "
-                "  100_km "
+                "  58_km "
                 "  'ROUND(Ⓢa♂/Ⓒa♂;-2)' "
                 "  2.279E8_km ]",
 
     // ------------------------------------------------------------------------
     // *Mars orbital eccentricity - Measurement [23]
     "e♂",       "[ 0.0934 "
-                "  0.0001 "
+                "  0.000058 "
                 "  'ROUND(Ⓢe♂/Ⓒe♂;-2)' ]",
     // *Mars orbital inclination - Measurement [23]
     "i♂",       "[ 1.850_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi♂/Ⓒi♂;-2)' ]",
     // *Mars longitude of ascending node - Measurement [23]
     "Ω♂",       "[ 49.558_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♂/ⒸΩ♂;-2)' "
                 "  49.56_° ]",
     // *Mars argument of perihelion - Measurement [23]
     "ω♂",       "[ 286.502_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♂/Ⓒω♂;-2)' "
                 "  286.5_° ]",
     // *Mars time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1700,6 +1710,11 @@ static const cstring basic_constants[] =
     "GM♃",      "[ 1.26686534E17_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Jupiter system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs♃",     "[ 1.267127641E17_m³/s² "
+                "  0.0000000042E17_m³/s² "
+                "  'ROUND(ⓈGMs♃/ⒸGMs♃;-2)' "
+                "  1.267E17_m³/s² ]",
     // *Jupiter mass - Calculation from GM and G
     "M♃",       "[ 'ROUND(CONVERT(ⒸGM♃/ⒸG;1_kg);XPON(UVAL(ⒸGM♃/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♃/ⒸG))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇM♃*ⒸM♃);-2);1_kg)' "
@@ -1749,27 +1764,27 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ♃/Ⓒϵ♃;-2)' ]",
     // *Jupiter semi-major axis - Measurement [23]
     "a♃",       "[ 778570000_km "
-                "  1000_km "
+                "  580_km "
                 "  'ROUND(Ⓢa♃/Ⓒa♃;-2)' "
                 "  7.786E8_km ]",
 
     // ------------------------------------------------------------------------
     // *Jupiter orbital eccentricity - Measurement [23]
     "e♃",       "[ 0.0489 "
-                "  0.0001 "
+                "  0.000058 "
                 "  'ROUND(Ⓢe♃/Ⓒe♃;-2)' ]",
     // *Jupiter orbital inclination - Measurement [23]
     "i♃",       "[ 1.303_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi♃/Ⓒi♃;-2)' ]",
     // *Jupiter longitude of ascending node - Measurement [23]
     "Ω♃",       "[ 100.464_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♃/ⒸΩ♃;-2)' "
                 "  100.5_° ]",
     // *Jupiter argument of perihelion - Measurement [23]
     "ω♃",       "[ 273.867_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♃/Ⓒω♃;-2)' "
                 "  273.9_° ]",
     // *Jupiter time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1778,10 +1793,15 @@ static const cstring basic_constants[] =
 
     "Astronomy/Saturn",     nullptr,
 
-    // *Saturn gravitational parameter - Measurement [4]
-    "GM♄",      "[ 3.79405848418E16_m³/s² "
-                "  0.00000000091E16_m³/s² "
+    // *Saturn gravitational parameter (planet alone) - Measurement [37]
+    "GM♄",      "[ 3.793120623E16_m³/s² "
+                "  0.000000024E16_m³/s² "
                 "  'ROUND(ⓈGM♄/ⒸGM♄;-2)' "
+                "  3.793E16_m³/s² ]",
+    // *Saturn system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs♄",     "[ 3.794058484E16_m³/s² "
+                "  0.000000024E16_m³/s² "
+                "  'ROUND(ⓈGMs♄/ⒸGMs♄;-2)' "
                 "  3.794E16_m³/s² ]",
     // *Saturn mass - Calculation from GM and G
     "M♄",       "[ 'ROUND(CONVERT(ⒸGM♄/ⒸG;1_kg);XPON(UVAL(ⒸGM♄/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♄/ⒸG))-2)' "
@@ -1801,7 +1821,7 @@ static const cstring basic_constants[] =
     // *Saturn oblateness - Calculation from measurement [22]
     "f♄",       "[ 'ROUND(1-ⒸRp♄/ⒸReq♄;XPON(UVAL(Ⓡf♄*(1-ⒸRp♄/ⒸReq♄)))-XPON(1-ⒸRp♄/ⒸReq♄)-2)' "
                 "  'ROUND(Ⓡf♄*Ⓒf♄;-2)' "
-                "  'ⓇRp♄+ⓇReq♄' ]",
+                "  'ⒸRp♄/(ⒸReq♄-ⒸRp♄)·(ⓇRp♄+ⓇReq♄)' ]",
     // *Saturn mean density - Calculation from measurement [4] [22]
     "ρv♄",       "[ 'ROUND(CONVERT(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄);1_kg/m³);XPON(UVAL(Ⓡρv♄*ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-XPON(UVAL(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♄*Ⓒρv♄);-2);1_kg/m³)' "
@@ -1816,11 +1836,11 @@ static const cstring basic_constants[] =
     "Ve♄",      "[ 'ROUND(CONVERT(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♄*√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♄*ⒸVe♄);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♄+(2/3·(2·ⓇReq♄+ⓇRp♄)))' ]",
-    // *Saturn sidereal rotation period - Measurement [22]
-    "Prot♄",    "[ 38361_s "
-                "  50_s "
+    // *Saturn sidereal rotation period - Measurement [40]
+    "Prot♄",    "[ 38018_s "
+                "  58_s "
                 "  'ROUND(ⓈProt♄/ⒸProt♄;-2)' "
-                "  3.836E4_s ]",
+                "  3.802E4_s ]",
     // *Saturn orbital period - Computed, anomalistic perigee interval [27]
     "Porb♄",    "[ 928565359_s "
                 "  0_s "
@@ -1835,27 +1855,27 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ♄/Ⓒϵ♄;-2)' ]",
     // *Saturn semi-major axis - Measurement [23]
     "a♄",       "[ 1433530000_km "
-                "  10000_km "
+                "  5800_km "
                 "  'ROUND(Ⓢa♄/Ⓒa♄;-2)' "
                 "  1.434E9_km ]",
 
     // ------------------------------------------------------------------------
     // *Saturn orbital eccentricity - Measurement [23]
     "e♄",       "[ 0.0565 "
-                "  0.0001 "
+                "  0.000058 "
                 "  'ROUND(Ⓢe♄/Ⓒe♄;-2)' ]",
     // *Saturn orbital inclination - Measurement [23]
     "i♄",       "[ 2.485_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi♄/Ⓒi♄;-2)' ]",
     // *Saturn longitude of ascending node - Measurement [23]
     "Ω♄",       "[ 113.665_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♄/ⒸΩ♄;-2)' "
                 "  113.7_° ]",
     // *Saturn argument of perihelion - Measurement [23]
     "ω♄",       "[ 339.392_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♄/Ⓒω♄;-2)' "
                 "  339.4_° ]",
     // *Saturn time of perihelion passage - Computed via IFTE from Tp and Porb [27]
@@ -1864,10 +1884,15 @@ static const cstring basic_constants[] =
 
     "Astronomy/Uranus",     nullptr,
 
-    // *Uranus gravitational parameter - Measurement [4]
-    "GM⛢",      "[ 5.7945564E15_m³/s² "
-                "  0.0000040E15_m³/s² "
+    // *Uranus gravitational parameter (planet alone) - Measurement [37]
+    "GM⛢",      "[ 5.7939513E15_m³/s² "
+                "  0.0000044E15_m³/s² "
                 "  'ROUND(ⓈGM⛢/ⒸGM⛢;-2)' "
+                "  5.794E15_m³/s² ]",
+    // *Uranus system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs⛢",     "[ 5.7945564E15_m³/s² "
+                "  0.0000044E15_m³/s² "
+                "  'ROUND(ⓈGMs⛢/ⒸGMs⛢;-2)' "
                 "  5.795E15_m³/s² ]",
     // *Uranus mass - Calculation from GM and G
     "M⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/ⒸG;1_kg);XPON(UVAL(ⒸGM⛢/ⒸG·ⓇG))-XPON(UVAL(ⒸGM⛢/ⒸG))-2)' "
@@ -1887,7 +1912,7 @@ static const cstring basic_constants[] =
     // *Uranus oblateness - Calculation from measurement [22]
     "f⛢",       "[ 'ROUND(1-ⒸRp⛢/ⒸReq⛢;XPON(UVAL(Ⓡf⛢*(1-ⒸRp⛢/ⒸReq⛢)))-XPON(1-ⒸRp⛢/ⒸReq⛢)-2)' "
                 "  'ROUND(Ⓡf⛢*Ⓒf⛢;-2)' "
-                "  'ⓇRp⛢+ⓇReq⛢' ]",
+                "  'ⒸRp⛢/(ⒸReq⛢-ⒸRp⛢)·(ⓇRp⛢+ⓇReq⛢)' ]",
     // *Uranus mean density - Calculation from measurement [4] [22]
     "ρv⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢);1_kg/m³);XPON(UVAL(Ⓡρv⛢*ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-XPON(UVAL(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv⛢*Ⓒρv⛢);-2);1_kg/m³)' "
@@ -1902,11 +1927,11 @@ static const cstring basic_constants[] =
     "Ve⛢",      "[ 'ROUND(CONVERT(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3));1_m/s);XPON(UVAL(ⓇVe⛢*√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3))))-XPON(UVAL(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe⛢*ⒸVe⛢);-2);1_m/s)' "
                 "  '1/2·(ⓇGM⛢+(2/3·(2·ⓇReq⛢+ⓇRp⛢)))' ]",
-    // *Uranus sidereal rotation period - Measurement [22]
-    "Prot⛢",    "[ 62064_s "
-                "  10_s "
+    // *Uranus sidereal rotation period - Measurement [41]
+    "Prot⛢",    "[ 62092.31_s "
+                "  0.04_s "
                 "  'ROUND(ⓈProt⛢/ⒸProt⛢;-2)' "
-                "  6.206E4_s ]",
+                "  6.209E4_s ]",
     // *Uranus orbital period - Computed, anomalistic perigee interval [27]
     "Porb⛢",    "[ 2658520424_s "
                 "  0_s "
@@ -1921,27 +1946,27 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ⛢/Ⓒϵ⛢;-2)' ]",
     // *Uranus semi-major axis - Measurement [23]
     "a⛢",       "[ 2872460000_km "
-                "  10000_km "
+                "  5800_km "
                 "  'ROUND(Ⓢa⛢/Ⓒa⛢;-2)' "
                 "  2.872E9_km ]",
 
     // ------------------------------------------------------------------------
     // *Uranus orbital eccentricity - Measurement [23]
     "e⛢",       "[ 0.04717 "
-                "  0.00001 "
+                "  0.0000058 "
                 "  'ROUND(Ⓢe⛢/Ⓒe⛢;-2)' ]",
     // *Uranus orbital inclination - Measurement [23]
     "i⛢",       "[ 0.773_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi⛢/Ⓒi⛢;-2)' ]",
     // *Uranus longitude of ascending node - Measurement [23]
     "Ω⛢",       "[ 74.006_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ⛢/ⒸΩ⛢;-2)' "
                 "  74.01_° ]",
     // *Uranus argument of perihelion - Measurement [23]
     "ω⛢",       "[ 96.998857_° "
-                "  0.000001_° "
+                "  0.00000058_° "
                 "  'ROUND(Ⓢω⛢/Ⓒω⛢;-2)' "
                 "  97.00_° ]",
     // *Uranus time of perihelion passage - Computed via IFTE from Tp and Porb [27]  (last perihelion 1966; next ~2050)
@@ -1950,10 +1975,15 @@ static const cstring basic_constants[] =
 
     "Astronomy/Neptune",     nullptr,
 
-    // *Neptune gravitational parameter - Measurement [4]
-    "GM♆",      "[ 6.83652710058E15_m³/s² "
-                "  0.00000010058E15_m³/s² "
+    // *Neptune gravitational parameter (planet alone) - Measurement [37]
+    "GM♆",      "[ 6.83509997E15_m³/s² "
+                "  0.00000963E15_m³/s² "
                 "  'ROUND(ⓈGM♆/ⒸGM♆;-2)' "
+                "  6.835E15_m³/s² ]",
+    // *Neptune system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs♆",     "[ 6.83652710E15_m³/s² "
+                "  0.00000963E15_m³/s² "
+                "  'ROUND(ⓈGMs♆/ⒸGMs♆;-2)' "
                 "  6.837E15_m³/s² ]",
     // *Neptune mass - Calculation from GM and G
     "M♆",       "[ 'ROUND(CONVERT(ⒸGM♆/ⒸG;1_kg);XPON(UVAL(ⒸGM♆/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♆/ⒸG))-2)' "
@@ -1973,7 +2003,7 @@ static const cstring basic_constants[] =
     // *Neptune oblateness - Calculation from measurement [22]
     "f♆",       "[ 'ROUND(1-ⒸRp♆/ⒸReq♆;XPON(UVAL(Ⓡf♆*(1-ⒸRp♆/ⒸReq♆)))-XPON(1-ⒸRp♆/ⒸReq♆)-2)' "
                 "  'ROUND(Ⓡf♆*Ⓒf♆;-2)' "
-                "  'ⓇRp♆+ⓇReq♆' ]",
+                "  'ⒸRp♆/(ⒸReq♆-ⒸRp♆)·(ⓇRp♆+ⓇReq♆)' ]",
     // *Neptune mean density - Calculation from measurement [4] [22]
     "ρv♆",       "[ 'ROUND(CONVERT(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆);1_kg/m³);XPON(UVAL(Ⓡρv♆*ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-XPON(UVAL(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♆*Ⓒρv♆);-2);1_kg/m³)' "
@@ -1988,9 +2018,9 @@ static const cstring basic_constants[] =
     "Ve♆",      "[ 'ROUND(CONVERT(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♆*√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♆*ⒸVe♆);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♆+(2/3·(2·ⓇReq♆+ⓇRp♆)))' ]",
-    // *Neptune sidereal rotation period - Measurement [22]
-    "Prot♆",    "[ 58000_s "
-                "  100_s "
+    // *Neptune sidereal rotation period - Measurement [42]
+    "Prot♆",    "[ 57996_s "
+                "  180_s "
                 "  'ROUND(ⓈProt♆/ⒸProt♆;-2)' ]",
     // *Neptune orbital period - Sidereal [28]
     "Porb♆",    "[ 5200416000_s "
@@ -2006,27 +2036,27 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢϵ♆/Ⓒϵ♆;-2)' ]",
     // *Neptune semi-major axis - Measurement [23]
     "a♆",       "[ 4495060000_km "
-                "  10000_km "
+                "  5800_km "
                 "  'ROUND(Ⓢa♆/Ⓒa♆;-2)' "
                 "  4.495E9_km ]",
 
     // ------------------------------------------------------------------------
     // *Neptune orbital eccentricity - Measurement [23]
     "e♆",       "[ 0.00859 "
-                "  0.00001 "
+                "  0.0000058 "
                 "  'ROUND(Ⓢe♆/Ⓒe♆;-2)' ]",
     // *Neptune orbital inclination - Measurement [23]
     "i♆",       "[ 1.770_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢi♆/Ⓒi♆;-2)' ]",
     // *Neptune longitude of ascending node - Measurement [23]
     "Ω♆",       "[ 131.784_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♆/ⒸΩ♆;-2)' "
                 "  131.8_° ]",
     // *Neptune argument of perihelion - Measurement [23]
     "ω♆",       "[ 273.187_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♆/Ⓒω♆;-2)' "
                 "  273.2_° ]",
     // *Neptune time of perihelion passage - Computed via IFTE from Tp and Porb [4]  (EXCEPTION: Tp = next perihelion 2042; floor-IFTE returns it unchanged)
@@ -2035,10 +2065,14 @@ static const cstring basic_constants[] =
 
     "Astronomy/Pluto",     nullptr,
 
-    // *Pluto gravitational parameter - Measurement [4]
-    "GM♇",      "[ 9.755E11_m³/s² "
-                "  0.005E11_m³/s² "
+    // *Pluto gravitational parameter (planet alone) - Measurement [37]
+    "GM♇",      "[ 8.693E11_m³/s² "
+                "  0.004E11_m³/s² "
                 "  'ROUND(ⓈGM♇/ⒸGM♇;-2)' ]",
+    // *Pluto system gravitational parameter (planet and moons) - Measurement [4] [37]
+    "GMs♇",     "[ 9.755E11_m³/s² "
+                "  0.005E11_m³/s² "
+                "  'ROUND(ⓈGMs♇/ⒸGMs♇;-2)' ]",
     // *Pluto mass - Calculation from GM and G
     "M♇",       "[ 'ROUND(CONVERT(ⒸGM♇/ⒸG;1_kg);XPON(UVAL(ⒸGM♇/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♇/ⒸG))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇM♇*ⒸM♇);-2);1_kg)' "
@@ -2046,12 +2080,12 @@ static const cstring basic_constants[] =
                 "  1.462E22_kg ]",
     // *Pluto equatorial radius - Measurement [26]
     "Req♇",     "[ 1188.3_km "
-                "  1.6_km "
+                "  0.8_km "
                 "  'ROUND(ⓈReq♇/ⒸReq♇;-2)' "
                 "  1188._km ]",
     // *Pluto polar radius - Measurement [26]
     "Rp♇",      "[ 1188.3_km "
-                "  1.6_km "
+                "  0.8_km "
                 "  'ROUND(ⓈRp♇/ⒸRp♇;-2)' "
                 "  1188._km ]",
     // *Pluto oblateness - Calculation from measurement [26]
@@ -2072,8 +2106,8 @@ static const cstring basic_constants[] =
     "Ve♇",      "[ 'ROUND(CONVERT(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♇*√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♇*ⒸVe♇);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♇+(2/3·(2·ⓇReq♇+ⓇRp♇)))' ]",
-    // *Pluto sidereal rotation period - Measurement [26]
-    "Prot♇",    "[ 551856.7_s "
+    // *Pluto sidereal rotation period - Calculation from rotation rate [22]
+    "Prot♇",    "[ 551856.1_s "
                 "  0.1_s "
                 "  'ROUND(ⓈProt♇/ⒸProt♇;-2)' "
                 "  5.519E5_s ]",
@@ -2085,34 +2119,34 @@ static const cstring basic_constants[] =
     "ωrot♇",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♇;1_r/s);XPON(UVAL(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♇))-2)' "
                 "  'CONVERT(ROUND(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇;-2);1_r/s)' "
                 "  'ⓇProt♇' ]",
-    // *Pluto axial tilt - Measurement [26]
-    "ϵ♇",       "[ 119.591_° "
-                "  0.001_° "
+    // *Pluto axial tilt - Calculation from pole direction and orbit [22]
+    "ϵ♇",       "[ 119.61_° "
+                "  0.01_° "
                 "  'ROUND(Ⓢϵ♇/Ⓒϵ♇;-2)' "
                 "  119.6_° ]",
     // *Pluto semi-major axis - Measurement [23]
     "a♇",       "[ 5906380000_km "
-                "  10000_km "
+                "  5800_km "
                 "  'ROUND(Ⓢa♇/Ⓒa♇;-2)' "
                 "  5.906E9_km ]",
 
     // ------------------------------------------------------------------------
     // *Pluto orbital eccentricity - Measurement [23]
     "e♇",       "[ 0.2488 "
-                "  0.0001 "
+                "  0.000058 "
                 "  'ROUND(Ⓢe♇/Ⓒe♇;-2)' ]",
     // *Pluto orbital inclination - Measurement [23]
     "i♇",       "[ 17.16_° "
-                "  0.01_° "
+                "  0.0058_° "
                 "  'ROUND(Ⓢi♇/Ⓒi♇;-2)' ]",
     // *Pluto longitude of ascending node - Measurement [23]
     "Ω♇",       "[ 110.299_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(ⓈΩ♇/ⒸΩ♇;-2)' "
                 "  110.3_° ]",
     // *Pluto argument of perihelion - Measurement [23]
     "ω♇",       "[ 113.834_° "
-                "  0.001_° "
+                "  0.00058_° "
                 "  'ROUND(Ⓢω♇/Ⓒω♇;-2)' "
                 "  113.8_° ]",
     // *Pluto time of perihelion passage - Computed via IFTE from Tp and Porb [4]  (last perihelion 1989)
@@ -2138,17 +2172,17 @@ static const cstring basic_constants[] =
     "Req☉",     "[ 695700_km "
                 "  0_km "
                 "  0 ]",
-    // *Solar polar radius - Measurement [18] [19]
-    "Rp☉",      "[ 695508_km "
-                "  140_km "
+    // *Solar polar radius - Calculation from nominal value and measurement [3] [38]
+    "Rp☉",      "[ 695694.8_km "
+                "  0.4_km "
                 "  'ROUND(ⓈRp☉/ⒸRp☉;-2)' "
-                "  6.955E5_km ]",
+                "  6.957E5_km ]",
 
     // ------------------------------------------------------------------------
-    // *Solar oblateness - Calculation from measurement [18] [19]
+    // *Solar oblateness - Calculation from measurement [3] [38]
     "f☉",       "[ 'ROUND(1-ⒸRp☉/ⒸReq☉;XPON(UVAL(Ⓡf☉*(1-ⒸRp☉/ⒸReq☉)))-XPON(1-ⒸRp☉/ⒸReq☉)-2)' "
                 "  'ROUND(Ⓡf☉*Ⓒf☉;-2)' "
-                "  'ⓇRp☉+ⓇReq☉' ]",
+                "  'ⒸRp☉/(ⒸReq☉-ⒸRp☉)·(ⓇRp☉+ⓇReq☉)' ]",
     // *Solar mean density - Calculation from nominal value [3]
     "ρv☉",       "[ 'ROUND(CONVERT(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉);1_kg/m³);XPON(UVAL(Ⓡρv☉*ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-XPON(UVAL(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☉*Ⓒρv☉);-2);1_kg/m³)' "
@@ -2178,8 +2212,8 @@ static const cstring basic_constants[] =
                 "  0.030E-52_1/m² "
                 "  'ROUND(ⓈΛ/ⒸΛ;-2)' ]",
     // *Hubble constant - Measurement [1]
-    "H₀",       "[ 67.4_km/(s·Mpc) "
-                "  0.5_km/(s·Mpc) "
+    "H₀",       "[ 67.36_km/(s·Mpc) "
+                "  0.54_km/(s·Mpc) "
                 "  'ROUND(ⓈH₀/ⒸH₀;-2)' ]",
     // *Baryon density parameter - Measurement [1]
     "ωb",       "[ 0.02237 "
@@ -2190,9 +2224,9 @@ static const cstring basic_constants[] =
                 "  0.0012 "
                 "  'ROUND(Ⓢωc/Ⓒωc;-2)' ]",
     // *CMB acoustic scale - Measurement [1]
-    "100θ*",    "[ 1.04109 "
-                "  0.00030 "
-                "  'ROUND(0.00030/1.04109;-2)' "
+    "100θ*",    "[ 1.04110 "
+                "  0.00031 "
+                "  'ROUND(0.00031/1.04110;-2)' "
                 "  1.041 ]",
 
     // ------------------------------------------------------------------------
@@ -2201,8 +2235,8 @@ static const cstring basic_constants[] =
                 "  0.0073 "
                 "  'ROUND(Ⓢτr/Ⓒτr;-2)' ]",
     // *Scalar spectral index - Measurement [1]
-    "ns",       "[ 0.9665 "
-                "  0.0038 "
+    "ns",       "[ 0.9649 "
+                "  0.0042 "
                 "  'ROUND(Ⓢns/Ⓒns;-2)' ]",
     // *Power spectrum amplitude - Measurement [1]
     "(ln(10¹⁰As))", "[ 3.044 "
@@ -2222,19 +2256,19 @@ static const cstring basic_constants[] =
     "RG",       "[ 50000_ly "
                 "  5000_ly "
                 "  'ROUND(ⓈRG/ⒸRG;-2)' ]",
-    // *Distance to Sgr A* - Measurement [6] [7]
-    "D●SgrA*",  "[ 26673_ly "
-                "  42_ly "
-                "  'ROUND(42/26673;-2)' "
-                "  2.667E4_ly ]",
-    // *Sgr A* Schwarzschild radius - Measurement [7]
-    "R●SgrA*",  "[ 12.0E6_km "
-                "  0.4E6_km "
-                "  'ROUND(0.4E6/12.0E6;-2)' ]",
-    // *Sgr A* black hole mass - Measurement [7]
+    // *Distance to Sgr A* - Measurement [6]
+    "D●SgrA*",  "[ 26996_ly "
+                "  102_ly "
+                "  'ROUND(102/26996;-2)' "
+                "  2.700E4_ly ]",
+    // *Sgr A* Schwarzschild radius - Calculation 2GM/c² from the mass [6]
+    "R●SgrA*",  "[ 12.69E6_km "
+                "  0.12E6_km "
+                "  'ROUND(0.12E6/12.69E6;-2)' ]",
+    // *Sgr A* black hole mass - Measurement [6]
     "M●SgrA*",  "[ 4.297E6_M☉ "
-                "  0.012E6_M☉ "
-                "  'ROUND(0.012E6/4.297E6;-2)' ]",
+                "  0.042E6_M☉ "
+                "  'ROUND(0.042E6/4.297E6;-2)' ]",
     // *Andromeda galaxy total mass - Measurement [35] [36]
     "MNGC224",  "[ 1.4E12_M☉ "
                 "  0.4E12_M☉ "
@@ -2255,13 +2289,13 @@ static const cstring basic_constants[] =
                 "  36000_ly "
                 "  'ROUND(ⓈDNGC224/ⒸDNGC224;-2)' "
                 "  2.482E6_ly ]",
-    // *Vega gravitational parameter - Measurement [13] [14]
-    "GM★Vega",  "[ 1.89E19_m³/s² "
-                "  0.05E19_m³/s² "
+    // *Vega gravitational parameter - Calculation from measured mass [3] [13]
+    "GM★Vega",  "[ 2.833E20_m³/s² "
+                "  0.098E20_m³/s² "
                 "  'ROUND(ⓈGM★Vega/ⒸGM★Vega;-2)' ]",
-    // *Vega luminosity - Measurement [13] [14]
-    "L★Vega",   "[ 1.51E27_W "
-                "  0.05E27_W "
+    // *Vega luminosity - Calculation from measured luminosity [3] [13]
+    "L★Vega",   "[ 1.536E28_W "
+                "  0.017E28_W "
                 "  'ROUND(ⓈL★Vega/ⒸL★Vega;-2)' ]",
 
     "Materials",     nullptr,

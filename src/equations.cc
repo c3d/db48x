@@ -1696,7 +1696,7 @@ static const cstring basic_equations[] =
     "}",
     //7.
     "Earth’s Sphere Of Influence",  "{ "
-    "  'Rsoi=(Ⓒa♁)·(ⒸGM♁/ⒸGM☉)↑(2/5)' "
+    "  'Rsoi=(Ⓒa♁)·(ⒸGMs♁/ⒸGM☉)↑(2/5)' "
     "}",
 
     //8.
@@ -1917,14 +1917,14 @@ static const cstring basic_equations[] =
     "}",
     //34.
     "Collinear Lagrange Points",  "{ "
-    "  'rapp=(Ⓒa♁)·(ⒸGM♁/(3·ⒸGM☉))↑(1/3)' "
-    "  'rL2=SQRT(ⒸGM♁/(((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)+(rL2_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3-ⒸGM☉/((Ⓒa♁)+(rL2_km))↑2))' "
-    "  'rL1=SQRT(ⒸGM♁/(ⒸGM☉/((Ⓒa♁)-(rL1_km))↑2-((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)-(rL1_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3))' "
+    "  'rapp=(Ⓒa♁)·(ⒸGMs♁/(3·ⒸGM☉))↑(1/3)' "
+    "  'rL2=SQRT(ⒸGMs♁/(((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGMs♁)+(rL2_km))·(ⒸGM☉+ⒸGMs♁)/(Ⓒa♁)↑3-ⒸGM☉/((Ⓒa♁)+(rL2_km))↑2))' "
+    "  'rL1=SQRT(ⒸGMs♁/(ⒸGM☉/((Ⓒa♁)-(rL1_km))↑2-((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGMs♁)-(rL1_km))·(ⒸGM☉+ⒸGMs♁)/(Ⓒa♁)↑3))' "
     "}",
     //35.
     "JWST at Sun Earth L2",  "{ "
     "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
-    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGMs♁))' "
     "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
     "}",
 
@@ -2125,7 +2125,7 @@ static const cstring basic_equations[] =
     //49.
     "Comet Interceptor",  "{ "
     "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
-    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGMs♁))' "
     "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
     "  'vobj=SQRT(ⒸGM☉·(2/(rX_au)-1/(aobj_au)))' "
     "  'vt=SQRT(ⒸGM☉·(aobj_au)·(1-eobj↑2))/(rX_au)' "
