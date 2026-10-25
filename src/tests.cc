@@ -13774,7 +13774,7 @@ void tests::constants_menu()
     step("Neutron to proton mass ratio")
         .fkey(0).expect("mnmp")
         .fkey(1).expect("1.00137 84194 6")
-        .fkey(2).expect("1.00137 84194 6±σ5.1⁳⁻¹⁰");
+        .fkey(2).expect("1.00137 84194 6±σ4.⁳⁻¹⁰");
     step("Electron relative atomic mass")
         .fkey(0).expect("Are")
         .fkey(1).expect("0.00054 85799 09")
@@ -13929,7 +13929,7 @@ void tests::constants_menu()
     step("Electron magnetic moment / bohr magneton ratio")
         .fkey(0).expect("μeμB")
         .fkey(1).expect("-1.00115 96521 8")
-        .fkey(2).expect("-1.00115 96521 8±σ1.1⁳⁻¹³");
+        .fkey(2).expect("-1.00115 96521 8±σ1.8⁳⁻¹³");
     step("Proton magnetic moment")
         .fkey(0).expect("μp")
         .fkey(1).expect("1.41060 67954 5⁳⁻²⁶ J/T")
