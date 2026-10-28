@@ -38,7 +38,7 @@ line, so there is nothing between the values and the result for Undo to return
 to. Nothing in RPL can force a save either — it is a gesture of the editor, not
 of the language.
 
-**Recalling the arguments themselves.** `LastArguments` reports what a call
+**Recalling the arguments themselves.** LastArguments reports what a call
 consumed, as a list, and unlike Undo it works inside a single command line -
 including a block transferred from this help:
 
@@ -79,7 +79,7 @@ last, so the surplus element is always the one to drop. Anything shorter, or
 longer by more than one, is refused by name.
 
 This is why the entries end by pushing their own arguments and dropping them
-again. Without that suffix `LastArguments` reports the last value the program
+again. Without that suffix LastArguments reports the last value the program
 computed internally - an expression full of `LocalVariable0` - rather than what
 the caller supplied. That is issue #1738. `PhitMu`, `PhitSx` and `PhitRand` take
 no arguments, so there is nothing for them to report.
@@ -140,8 +140,9 @@ entries that answer with names rather than bare numbers.
 Parameters go first and the varying argument last, bare or bundled in a list of
 the right length, whose length is checked before anything is computed.
 
-A first submenu, [LawDemos](#lawdemoslibrary), shows the laws at work on random
-draws.
+Demonstrations of the laws on random draws are in LIB → Demo → Probability:
+[DemoHisto](#demohisto), [DemoWalk](#demowalk) and [DemoMarkov](#demomarkov)
+(see [LawDemos](#lawdemoslibrary)).
 
 Three of these laws are not only models but instruments: [Student](#studentlibrary)
 measures means, [Chi2](#chi2library) measures counts and variances, and
@@ -150,12 +151,15 @@ StatTests section — see [StatTests](#stattestslibrary).
 
 ## LawDemosLibrary
 
-Demonstrations of the distributions on random draws, a new case at each press.
+Demonstrations of the distributions on random draws, in LIB → Demo →
+Probability, a new case at each press.
 Seed the generator with RDZ to replay one.
 
-* DemoHisto: a law at random, or the one given, its histogram and its density.
-* DemoWalk: a Brownian walk and a Lévy flight side by side.
-* DemoMarkov: a Markov chain, its path and its stationary distribution.
+* [DemoHisto](#demohisto): a law at random, or the one given, its histogram
+  and its density.
+* [DemoWalk](#demowalk): a Brownian walk and a Lévy flight side by side.
+* [DemoMarkov](#demomarkov): a Markov chain, its path and its stationary
+  distribution.
 
 
 ## DemoHisto
@@ -274,7 +278,7 @@ tunas where prey is sparse, and Brownian ones where it is plentiful.
 
 A Markov chain: the next state depends only on the present one, through a
 matrix of transition probabilities `P`, where `P(i,j)` is the probability of
-going from state `i` to state `j`, each row summing to 1.
+going from state *i* to state `j`, each row summing to 1.
 
 By default, an economy with three states, growth (G), stagnation (S) and
 recession (R), from quarter to quarter:
@@ -682,7 +686,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## NormlArgs
 
-Labels a row of values with the parameter names of Norml. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+Labels a row of values with the parameter names of Norml. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
 
 ```rpl
 0 1 1.5 ⓁNormlArgs 3 →List
@@ -767,7 +771,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## LgNrmArgs
 
-Labels a row of values with the parameter names of LgNrm. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+Labels a row of values with the parameter names of LgNrm. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
 
 ```rpl
 0 1 1.5 ⓁLgNrmArgs 3 →List
@@ -852,7 +856,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## ExponArgs
 
-Labels a row of values with the parameter names of Expon. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+Labels a row of values with the parameter names of Expon. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
 
 ```rpl
 2 0.5 ⓁExponArgs 2 →List
@@ -937,7 +941,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## WeiblArgs
 
-Labels a row of values with the parameter names of Weibl. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+Labels a row of values with the parameter names of Weibl. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
 
 ```rpl
 2 1 1 ⓁWeiblArgs 3 →List
@@ -1022,7 +1026,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## RayleighArgs
 
-Labels a row of values with the parameter names of Rayleigh. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `s`, `X` — or `{ s X }`.
+Labels a row of values with the parameter names of Rayleigh. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `s`, `X` — or `{ s X }`.
 
 ```rpl
 1 1 ⓁRayleighArgs 2 →List
@@ -1098,7 +1102,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## LogisArgs
 
-Labels a row of values with the parameter names of Logis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+Labels a row of values with the parameter names of Logis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
 
 ```rpl
 0 1 1 ⓁLogisArgs 3 →List
@@ -1193,7 +1197,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## ParetoArgs
 
-Labels a row of values with the parameter names of Pareto. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+Labels a row of values with the parameter names of Pareto. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
 
 ```rpl
 1 3 2 ⓁParetoArgs 3 →List
@@ -1278,7 +1282,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## CauchArgs
 
-Labels a row of values with the parameter names of Cauch. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+Labels a row of values with the parameter names of Cauch. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
 
 ```rpl
 0 1 1 ⓁCauchArgs 3 →List
@@ -1363,7 +1367,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## UnifContArgs
 
-Labels a row of values with the parameter names of UnifCont. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of UnifCont. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 0 1 0.4 ⓁUnifContArgs 3 →List
@@ -1448,7 +1452,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## TriSymArgs
 
-Labels a row of values with the parameter names of TriSym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of TriSym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 0 1 0.3 ⓁTriSymArgs 3 →List
@@ -1533,7 +1537,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## Chi2Args
 
-Labels a row of values with the parameter names of Chi2. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+Labels a row of values with the parameter names of Chi2. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
 
 ```rpl
 4 3 ⓁChi2Args 2 →List
@@ -1618,7 +1622,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## BetaArgs
 
-Labels a row of values with the parameter names of Beta. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `b`, `X` — or `{ a b X }`.
+Labels a row of values with the parameter names of Beta. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `b`, `X` — or `{ a b X }`.
 
 ```rpl
 2 3 0.4 ⓁBetaArgs 3 →List
@@ -1703,7 +1707,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## PhitArgs
 
-Labels a row of values with the parameter names of Phit. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `X` — or `{ X }`.
+Labels a row of values with the parameter names of Phit. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `X` — or `{ X }`.
 
 ```rpl
 1 ⓁPhitArgs 1 →List
@@ -1788,7 +1792,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## TriRightArgs
 
-Labels a row of values with the parameter names of TriRight. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of TriRight. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 0 3 2 ⓁTriRightArgs 3 →List
@@ -1873,7 +1877,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## TriLeftArgs
 
-Labels a row of values with the parameter names of TriLeft. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of TriLeft. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 0 3 1 ⓁTriLeftArgs 3 →List
@@ -1958,7 +1962,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## TriAsymArgs
 
-Labels a row of values with the parameter names of TriAsym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+Labels a row of values with the parameter names of TriAsym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
 
 ```rpl
 0 3 1 0.8 ⓁTriAsymArgs 4 →List
@@ -2043,7 +2047,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## UShapeArgs
 
-Labels a row of values with the parameter names of UShape. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of UShape. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 0 1 0.25 ⓁUShapeArgs 3 →List
@@ -2128,7 +2132,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## GEVArgs
 
-Labels a row of values with the parameter names of GEV. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+Labels a row of values with the parameter names of GEV. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
 
 ```rpl
 0 1 0.2 1 ⓁGEVArgs 4 →List
@@ -2213,7 +2217,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## BernoulliArgs
 
-Labels a row of values with the parameter names of Bernoulli. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+Labels a row of values with the parameter names of Bernoulli. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
 
 ```rpl
 0.3 0 ⓁBernoulliArgs 2 →List
@@ -2298,7 +2302,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## BinomArgs
 
-Labels a row of values with the parameter names of Binom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+Labels a row of values with the parameter names of Binom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
 
 ```rpl
 20 0.3 8 ⓁBinomArgs 3 →List
@@ -2383,7 +2387,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## PoissArgs
 
-Labels a row of values with the parameter names of Poiss. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+Labels a row of values with the parameter names of Poiss. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
 
 ```rpl
 10 10 ⓁPoissArgs 2 →List
@@ -2468,7 +2472,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## GeomArgs
 
-Labels a row of values with the parameter names of Geom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+Labels a row of values with the parameter names of Geom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
 
 ```rpl
 0.3 3 ⓁGeomArgs 2 →List
@@ -2553,7 +2557,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## HyperArgs
 
-Labels a row of values with the parameter names of Hyper. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+Labels a row of values with the parameter names of Hyper. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
 
 ```rpl
 50 10 5 1 ⓁHyperArgs 4 →List
@@ -2638,7 +2642,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## UnifDisArgs
 
-Labels a row of values with the parameter names of UnifDis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+Labels a row of values with the parameter names of UnifDis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
 
 ```rpl
 1 6 3 ⓁUnifDisArgs 3 →List
@@ -2723,7 +2727,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## GammaArgs
 
-Labels a row of values with the parameter names of Gamma. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+Labels a row of values with the parameter names of Gamma. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
 
 ```rpl
 2 3 3 ⓁGammaArgs 3 →List
@@ -2808,7 +2812,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## NormTruncArgs
 
-Labels a row of values with the parameter names of NormTrunc. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+Labels a row of values with the parameter names of NormTrunc. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
 
 ```rpl
 0 1 -1 2 0.5 ⓁNormTruncArgs 5 →List
@@ -2893,7 +2897,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## NegBinomArgs
 
-Labels a row of values with the parameter names of NegBinom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+Labels a row of values with the parameter names of NegBinom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
 
 ```rpl
 3 0.5 2 ⓁNegBinomArgs 3 →List
@@ -2978,7 +2982,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## StudentArgs
 
-Labels a row of values with the parameter names of Student. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+Labels a row of values with the parameter names of Student. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
 
 ```rpl
 4 1 ⓁStudentArgs 2 →List
@@ -3063,7 +3067,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## FisherArgs
 
-Labels a row of values with the parameter names of Fisher. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+Labels a row of values with the parameter names of Fisher. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
 
 ```rpl
 4 6 1 ⓁFisherArgs 3 →List
@@ -3150,7 +3154,7 @@ Seed the generator with RDZ to make a sequence reproducible; without a seed each
 
 ## LevyArgs
 
-Labels a row of values with the parameter names of Levy. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+Labels a row of values with the parameter names of Levy. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is LastArguments straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
 
 ```rpl
 0 1 1 ⓁLevyArgs 3 →List
