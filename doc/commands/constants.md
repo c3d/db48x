@@ -243,17 +243,19 @@ for `UrX`.
 
 Round a value based on a standard uncertainty, implementing [Rule 3](#rule-3).
 
+**1)**
 ```rpl
 -3.141592654_m  0.000045_m  StdRnd
 @ Expecting -3.14159 3 m
 ```
 
+**2)**
 ```rpl
 -3.141592654_m  0.000045  StdRnd
 @ Expecting -3.14159 3 m
 ```
 
-To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
+**3)** To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
 ```rpl
 'ⒸNA*Ⓒu'  Duplicate  ⓇMu  →Us  StdRnd →Num
 @ Expecting 1.00000 00010 5⁳⁻³ kg/mol
@@ -266,12 +268,13 @@ To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
 Round a value based on a relative uncertainty, implementing [Rule 2](#rule-2)
 and [Rule 3](#rule-3).
 
+**1)**
 ```rpl
 -3.141592654_m  0.000012  RelRnd
 @ Expecting -3.14159 3 m
 ```
 
-To calculate `UrMu=ⓇMu` and then the correct rounding of `Mu='ⒸNA*Ⓒu'`,
+**2)** To calculate `UrMu=ⓇMu` and then the correct rounding of `Mu='ⒸNA*Ⓒu'`,
 you can use the following code:
 ```rpl
 'ⒸNA*Ⓒu'  Duplicate  ⓈMu →Ur RelRnd  →Num
@@ -279,7 +282,7 @@ you can use the following code:
 @ which is the correctly rounded value of ⒸMu
 ```
 
-To calculate `Urε₀=Ⓡε₀` and then the correct rounding of
+**3)** To calculate `Urε₀=Ⓡε₀` and then the correct rounding of
 `ε₀='CONVERT(1/(Ⓒc^2·Ⓒμ₀);1_F/m)'`:
 
 ```rpl
@@ -293,7 +296,7 @@ To calculate `Urε₀=Ⓡε₀` and then the correct rounding of
 
 Round one value to the precision of another one.
 
-This implements [Rule 4](#rule-4) and [Rule 5](#rule-5). The user has to judge
+**1)** This implements [Rule 4](#rule-4) and [Rule 5](#rule-5). The user has to judge
 carefully to establish the respective role of `X` and `Y`. There is no automatic
 use here, since it depends on the precise nature of the calculation.
 
@@ -303,6 +306,7 @@ use here, since it depends on the precise nature of the calculation.
 @ Expecting -3.14159 3 m
 ```
 
+**2)**
 ```rpl
 -3.141592654_m 0.00045  PrcRnd
 @ Expecting -3.14159 m

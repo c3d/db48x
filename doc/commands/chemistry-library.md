@@ -145,14 +145,14 @@ programs. A missing value is the text `"—"`.
 
 The standard atomic weight of an element, as the interval of the CIAAW.
 
-`Z` or `"Symbol"` or `"Name"` ▶ `a…b`
+**1)** `Z` or `"Symbol"` or `"Name"` ▶ `a…b`
 
 ```rpl
 "Hydrogen" ⓁAtWt
 @ Expecting 1.00784…1.00811
 ```
 
-As an interval, it computes the relative molecular mass of a compound
+**2)** As an interval, it computes the relative molecular mass of a compound
 directly. For water, H₂O:
 
 ```rpl
@@ -186,13 +186,14 @@ nested) with a count after them, and hydrates after a middle dot, a dot or a
 star, with their
 coefficient, as in `"CuSO4·5H2O"`.
 
-`"Formula"` ▶ `a…b` in g/mol
+**1)** `"Formula"` ▶ `a…b` in g/mol
 
 ```rpl
 "H2O" ⓁMolarMass
 @ Expecting 18.01471…18.01599 g/mol
 ```
 
+**2)**
 ```rpl
 @ Copper sulfate pentahydrate
 "CuSO4·5H2O" ⓁMolarMass

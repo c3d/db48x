@@ -38,7 +38,7 @@ line, so there is nothing between the values and the result for Undo to return
 to. Nothing in RPL can force a save either — it is a gesture of the editor, not
 of the language.
 
-**Recalling the arguments themselves.** LastArguments reports what a call
+**1)** **Recalling the arguments themselves.** LastArguments reports what a call
 consumed, as a list, and unlike Undo it works inside a single command line -
 including a block transferred from this help:
 
@@ -49,7 +49,7 @@ including a block transferred from this help:
 
 The density is left on the stack below.
 
-**Loose or bundled.** Every entry accepts its arguments either way: five bare
+**2)** **Loose or bundled.** Every entry accepts its arguments either way: five bare
 numbers, or one list of five. So the list travels, and can be named:
 
 ```rpl
@@ -64,7 +64,7 @@ A list is checked for length before use, which bare values cannot be. A bundle
 of the wrong size says so and stays on the stack for you to redirect, instead
 of being consumed to compute something nobody asked for.
 
-`<Law>Mu`, `<Law>Sx` and `<Law>Rand` take the parameters alone, so they accept
+**3)** `<Law>Mu`, `<Law>Sx` and `<Law>Rand` take the parameters alone, so they accept
 a bundle of their own size or one element longer, dropping the trailing varying
 argument. A point computed with `ⓁNormlPDF` can therefore be drawn from without
 retyping anything:

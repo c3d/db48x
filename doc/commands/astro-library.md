@@ -350,14 +350,14 @@ and differences against each body's velocity. The example below reproduces the
 Earth→Mars leg of NASA's **Mars 2020 (Perseverance)** mission — departure in the
 late-July 2020 window, ~200-day cruise.
 
-`t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
+**1)** `t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
 
 ```rpl
 2459050.5 2459250.5 'Ⓛ♁Pf' 'Ⓛ♂Pf' ⓁTrCost     @ (Earth→Mars ~200 d — Mars 2020 / Perseverance)
 @ Expecting { 6.37381 3392 3.64458 48380 2 2.72922 85539 7 }
 ```
 
-The Moon plugs in identically:
+**2)** The Moon plugs in identically:
 
 ```rpl
 2459050.5 2459250.5 'Ⓛ☾Hf' 'Ⓛ♂Pf' ⓁTrCost     @ (Moon→Mars)
