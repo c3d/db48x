@@ -36,6 +36,12 @@ The constant value can be a single value, as above, or an array containing:
 * relative uncertainty;
 * optionally a label (defaults to the value).
 
+The standard uncertainty follows the GUM (JCGM 100:2008). Where the source gives
+a standard deviation or a standard error, it is used as given. Where it gives an
+accuracy as ± bounds, the bounds are taken as those of a rectangular
+distribution, whose standard uncertainty is the half-width divided by √3
+(GUM 4.3.7). The description of each constant says which applies.
+
 ```
 "Sample"
 
@@ -2811,6 +2817,9 @@ Dry air density
 
 Measured. Volumetric density of dry air at standard temperature (0°C)
 and pressure (101.325 kPa).
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2820,6 +2829,9 @@ Refractive index of dry air
 
 Measured. Refractive index of dry air at 589 nm (sodium D line), 0°C,
 1 atm. Varies slightly with humidity and CO2 content.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 
 ### cpAir constant
@@ -2827,6 +2839,9 @@ Measured. Refractive index of dry air at 589 nm (sodium D line), 0°C,
 Specific heat cp of dry air
 
 Measured. Specific heat of dry air at constant pressure at 300 K.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2836,6 +2851,9 @@ Specific heat cv of dry air
 
 Specific heat of dry air at constant volume, calculated as
 `cpAir − RAir`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2859,12 +2877,13 @@ Exact calculation: `R/M_Air`. Specific gas constant of dry air,
 
 Electric permittivity of dry air
 
-Measured. Electric permittivity of dry airat STP. The relative
-permittivity `εr≈1.000536` is very close to vacuum permittivity `ε₀`.
-It is a measure of how dense an electric field is "permitted" to
-form in response to electric charges.
-[Materials 1](#materials-1)
-[Materials 2](#materials-2)
+Measured. Electric permittivity of dry air (free of CO2) at 20 °C and 1 atm, ε₀·(1 + (ε−1)),
+with ε − 1 = 536.4×10⁻⁶. This is the mean of the best measurements
+(radio frequency, microwave and optical); their average deviation,
+0.3×10⁻⁶, is taken as the standard uncertainty. At other temperatures
+and pressures, ε − 1 is proportional to the density of the gas, p/T.
+[Materials 29](#materials-29)
+
 
 ### μAir constant
 
@@ -2874,6 +2893,9 @@ Measured. Magnetic permeability of dry air at STP. The relative
 permeability `μr≈1.0000004`, essentially identical to `μ₀`. It
 quantifies the strength of the magnetic field induced by an electric
 current.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2885,6 +2907,10 @@ Measured. Electrical resistivity of dry air at STP. Dry air is an
 excellent insulator; resistivity ranges from 10¹³ to 10¹⁶ Ω·m
 depending on ionisation level. It quantifies how strongly a material
 opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2895,6 +2921,10 @@ Dielectric rigidity of dry air
 Measured. Dielectric breakdown field strength of dry air at STP.
 Above this threshold, dry air undergoes avalanche ionisation
 (lightning, spark discharge).
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
@@ -2908,6 +2938,9 @@ Dinitrogen N2 density
 
 Measured. Volumetric density of dinitrogen (N2) at `0°C`,
 `101.325 kPa`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -2917,6 +2950,9 @@ Measured. Volumetric density of dinitrogen (N2) at `0°C`,
 Dinitrogen N2 specific heat cp
 
 Measured. Specific heat of N2 at constant pressure.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -2926,6 +2962,9 @@ Measured. Specific heat of N2 at constant pressure.
 Dinitrogen N2 specific heat cv
 
 Measured. Specific heat of N2 at constant volume.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -2950,10 +2989,13 @@ where `M_N2=28.014 g/mol`. [Materials 2](#materials-2)
 
 Electric permittivity of N2
 
-Measured. Electric permittivity of N2 at STP. Relative permittivity
-`εr≈1.000580`; N2 is widely used as an insulating gas in high-voltage
-equipment. It is a measure of how dense an electric field is "permitted"
-to form in response to electric charges. [Materials 2](#materials-2)
+Measured. Electric permittivity of nitrogen at 20 °C and 1 atm, ε₀·(1 + (ε−1)),
+with ε − 1 = 548×10⁻⁶. This is the mean of the best measurements
+(radio frequency, microwave and optical); their average deviation,
+0.5×10⁻⁶, is taken as the standard uncertainty. At other temperatures
+and pressures, ε − 1 is proportional to the density of the gas, p/T.
+[Materials 29](#materials-29)
+
 
 ### μN2 constant
 
@@ -2961,7 +3003,11 @@ Magnetic permeability of N2
 
 Measured. Magnetic permeability of N2 at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
-induced by an electric current. [Materials 2](#materials-2)
+induced by an electric current.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### ρN2 constant
 
@@ -2969,7 +3015,12 @@ Resistivity of N2
 
 Measured. Electrical resistivity of dry N2 at STP. Excellent insulator
 used in purged electrical enclosures. It quantifies how strongly a
-material opposes the flow of electric current. [Materials 2](#materials-2)
+material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ### EdN2 constant
 
@@ -2977,7 +3028,12 @@ Dielectric rigidity of N2
 
 Measured. Dielectric breakdown field of N2 at STP. Slightly higher
 than dry air; preferred for high-voltage insulation. It is the electric
-field threshold above which an avalanche ionisation occurs. [Materials 2](#materials-2)
+field threshold above which an avalanche ionisation occurs.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ## O2 constants
 
@@ -2989,6 +3045,9 @@ Dioxygen O2 density
 
 Measured. Volumetric density of dioxygen (O2) at `0°C`,
 `101.325 kPa`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -2998,6 +3057,9 @@ Measured. Volumetric density of dioxygen (O2) at `0°C`,
 Dioxygen O2 specific heat cp
 
 Measured. Specific heat of O2 at constant pressure.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -3007,6 +3069,9 @@ Measured. Specific heat of O2 at constant pressure.
 Dioxygen O2 specific heat cv
 
 Measured. Specific heat of O2 at constant volume.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -3031,9 +3096,13 @@ where `M_O2=31.999 g/mol`. [Materials 2](#materials-2)
 
 Electric permittivity of O2
 
-Measured. Electric permittivity of O2 at STP. Relative permittivity
-`εr≈1.000530`, comparable to N2. It is a measure of how dense an electric
-field is "permitted" to form in response to electric charges. [Materials 2](#materials-2)
+Measured. Electric permittivity of oxygen at 20 °C and 1 atm, ε₀·(1 + (ε−1)),
+with ε − 1 = 494.7×10⁻⁶. This is the mean of the best measurements
+(radio frequency, microwave and optical); their average deviation,
+0.2×10⁻⁶, is taken as the standard uncertainty. At other temperatures
+and pressures, ε − 1 is proportional to the density of the gas, p/T.
+[Materials 29](#materials-29)
+
 
 ### μO2 constant
 
@@ -3041,7 +3110,11 @@ Magnetic permeability of O2
 
 Measured. Magnetic permeability of O2 at STP. Paramagnetic with
 `μr≈1.0000019` due to its unpaired electrons. It quantifies the strength
-of the magnetic field induced by an electric current. [Materials 2](#materials-2)
+of the magnetic field induced by an electric current.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### ρO2 constant
 
@@ -3049,14 +3122,24 @@ Resistivity of O2
 
 Measured. Electrical resistivity of dry O2 at STP. Good insulator
 under standard conditions. It quantifies how strongly a material
-opposes the flow of electric current. [Materials 2](#materials-2)
+opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ### EdO2 constant
 
 Dielectric rigidity of O2
 
 Measured. Dielectric breakdown electric field of O2 at STP.
-Slightly lower than N2. [Materials 2](#materials-2)
+Slightly lower than N2.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ## Argon constants
 
@@ -3067,21 +3150,33 @@ Gas
 Argon density
 
 Measured. Volumetric density of argon (Ar) at `0°C`,
-`101.325 kPa`. [Materials 2](#materials-2)
+`101.325 kPa`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### cpAr constant
 
 Argon specific heat cp
 
 Exact calculation: `(5/2)·R/M_Ar` (monatomic ideal gas). Specific
-heat of argon at constant pressure. [Materials 2](#materials-2)
+heat of argon at constant pressure.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### cvAr constant
 
 Argon specific heat cv
 
 Specific heat of argon at constant volume. Exactly `(3/2)·R/M_Ar` for
-a monatomic ideal gas. [Materials 2](#materials-2)
+a monatomic ideal gas.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### γAr constant
 
@@ -3100,10 +3195,13 @@ Exact calculation. Specific gas constant of argon, `RAr=R/M_Ar`, where
 
 Electric permittivity of Ar
 
-Measured. Electric permittivity of Ar at STP. Relative permittivity
-`εr≈1.000516`; used as an inert dielectric medium. It is a measure of how
-dense an electric field is "permitted" to form in response to electric charges.
-[Materials 2](#materials-2)
+Measured. Electric permittivity of argon at 20 °C and 1 atm, ε₀·(1 + (ε−1)),
+with ε − 1 = 517.2×10⁻⁶. This is the mean of the best measurements
+(radio frequency, microwave and optical); their average deviation,
+0.4×10⁻⁶, is taken as the standard uncertainty. At other temperatures
+and pressures, ε − 1 is proportional to the density of the gas, p/T.
+[Materials 29](#materials-29)
+
 
 ### μAr constant
 
@@ -3111,7 +3209,11 @@ Magnetic permeability of Ar
 
 Measured. Magnetic permeability of Ar at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
-induced by an electric current. [Materials 2](#materials-2)
+induced by an electric current.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### ρAr constant
 
@@ -3119,14 +3221,24 @@ Resistivity of Ar
 
 Measured. Electrical resistivity of argon at STP. Excellent insulator; used
 in plasma physics and dielectric studies. It quantifies how strongly a
-material opposes the flow of electric current. [Materials 2](#materials-2)
+material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ### EdAr constant
 
 Dielectric rigidity of Ar
 
 Measured. Dielectric breakdown electric field of argon at STP. Lower than
-air due to absence of polar molecules. [Materials 2](#materials-2)
+air due to absence of polar molecules.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ## CO2 constants
 
@@ -3138,6 +3250,9 @@ Carbon dioxide CO2 density
 
 Measured. Volumetric density of carbon dioxide (CO2) at `0°C`,
 `101.325 kPa`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -3148,6 +3263,9 @@ Carbon dioxide CO2 specific heat cp
 
 Measured. Specific heat of CO2 at constant pressure at `300 K`.
 Strongly temperature-dependent.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -3157,6 +3275,9 @@ Strongly temperature-dependent.
 Carbon dioxide CO2 specific heat cv
 
 Measured. Specific heat of CO2 at constant volume at `300 K`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
@@ -3182,12 +3303,13 @@ where `M_CO2=44.010 g/mol`. [Materials 2](#materials-2)
 
 Electric permittivity of CO2
 
-Measured. Electric permittivity of CO2 at STP. Relative permittivity `εr≈1.000921`,
-slightly higher than N2 and Ar due to CO2's quadrupole moment. It is a measure
-of how dense an electric field is "permitted" to form in response to electric
-charges.
-[Materials 2](#materials-2)
-[Materials 3](#materials-3)
+Measured. Electric permittivity of carbon dioxide at 20 °C and 1 atm, ε₀·(1 + (ε−1)),
+with ε − 1 = 922×10⁻⁶. This is the mean of the best measurements
+(radio frequency, microwave and optical); their average deviation,
+1×10⁻⁶, is taken as the standard uncertainty. At other temperatures
+and pressures, ε − 1 is proportional to the density of the gas, p/T.
+[Materials 29](#materials-29)
+
 
 ### μCO2 constant
 
@@ -3195,7 +3317,11 @@ Magnetic permeability of CO2
 
 Measured. Magnetic permeability of CO2 at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
-induced by an electric current. [Materials 2](#materials-2)
+induced by an electric current.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 2](#materials-2)
 
 ### ρCO2 constant
 
@@ -3203,14 +3329,24 @@ Resistivity of CO2
 
 Measured. Electrical resistivity of CO2 at STP. Lower than N2 and Ar; sometimes
 used as arc-quenching medium in circuit breakers. It quantifies how strongly
-a material opposes the flow of electric current. [Materials 2](#materials-2)
+a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 ### EdCO2 constant
 
 Dielectric rigidity of CO2
 
 Measured. Dielectric breakdown electric field of CO2 at STP. Comparable to dry
-air. [Materials 2](#materials-2)
+air.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 2](#materials-2)
 
 
 ## B. LIQUIDS (at `T = 293.15 K = 0°C`, `StdP = 101.325 kPa`)
@@ -3227,7 +3363,11 @@ Liquid
 Liquid water density
 
 Measured (IAPWS-IF97). Volumetric density of liquid water at `20°C`,
-`101.325 kPa`. [Materials 4](#materials-4)
+`101.325 kPa`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 4](#materials-4)
 [Materials 2](#materials-2)
 
 ### nH2O constant
@@ -3235,6 +3375,9 @@ Measured (IAPWS-IF97). Volumetric density of liquid water at `20°C`,
 Refractive index of liquid water
 
 Measured. Refractive index of liquid water at `589 nm` (sodium D line), `20°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 4](#materials-4)
 
 ### cpH2O constant
@@ -3242,7 +3385,11 @@ Measured. Refractive index of liquid water at `589 nm` (sodium D line), `20°C`.
 Specific heat cp of liquid water
 
 Measured (IAPWS-IF97). Specific heat of liquid water at constant pressure
-at `20°C`. Near its minimum value in the `0–100°C` range. [Materials 4](#materials-4)
+at `20°C`. Near its minimum value in the `0–100°C` range.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 4](#materials-4)
 [Materials 2](#materials-2)
 
 ### ρH2O constant
@@ -3252,13 +3399,47 @@ Resistivity of liquid water
 Measured. Electrical resistivity of ultra-pure water at `25°C` . The value
 `1.8×10⁵ Ω·m (18 MΩ·cm)` is the theoretical maximum for pure water. It
 quantifies how strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
 [Materials 4](#materials-4) [Materials 2](#materials-2)
 
+
+
+### pKwH2O constant
+
+Ionization constant of water
+
+Calculation. `pKw = −log₁₀ Kw` of liquid water at `25 °C` and `0.1 MPa`,
+`13.994`, from equations (2) to (4) of the source with the density
+`0.997047 g/cm³` (IAPWS-95); the calculation reproduces the test values of its
+table 2 to `1E-7`. Its table 3 gives `13.99`, and the former formulation of
+2007 gave `13.995`. The source states that measured values do not generally
+deviate from the formulation by more than `0.05` in the liquid at moderate
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is `0.05/√3`. In pure water at `25 °C`, `pH = pKw/2 ≈ 7.00`.
+[Materials 27](#materials-27), section 5 and table 3
 
 ## C. SOLIDS (at `T = 293.15 K = 20°C`, `StdP = 101.325 kPa`)
   Parameters: `ρv`, `n`, `cp`, `ε`, `ρ*`, `Ed*`  * when relevant
 
 ## C1. Materials for optical fibers and waveguides
+
+## Acetic Acid constants
+
+Acetic acid, CH₃COOH, the weak acid of vinegar.
+
+### pKaAcetic constant
+
+Acidity constant of acetic acid
+
+Measured. `pKa` of acetic acid at `25 °C` and zero ionic strength, `4.756`,
+the value selected by the source with its best evaluation code, A, an
+estimated uncertainty of `±0.003`: that bound is taken as a rectangular
+distribution, whose standard uncertainty is `0.003/√3`. In a solution of
+concentration `C`, it gives `[H⁺]` with `Ka = 10^-pKa`; see `WeakAcid` in the
+Uncertainty library. [Materials 28](#materials-28), table 7.2, p. 238
 
 ## Silicon constants
 
@@ -3270,20 +3451,33 @@ Crystalline silicon density
 
 Measured. Volumetric density of crystalline silicon, the foundation
 of modern microelectronics and an important infrared photonic
-material. [Materials 10](#materials-10) [Materials 11](#materials-11)
+material.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 10](#materials-10) [Materials 11](#materials-11)
 
 ### nSi constant
 
 Refractive index of crystalline silicon
 
 Measured (Silicon is transparent only for `λ > 1.1 µm`). Refractive
-index of crystalline silicon at `1150 nm`, `20°C`. [Materials 11](#materials-11)
+index of crystalline silicon at `1550 nm`, the wavelength of optical
+telecommunications and silicon photonics, `20°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 30](#materials-30)
 
 ### cpSi constant
 
 Specific heat of silicon
 
-Measured. Specific heat of crystalline silicon at `300 K`. [Materials 10](#materials-10)
+Measured. Specific heat of crystalline silicon at `300 K`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 10](#materials-10)
 
 ### εsi constant
 
@@ -3300,6 +3494,10 @@ Resistivity of crystalline silicon
 Measured. Electrical resistivity of intrinsic crystalline silicon at `300 K`.
 Semiconductor; resistivity varies over many orders of magnitude with doping.
 It quantifies how strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
 [Materials 10](#materials-10) [Materials 11](#materials-11)
 
 ## SiO2 constants
@@ -3311,7 +3509,11 @@ Dielectric
 Fused silica density
 
 Measured. Volumetric density of amorphous fused silica (vitreous SiO2),
-the primary material for standard optical fibers. [Materials 7](#materials-7)
+the primary material for standard optical fibers.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 7](#materials-7)
 
 ### nSiO2 constant
 
@@ -3319,13 +3521,22 @@ Refractive index of fused silica
 
 Measured (Malitson 1965 Sellmeier fit). Refractive index of fused silica
 at `589.3 nm` (sodium D line), `20°C`. The Sellmeier-calibrated value
-from Malitson (1965) is the standard reference for fiber optic design. [Materials 5](#materials-5)
+from Malitson (1965) is the standard reference for fiber optic design.
+The value is computed with the Sellmeier dispersion formula of Malitson 1965.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 5](#materials-5)
 
 ### cpSiO2 constant
 
 Specific heat of fused silica
 
-Measured. Specific heat of fused silica at `20°C`. [Materials 7](#materials-7)
+Measured. Specific heat of fused silica at `20°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 7](#materials-7)
 
 ### εox constant
 
@@ -3342,14 +3553,24 @@ Resistivity of fused silica
 
 Measured. Electrical resistivity of fused silica at `20°C`. Among the best
 solid insulators; used in high-voltage isolation and MEMS. It quantifies
-how strongly a material opposes the flow of electric current. [Materials 7](#materials-7)
+how strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 7](#materials-7)
 
 ### EdSiO2 constant
 
 Dielectric rigidity of fused silica
 
 Measured. Dielectric breakdown electric field of fused silica. Very high;
-SiO2 is the standard gate dielectric in MOSFET technology. [Materials 7](#materials-7)
+SiO2 is the standard gate dielectric in MOSFET technology.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 7](#materials-7)
 
 ## GeO2 constants
 
@@ -3361,7 +3582,11 @@ Germanate glass density
 
 Measured. Volumetric density of germanate glass (GeO2), used as a dopant
 in the core of standard single-mode optical fibers to raise the refractive
-index. [Materials 8](#materials-8) [Materials 9](#materials-9)
+index.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 8](#materials-8) [Materials 9](#materials-9)
 
 ### nGeO2 constant
 
@@ -3369,13 +3594,21 @@ Refractive index of germanate glass
 
 Measured. Refractive index of pure GeO2 glass at `589 nm`, `20°C`. The
 actual core index of a doped fiber is interpolated between nSiO2
-and nGeO2. [Materials 8](#materials-8)
+and nGeO2.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 8](#materials-8)
 
 ### cpGeO2 constant
 
 Specific heat of germanate glass
 
-Measured. Specific heat of germanate glass. [Materials 9](#materials-9)
+Measured. Specific heat of germanate glass.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 9](#materials-9)
 
 ### ρGeO2 constant
 
@@ -3383,14 +3616,24 @@ Resistivity of germanate glass
 
 Measured. Electrical resistivity of pure GeO2 glass at `20°C`. Lower
 than fused silica but still an excellent insulator. It quantifies how
-strongly a material opposes the flow of electric current. [Materials 9](#materials-9)
+strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 9](#materials-9)
 
 ### EdGeO2 constant
 
 Dielectric rigidity of germanate glass
 
 Measured. Dielectric breakdown electric field of GeO2 glass. Similar
-order of magnitude to SiO2; varies with purity. [Materials 9](#materials-9)
+order of magnitude to SiO2; varies with purity.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 9](#materials-9)
 
 ## Si3N4 constants
 
@@ -3402,6 +3645,9 @@ Silicon nitride density
 
 Measured. Volumetric density of silicon nitride (Si3N4) deposited by
 LPCVD, the standard platform for integrated photonic waveguides.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 18](#materials-18) [Materials 19](#materials-19)
 
 ### nSi3N4 constant
@@ -3410,13 +3656,21 @@ Refractive index of LPCVD Si3N4
 
 Measured; depends on deposition conditions. Refractive index of LPCVD Si3N4
 at `633 nm` (He-Ne laser), `20°C`. The value depends on deposition conditions
-and stoichiometry. [Materials 18](#materials-18)
+and stoichiometry.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 18](#materials-18)
 
 ### cpSi3N4 constant
 
 Specific heat of Si3N4
 
-Measured. Specific heat of silicon nitride. [Materials 19](#materials-19)
+Measured. Specific heat of silicon nitride.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 19](#materials-19)
 
 ### ρSi3N4 constant
 
@@ -3424,14 +3678,24 @@ Resistivity of Si3N4
 
 Measured. Electrical resistivity of LPCVD Si3N4 at `20°C`. Excellent insulator
 used for passivation and etch-stop layers in integrated circuits. It quantifies
-how strongly a material opposes the flow of electric current. [Materials 19](#materials-19)
+how strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 19](#materials-19)
 
 ### EdSi3N4 constant
 
 Dielectric rigidity of Si3N4
 
 Measured. Dielectric breakdown electric field of Si3N4 thin films. Higher than
-SiO2; used as storage dielectric in SONOS flash memory. [Materials 19](#materials-19)
+SiO2; used as storage dielectric in SONOS flash memory.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 19](#materials-19)
 
 
 ## C2. Reference optical glasses
@@ -3445,21 +3709,33 @@ Dielectric
 Schott BK7 glass density
 
 Measured. Volumetric density of Schott BK7 borosilicate glass, the
-most widely used optical glass for visible-range optics. [Materials 15](#materials-15)
+most widely used optical glass for visible-range optics.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 15](#materials-15)
 
 ### nBK7 constant
 
 Refractive index of Schott BK7 glass
 
 Measured (Schott catalogue nominal nd). Refractive index of Schott BK7 at
-`589.3 nm` (sodium d line), `20°C`. This is the nominal nd value used in
-optical design. [Materials 15](#materials-15)
+`587.6 nm` (helium d line), `20°C`. This is the nominal nd value used in
+optical design.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 15](#materials-15)
 
 ### cpBK7 constant
 
 Specific heat of BK7 glass
 
-Measured. Specific heat of BK7 glass. [Materials 15](#materials-15)
+Measured. Specific heat of BK7 glass.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 15](#materials-15)
 
 ### ρBK7 constant
 
@@ -3467,14 +3743,24 @@ Resistivity of BK7 glass
 
 Measured. Electrical resistivity of BK7 borosilicate glass at `20°C`. Used
 in high-voltage optical isolators. It quantifies how strongly a material
-opposes the flow of electric current. [Materials 15](#materials-15)
+opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 15](#materials-15)
 
 ### EdBK7 constant
 
 Dielectric rigidity of BK7 glass
 
 Measured. Dielectric breakdown electric field of BK7 glass. Lower than
-crystalline dielectrics due to its amorphous microstructure. [Materials 15](#materials-15)
+crystalline dielectrics due to its amorphous microstructure.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 15](#materials-15)
 
 
 ## C3. Optical crystals (UV & IR)
@@ -3488,7 +3774,11 @@ Dielectric
 Sapphire density
 
 Measured. Volumetric density of single-crystal sapphire (alpha-Al2O3),
-used for UV-to-IR windows, substrates, and high-power laser rods. [Materials 16](#materials-16)
+used for UV-to-IR windows, substrates, and high-power laser rods.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 16](#materials-16)
 
 ### nAl2O3 constant
 
@@ -3496,13 +3786,22 @@ Ordinary refractive index of sapphire
 
 Measured (ordinary axis; birefringent material). Ordinary refractive index
 of sapphire at `589 nm`, `20°C`. Sapphire is birefringent; the extraordinary
-index is slightly higher. [Materials 16](#materials-16)
+index is slightly higher.
+The value is computed with the Sellmeier dispersion formula of Malitson & Dodge 1972.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 16](#materials-16)
 
 ### cpAl2O3 constant
 
 Specific heat of sapphire
 
-Measured. Specific heat of sapphire at `300 K`. [Materials 16](#materials-16) [Materials 2](#materials-2)
+Measured. Specific heat of sapphire at `300 K`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 16](#materials-16) [Materials 2](#materials-2)
 
 ### ρAl2O3 constant
 
@@ -3511,14 +3810,24 @@ Resistivity of sapphire
 Measured. Electrical resistivity of single-crystal sapphire at `20°C`. One
 of the best insulating substrates; used in power electronics and RF
 substrates. It quantifies how strongly a material opposes the flow of electric
-current. [Materials 16](#materials-16)
+current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 16](#materials-16)
 
 ### EdAl2O3 constant
 
 Dielectric rigidity of sapphire
 
 Measured. Dielectric breakdown electric field of sapphire. High strength;
-enables use in high-field capacitors and microwave devices. [Materials 16](#materials-16)
+enables use in high-field capacitors and microwave devices.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 16](#materials-16)
 
 ## CaF2 constants
 
@@ -3530,7 +3839,11 @@ Calcium fluoride density
 
 Measured. Volumetric density of calcium fluoride (CaF2), a key material
 for deep ultraviolet optics (`193` nm excimer lithography) and infrared
-windows. [Materials 17](#materials-17) [Materials 15](#materials-15)
+windows.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 17](#materials-17) [Materials 15](#materials-15)
 
 ### nCaF2 constant
 
@@ -3538,13 +3851,20 @@ Refractive index of CaF2
 
 Measured. Refractive index of CaF2 at `589 nm`, `20°C`. CaF2 is transparent
 from `130 nm` to `10 µm`, making it useful across a very wide spectral range.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 17](#materials-17)
 
 ### cpCaF2 constant
 
 Specific heat of CaF2
 
-Measured. Specific heat of calcium fluoride. [Materials 15](#materials-15)
+Measured. Specific heat of calcium fluoride.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 15](#materials-15)
 
 ### ρCaF2 constant
 
@@ -3552,14 +3872,24 @@ Resistivity of CaF2
 
 Measured. Electrical resistivity of single-crystal CaF2 at `20°C` . Excellent
 insulator; ionic crystal structure provides high purity. It quantifies
-how strongly a material opposes the flow of electric current. [Materials 17](#materials-17)
+how strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 17](#materials-17)
 
 ### EdCaF2 constant
 
 Dielectric rigidity of CaF2
 
 Measured. Dielectric breakdown electric field of CaF2 crystal. Very high;
-consistent with use in high-power UV laser optics. [Materials 17](#materials-17)
+consistent with use in high-power UV laser optics.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 17](#materials-17)
 
 ## C Diamond constants
 
@@ -3571,20 +3901,33 @@ Diamond density
 
 Measured. Volumetric density of cubic (type IIa) diamond. Diamond has
 the highest known thermal conductivity of any material at room
-temperature. [Materials 13](#materials-13) [Materials 14](#materials-14)
+temperature.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 13](#materials-13) [Materials 14](#materials-14)
 
 ### nC constant
 
 Refractive index of diamond
 
 Measured (type IIa diamond). Refractive index of diamond at `589 nm`,
-`20°C`. [Materials 14](#materials-14)
+`20°C`.
+The value is computed with the Sellmeier dispersion formula of Peter 1923.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 14](#materials-14)
 
 ### cpC constant
 
 Specific heat of diamond
 
-Measured. Specific heat of diamond at `300 K`. [Materials 13](#materials-13)
+Measured. Specific heat of diamond at `300 K`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 13](#materials-13)
 
 ### ρC constant
 
@@ -3592,7 +3935,12 @@ Resistivity of diamond
 
 Measured (type IIa natural diamond). Electrical resistivity of type IIa diamond
 at `20°C`. Resistivity varies strongly with crystal purity. It quantifies how
-strongly a material opposes the flow of electric current. [Materials 13](#materials-13) [Materials 14](#materials-14)
+strongly a material opposes the flow of electric current.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 13](#materials-13) [Materials 14](#materials-14)
 
 ### EdC constant
 
@@ -3600,7 +3948,12 @@ Dielectric rigidity of diamond
 
 Measured (type IIa diamond). Dielectric breakdown electric field of diamond.
 Highest of any known solid; enables use in next-generation high-power
-electronics. [Materials 13](#materials-13) [Materials 14](#materials-14)
+electronics.
+This is an order of magnitude: the value depends on the purity of the material
+(and, for a gas, on its ionization, the gap and the pressure). Its uncertainty is
+the range of usual values, taken as the bound of a uniform distribution and
+divided by √3.
+[Materials 13](#materials-13) [Materials 14](#materials-14)
 
 
 ## C4. Reference metals (thermal and mechanical engineering)
@@ -3617,13 +3970,68 @@ Metal
 Aluminium density
 
 Measured. Volumetric density of pure aluminium, a standard reference
-material in mechanical and thermal engineering. [Materials 12](#materials-12) [Materials 2](#materials-2)
+material in mechanical and thermal engineering.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 12](#materials-12) [Materials 2](#materials-2)
 
 ### cpAl constant
 
 Specific heat of aluminium
 
-Measured. Specific heat of pure aluminium at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
+Measured. Specific heat of pure aluminium at `20°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12) [Materials 2](#materials-2)
+
+### kAl constant
+
+Thermal conductivity of aluminium
+
+Measured. Recommended value for well-annealed, high-purity aluminium at
+`300 K`, `237 W/(m·K)`, given by the source to within ±3 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±3 %/√3. Alloys conduct markedly less.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12), p. 302
+
+
+### ρAl constant
+
+Electrical resistivity of aluminium
+
+Measured. Recommended value for well-annealed aluminium of purity 99.99 % or
+higher at `300 K`, `2.733E-8 Ω·m` (`2.650E-8 Ω·m` at `293 K`), corrected for
+thermal expansion. The source gives it to within ±1 % below `400 K`: that bound
+is taken as a rectangular distribution, whose standard uncertainty is
+±1 %/√3. [Materials 22](#materials-22), table 1, p. 1133
+
+
+### αρAl constant
+
+Temperature coefficient of the electrical resistivity of aluminium
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.004213 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `400 K` of
+the source. Its standard uncertainty, `0.000074 K⁻¹` (1.8 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 22](#materials-22), table 1, p. 1133
+
+### αLAl constant
+
+Linear thermal expansion of aluminium
+
+Measured. Mean coefficient of linear expansion of the pure metal from `20` to `100 °C`,
+`23.8E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
 
 ## Cu Metal constants
 
@@ -3634,13 +4042,86 @@ Metal
 Copper density
 
 Measured. Volumetric density of copper, the reference material for
-thermal and electrical conductivity in engineering. [Materials 12](#materials-12) [Materials 2](#materials-2)
+thermal and electrical conductivity in engineering.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12) [Materials 2](#materials-2)
 
 ### cpCu constant
 
 Specific heat of copper
 
-Measured. Specific heat of copper at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
+Measured. Specific heat of copper at `20°C`.
+The source gives no uncertainty: the value is taken as exact to ± one unit of
+its last digit, a bound of a uniform distribution, whose standard uncertainty is
+that bound divided by √3.
+[Materials 12](#materials-12) [Materials 2](#materials-2)
+
+
+### ECu constant
+
+Young modulus of copper
+
+Measured. Average of the room-temperature measurements on annealed
+polycrystalline copper, `123.5 GPa`; its uncertainty is the standard error of
+that average, as given by the source: the spread from one specimen to another
+is larger. [Materials 20](#materials-20), table 10, p. 923
+
+### νCu constant
+
+Poisson ratio of copper
+
+Measured. Average for annealed polycrystalline copper at room temperature,
+`0.350`, with the standard error of that average. [Materials 20](#materials-20), table 10, p. 923
+
+### kCu constant
+
+Thermal conductivity of copper
+
+Measured. Recommended value for well-annealed, high-purity copper at
+`300 K`, `401 W/(m·K)`, given by the source to within ±2 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±2 %/√3. Alloys conduct markedly less.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12), p. 332
+
+
+### ρCu constant
+
+Electrical resistivity of copper
+
+Measured. Recommended total resistivity of annealed copper of purity 99.999 %
+or higher at `300 K`, `1.725E-8 Ω·m` (`1.678E-8 Ω·m` at `293 K`), corrected
+for thermal expansion. The source gives it to within ±0.5 % from `250 K` to
+`350 K`: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±0.5 %/√3. Commercial annealed copper (the IACS standard) is
+slightly more resistive, `1.7241E-8 Ω·m` at `20 °C`. [Materials 23](#materials-23), table 2, p. 1161
+
+
+### αρCu constant
+
+Temperature coefficient of the electrical resistivity of copper
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.003919 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `350 K` of
+the source. Its standard uncertainty, `0.000043 K⁻¹` (1.1 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 23](#materials-23), table 2, p. 1161
+
+### αLCu constant
+
+Linear thermal expansion of copper
+
+Measured. Mean coefficient of linear expansion of the pure metal from `25` to `100 °C`,
+`16.8E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
 
 ## Fe Metal constants
 
@@ -3651,15 +4132,202 @@ Metal
 Iron density (alpha phase)
 
 Measured (alpha phase, BCC). Volumetric density of iron in its alpha
-phase (body-centred cubic), stable below `912°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
+phase (body-centred cubic), stable below `912°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12) [Materials 2](#materials-2)
 
 ### cpFe constant
 
 Specific heat of iron (alpha phase, BCC)
 
 Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
 [Materials 12](#materials-12) [Materials 2](#materials-2)
 
+
+
+### EFe constant
+
+Young modulus of iron
+
+Measured. Best value for polycrystalline iron, `205 GPa`; its uncertainty is
+the standard deviation given by the source, which includes the variations
+between specimens and methods: cold work lowers E, and annealed iron is nearer
+`212 GPa`. [Materials 21](#materials-21), table 8, p. 569
+
+### νFe constant
+
+Poisson ratio of iron
+
+Measured. Best value for polycrystalline iron, `0.282`, with the standard
+deviation given by the source, which includes irons and steels of various
+compositions. [Materials 21](#materials-21), table 17, p. 582
+
+### kFe constant
+
+Thermal conductivity of iron
+
+Measured. Recommended value for well-annealed, high-purity iron at
+`300 K`, `80.2 W/(m·K)`, given by the source to within ±3 % near room
+temperature: that bound is taken as a rectangular distribution, whose standard
+uncertainty is ±3 %/√3. Alloys conduct markedly less.
+The source gives no standard uncertainty: the uncertainty shown is our estimate
+of the spread between sources and samples, taken as the bound of a uniform
+distribution and divided by √3.
+[Materials 12](#materials-12), p. 354
+
+
+### ρFe constant
+
+Electrical resistivity of iron
+
+Measured. Recommended value for the NBS electrolytic iron reference material
+at `300 K`, `10.50E-8 Ω·m` for a residual resistivity ratio of 22.5 (`10.46E-8`
+to `10.56E-8 Ω·m` from the purest to the least pure specimens), corrected for
+thermal expansion. The source states its high-temperature data accurate to
+about 1 to 2 %: ±2 % is taken as the bounds of a rectangular distribution,
+whose standard uncertainty is ±2 %/√3. [Materials 24](#materials-24), table 4.1, p. 55
+
+
+
+### αρFe constant
+
+Temperature coefficient of the electrical resistivity of iron
+
+Calculation. `α = (1/ρ)·dρ/dT` at `300 K`, `0.005241 K⁻¹`, from the slope at
+`300 K` of the parabola through the recommended resistivities at `250`, `300` and `400 K` of
+the source. Its standard uncertainty, `0.000142 K⁻¹` (2.7 %), propagates those of
+the three values, taken as independent: a prudent figure, since the errors of a
+compilation are rather correlated, which lowers the error of a slope. With it,
+the resistivity at a temperature `T` near `300 K` is `ρ·(1+α·(T-300 K))`.
+[Materials 24](#materials-24), table 4.1, p. 55
+
+### αLFe constant
+
+Linear thermal expansion of iron
+
+Measured. Mean coefficient of linear expansion of the pure metal from `20` to `100 °C`,
+`12.2E-6 K⁻¹`, the usual form for engineering. The source gives no uncertainty:
+±1 %, the spread between the studies of aluminium compared by
+[Materials 26](#materials-26), is our estimate, taken as the bounds of a
+rectangular distribution (divided by √3). [Materials 26](#materials-26), table 3, p. 25
+
+## Al Alloy constants
+
+Aluminium alloy 6061, the most common general-purpose aluminium alloy for bars,
+tubes and profiles; 6061 is its standard designation (Aluminum Association).
+
+### EAlAlloy constant
+
+Young modulus of aluminium alloy 6061
+
+Typical value for rolled, drawn or extruded 6061, `68.3 GPa` (`9.9×10³ ksi`).
+The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+### νAlAlloy constant
+
+Poisson ratio of aluminium alloy 6061
+
+Typical value for 6061, `0.33`. The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+
+### ρvAlAlloy constant
+
+Density of aluminium alloy 6061
+
+Typical value, `2713 kg/m³` (`0.098 lb/in³`). The source gives a typical value without uncertainty: ±0.5 % is our
+estimate, taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 3.6.2.0, p. 3-269
+
+### cpAlAlloy constant
+
+Specific heat of aluminium alloy 6061
+
+`900 J/(kg·K)` (`0.215 Btu/(lb·°F)`) at `21 °C`. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+### kAlAlloy constant
+
+Thermal conductivity of aluminium alloy 6061
+
+`156 W/(m·K)` (`90 Btu/(h·ft·°F)`) for the T6 temper at `21 °C`, well below the
+`237 W/(m·K)` of pure aluminium. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+### αLAlAlloy constant
+
+Linear thermal expansion of aluminium alloy 6061
+
+`22.7E-6 K⁻¹` (`12.6E-6 /°F`) near `21 °C`. Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 3.6.2.0, p. 3-273
+
+## Carbon Steel constants
+
+Carbon steel AISI 1025, a mild steel for sheet, tubing and bar; AISI 1025 is its
+standard designation (AISI-SAE), about 0.25 % carbon.
+
+### ESteel constant
+
+Young modulus of carbon steel
+
+Typical value for annealed or normalized AISI 1025 carbon steel, `200 GPa`
+(`29.0×10³ ksi`). The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### νSteel constant
+
+Poisson ratio of carbon steel
+
+Typical value for AISI 1025 carbon steel, `0.32`. The source gives a typical value for design, without uncertainty. Its
+uncertainty is our estimate of the spread between handbooks and between
+batches, ±2 % for the modulus and ±0.01 for the Poisson ratio, taken as
+the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+
+### ρvSteel constant
+
+Density of carbon steel
+
+Typical value for AISI 1025, `7861 kg/m³` (`0.284 lb/in³`). The source gives a typical value without uncertainty: ±0.5 % is our
+estimate, taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### cpSteel constant
+
+Specific heat of carbon steel
+
+Mean value for AISI 1025 from `50` to `100 °C`, `486 J/(kg·K)`
+(`0.116 Btu/(lb·°F)`). The source gives a typical value without uncertainty: ±2 % is our estimate,
+taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### kSteel constant
+
+Thermal conductivity of carbon steel
+
+Value for AISI 1025 at `0 °C`, `51.9 W/(m·K)` (`30.0 Btu/(h·ft·°F)`). The source gives a typical value without uncertainty: ±2 % is our estimate,
+taken as the bounds of a rectangular distribution (divided by √3). [Materials 25](#materials-25), table 2.2.1.0(b), p. 2-8
+
+### αLSteel constant
+
+Linear thermal expansion of carbon steel
+
+Mean value for AISI 1025 from `21` to `66 °C`, `10.8E-6 K⁻¹` (`6.0E-6 /°F`).
+Read on a figure of the source, which gives no uncertainty: ±3 %, for the
+reading and the spread between batches, is our estimate, taken as the bounds
+of a rectangular distribution (divided by √3). [Materials 25](#materials-25), figure 2.2.1.0, p. 2-9
 
 ## Dates constants
 
@@ -3959,3 +4627,47 @@ Luke, K., Okawachi, Y., Lamont, M.R.E., Gaeta, A.L., & Lipson, M. (2015). "Broad
 ### Materials 19
 
 NIST Materials Measurement Laboratory (2024). Materials Properties Database. [Source](https://trc.nist.gov) — Accessed: March 2026
+
+### Materials 20
+
+Ledbetter, H.M., & Naimon, E.R. (1974). "Elastic Properties of Metals and Alloys. II. Copper". J. Phys. Chem. Ref. Data, 3(4), 897–935. DOI: 10.1063/1.3253150
+
+### Materials 21
+
+Ledbetter, H.M., & Reed, R.P. (1973). "Elastic Properties of Metals and Alloys, I. Iron, Nickel, and Iron-Nickel Alloys". J. Phys. Chem. Ref. Data, 2(3), 531–618. DOI: 10.1063/1.3253127
+
+### Materials 22
+
+Desai, P.D., James, H.M., & Ho, C.Y. (1984). "Electrical Resistivity of Aluminum and Manganese". J. Phys. Chem. Ref. Data, 13(4), 1131–1172. DOI: 10.1063/1.555725
+
+### Materials 23
+
+Matula, R.A. (1979). "Electrical resistivity of copper, gold, palladium, and silver". J. Phys. Chem. Ref. Data, 8(4), 1147–1298. DOI: 10.1063/1.555614
+
+### Materials 24
+
+Hust, J.G., & Lankford, A.B. (1984). "Update of Thermal Conductivity and Electrical Resistivity of Electrolytic Iron, Tungsten, and Stainless Steel". NBS Special Publication 260-90, National Bureau of Standards, Boulder. [Source](https://www.nist.gov/system/files/documents/2016/10/06/SP260-90.PDF)
+
+### Materials 25
+
+Department of Defense (2003). MIL-HDBK-5J, "Metallic Materials and Elements for Aerospace Vehicle Structures", 31 January 2003 (equivalent to MMPDS-01). [Source](https://everyspec.com/MIL-HDBK/MIL-HDBK-0001-0099/MIL_HDBK_5J_139/)
+
+### Materials 26
+
+Hidnert, P., & Souder, W. (1950). "Thermal Expansion of Solids". Circular of the National Bureau of Standards 486, Washington. [Source](https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular486.pdf)
+
+### Materials 27
+
+IAPWS (2024). R11-24, "Revised Release on the Ionization Constant of H₂O". International Association for the Properties of Water and Steam, 29 June 2024. [Source](https://iapws.org/relguide/Ionization.html)
+
+### Materials 28
+
+Goldberg, R.N., Kishore, N., & Lennen, R.M. (2002). "Thermodynamic Quantities for the Ionization Reactions of Buffers". J. Phys. Chem. Ref. Data, 31(2), 231–370. DOI: 10.1063/1.1416902
+
+### Materials 29
+
+Maryott, A.A., & Buckley, F. (1953). Table of Dielectric Constants and Electric Dipole Moments of Substances in the Gaseous State. National Bureau of Standards Circular 537, Washington, D.C. [Source](https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular537.pdf) — Table 2.2, recommended values of ε − 1 for the reference gases at 20 °C and 1 atm.
+
+### Materials 30
+
+Li, H.H. (1980). "Refractive index of silicon and germanium and its wavelength and temperature derivatives". Journal of Physical and Chemical Reference Data, 9(3), 561–658. DOI: 10.1063/1.555624 — Refractive index of silicon at 293 K, 3.4757 at 1.55 µm, source for `nSi`.
