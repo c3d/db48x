@@ -562,7 +562,8 @@ MENU(RangeMenu,
      "∪",       ID_RangeUnion,
      "∩",       ID_RangeIntersect,
 
-     "Size",    ID_Size);
+     "Size",    ID_Size,
+     "CstRng",  ID_ConstantRange);
 
 
 MENU(VectorMenu,

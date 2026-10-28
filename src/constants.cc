@@ -192,9 +192,10 @@ algebraic_p constant::range() const
         }
         if (value && uncertainty)
         {
-            if (range::adjust_input(ID_drange, value, uncertainty))
-                if (range_p range = range::make(ID_drange, value, uncertainty))
-                    value = range;
+            // The uncertainty of a constant is a standard uncertainty
+            // (CODATA: "one-standard-deviation uncertainty"), not a bound
+            if (range_p range = range::make(ID_uncertain, value, uncertainty))
+                value = range;
             if (uexpr && value)
                 value = unit::make(value, uexpr);
         }

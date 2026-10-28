@@ -13261,7 +13261,7 @@ void tests::constants_operations()
         .expect("299 792 458 m/s");
     step("Check constant value from command line")
         .test(CLEAR, "Ⓒc CONSTANTRANGE", ENTER)
-        .expect("299 792 458±0 m/s");
+        .expect("299 792 458±σ0 m/s");
     step("Check constant name from menu")
         .test(CLEAR, "Ⓒc", ENTER)
         .expect("c")
@@ -13276,7 +13276,7 @@ void tests::constants_operations()
         .test(CLEAR, "Ⓒc", ENTER)
         .expect("c")
         .test(ID_PartsMenu, F6, ID_ConstantRange)
-        .expect("299 792 458±0 m/s");
+        .expect("299 792 458±σ0 m/s");
     step("Check G constant value from command line")
         .test(CLEAR, "ⒸG CONSTANTVALUE", ENTER)
         .expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)");
@@ -13285,7 +13285,7 @@ void tests::constants_operations()
         .expect("\"G\"");
     step("Check G constant range from command line")
         .test(CLEAR, "ⒸG CONSTANTRANGE", ENTER)
-        .expect("6.6743⁳⁻¹¹±1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
+        .expect("6.6743⁳⁻¹¹±σ1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
     step("Insert constant from constants menu")
         .test(CLEAR, ID_ConstantsMenu, F4, F2, ENTER)
         .expect("c")
@@ -13546,67 +13546,67 @@ void tests::constants_menu()
     step("i")
         .fkey(0).expect("ⅈ")
         .fkey(1).expect("ⅈ")
-        .fkey(2).expect("ⅈ±0");
+        .fkey(2).expect("ⅈ±σ0");
     step("Infinity")
         .fkey(0).expect("∞")
         .fkey(1).expect("9.99999⁳⁹⁹⁹⁹⁹⁹")
-        .fkey(2).expect("9.99999⁳⁹⁹⁹⁹⁹⁹±0");
+        .fkey(2).expect("9.99999⁳⁹⁹⁹⁹⁹⁹±σ0");
     step("Undefined")
         .fkey(0).expect("?")
         .fkey(1).expect("'Undefined'")
-        .fkey(2).expect("'(Undefined+Undefined)÷2'±0");
+        .fkey(2).expect("'Undefined'±σ0");
     step("j")
         .fkey(0).expect("ⅉ")
         .fkey(1).expect("ⅈ")
-        .fkey(2).expect("ⅈ±0");
+        .fkey(2).expect("ⅈ±σ0");
     step("rad")
         .fkey(0).expect("rad")
         .fkey(1).expect("1 r")
-        .fkey(2).expect("1±0 r");
+        .fkey(2).expect("1±σ0 r");
     step("twoπ")
         .fkey(0).expect("twoπ")
         .fkey(1).expect("6.28318 53071 8 r")
-        .fkey(2).expect("6.28318 53071 8±0 r");
+        .fkey(2).expect("6.28318 53071 8±σ0 r");
     step("angl")
         .fkey(0).expect("angl")
         .fkey(1).expect("180 °")
-        .fkey(2).expect("180±0 °");
+        .fkey(2).expect("180±σ0 °");
     step("Minus infinity")
         .fkey(0).expect("−∞")
         .fkey(1).expect("-9.99999⁳⁹⁹⁹⁹⁹⁹")
-        .fkey(2).expect("-9.99999⁳⁹⁹⁹⁹⁹⁹±0");
+        .fkey(2).expect("-9.99999⁳⁹⁹⁹⁹⁹⁹±σ0");
     step("τ")
         .fkey(0).expect("τ")
         .fkey(1).expect("6.28318 53071 8 r")
-        .fkey(2).expect("6.28318 53071 8±0 r");
+        .fkey(2).expect("6.28318 53071 8±σ0 r");
     step("γ (Euler-Mascheroni)")
         .fkey(0).expect("γ")
         .fkey(1).expect("0.57721 56649 02")
-        .fkey(2).expect("0.57721 56649 02±0");
+        .fkey(2).expect("0.57721 56649 02±σ0");
     step("ϕ (golden ratio)")
         .fkey(0).expect("ϕ")
         .fkey(1).expect("1.61803 39887 5")
-        .fkey(2).expect("1.61803 39887 5±0");
+        .fkey(2).expect("1.61803 39887 5±σ0");
     step("Gⓒ (Catalan)")
         .fkey(0).expect("Gⓒ")
         .fkey(1).expect("0.91596 55941 77")
-        .fkey(2).expect("0.91596 55941 77±0");
+        .fkey(2).expect("0.91596 55941 77±σ0");
     step("K₀ (Khinchin)")
         .fkey(0).expect("K₀")
         .fkey(1).expect("2.68545 20010 7")
-        .fkey(2).expect("2.68545 20010 7±0");
+        .fkey(2).expect("2.68545 20010 7±σ0");
     step("Fα (Feigenbaum alpha)")
         .fkey(0).expect("Fα")
         .fkey(1).expect("2.50290 78751")
-        .fkey(2).expect("2.50290 78751±0");
+        .fkey(2).expect("2.50290 78751±σ0");
     step("Fδ (Feigenbaum delta)")
         .fkey(0).expect("Fδ")
         .fkey(1).expect("4.66920 16091")
-        .fkey(2).expect("4.66920 16091±0");
+        .fkey(2).expect("4.66920 16091±σ0");
     step("δₛ (silver ratio)")
         .fkey(0).expect("δₛ")
         .fkey(1).expect("2.41421 35623 7")
-        .fkey(2).expect("2.41421 35623 7±0");
+        .fkey(2).expect("2.41421 35623 7±σ0");
 
 
     // ------------------------------------------------------------------------
@@ -13616,55 +13616,55 @@ void tests::constants_menu()
     step("Avogadro constant")
         .fkey(0).expect("NA")
         .fkey(1).expect("6.02214 076⁳²³ mol⁻¹")
-        .fkey(2).expect("6.02214 076⁳²³±0 mol⁻¹");
+        .fkey(2).expect("6.02214 076⁳²³±σ0 mol⁻¹");
     step("Boltzmann constant")
         .fkey(0).expect("k")
         .fkey(1).expect("1.38064 9⁳⁻²³ J/K")
-        .fkey(2).expect("1.38064 9⁳⁻²³±0 J/K");
+        .fkey(2).expect("1.38064 9⁳⁻²³±σ0 J/K");
     step("Molar volume")
         .fkey(0).expect("Vm")
         .fkey(1).expect("0.02241 39695 45 m↑3/mol")
-        .fkey(2).expect("0.02241 39695 45±0 m↑3/mol");
+        .fkey(2).expect("0.02241 39695 45±σ0 m↑3/mol");
     step("Universal Gas constant")
         .fkey(0).expect("R")
         .fkey(1).expect("8.31446 26181 5 J/(mol·K)")
-        .fkey(2).expect("8.31446 26181 5±0 J/(mol·K)");
+        .fkey(2).expect("8.31446 26181 5±σ0 J/(mol·K)");
     step("Faraday constant")
         .fkey(0).expect("F")
         .fkey(1).expect("96 485.33212 33 C/mol")
-        .fkey(2).expect("96 485.33212 33±0 C/mol");
+        .fkey(2).expect("96 485.33212 33±σ0 C/mol");
     step("Standard temperature")
         .fkey(0).expect("StdT")
         .fkey(1).expect("273.15 K")
-        .fkey(2).expect("273.15±0 K");
+        .fkey(2).expect("273.15±σ0 K");
     step("Standard pressure")
         .fkey(0).expect("StdP")
         .fkey(1).expect("101.325 kPa")
-        .fkey(2).expect("101.325±0 kPa");
+        .fkey(2).expect("101.325±σ0 kPa");
     step("Mass unit")
         .fkey(0).expect("Mu")
         .fkey(1).expect("1.00000 00010 5 g/mol")
-        .fkey(2).expect("1.00000 00010 5±3.1⁳⁻¹⁰ g/mol");
+        .fkey(2).expect("1.00000 00010 5±σ3.1⁳⁻¹⁰ g/mol");
     step("Carbon-12 mass")
         .fkey(0).expect("MC12")
         .fkey(1).expect("12.00000 00126 g/mol")
-        .fkey(2).expect("12.00000 00126±0.00000 00037 g/mol");
+        .fkey(2).expect("12.00000 00126±σ0.00000 00037 g/mol");
     step("Dalton constant")
         .fkey(0).expect("Da")
         .fkey(1).expect("1.66053 90689 2⁳⁻²⁷ kg")
-        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±5.1⁳⁻³⁷ kg");
+        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±σ5.1⁳⁻³⁷ kg");
     step("Loschmidt constant")
         .fkey(0).expect("n0")
         .fkey(1).expect("2.68678 01118⁳²⁵ (m↑3)⁻¹")
-        .fkey(2).expect("2.68678 01118⁳²⁵±0 (m↑3)⁻¹");
+        .fkey(2).expect("2.68678 01118⁳²⁵±σ0 (m↑3)⁻¹");
     step("Sakur-Tetrode constant")
         .fkey(0).expect("SoR")
         .fkey(1).expect("-1.16487 05214 9")
-        .fkey(2).expect("-1.16487 05214 9±4.7⁳⁻¹⁰");
+        .fkey(2).expect("-1.16487 05214 9±σ4.7⁳⁻¹⁰");
     step("Boltzmann / electron mass ratio")
         .fkey(0).expect("kq")
         .fkey(1).expect("0.00008 61733 33 J/(K·C)")
-        .fkey(2).expect("0.00008 61733 33±0 J/(K·C)");
+        .fkey(2).expect("0.00008 61733 33±σ0 J/(K·C)");
 
     // ------------------------------------------------------------------------
     step("Physics constants")
@@ -13673,51 +13673,51 @@ void tests::constants_menu()
     step("Imaginary unit")
         .fkey(0).expect("ⅉ")
         .fkey(1).expect("ⅈ")
-        .fkey(2).expect("ⅈ±0");
+        .fkey(2).expect("ⅈ±σ0");
     step("Speed of light")
         .fkey(0).expect("c")
         .fkey(1).expect("299 792 458 m/s")
-        .fkey(2).expect("299 792 458±0 m/s");
+        .fkey(2).expect("299 792 458±σ0 m/s");
     step("Gravitational constant")
         .fkey(0).expect("G")
         .fkey(1).expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)")
-        .fkey(2).expect("6.6743⁳⁻¹¹±1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
+        .fkey(2).expect("6.6743⁳⁻¹¹±σ1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
     step("Earth gravity")
         .fkey(0).expect("g")
         .fkey(1).expect("9.80665 m/s↑2")
-        .fkey(2).expect("9.80665±0 m/s↑2");
+        .fkey(2).expect("9.80665±σ0 m/s↑2");
     step("Stefan-Boltzmann constant")
         .fkey(0).expect("σ")
         .fkey(1).expect("0.00000 00567 04 W/(m↑2·K↑4)")
-        .fkey(2).expect("0.00000 00567 04±0 W/(m↑2·K↑4)");
+        .fkey(2).expect("0.00000 00567 04±σ0 W/(m↑2·K↑4)");
     step("Vaccuum permittivity")
         .fkey(0).expect("ε₀")
         .fkey(1).expect("8.85418 78188⁳⁻¹² F/m")
-        .fkey(2).expect("8.85418 78188⁳⁻¹²±1.4⁳⁻²¹ F/m");
+        .fkey(2).expect("8.85418 78188⁳⁻¹²±σ1.4⁳⁻²¹ F/m");
     step("Vaccuum permeability")
         .fkey(0).expect("μ₀")
         .fkey(1).expect("0.00000 12566 37 H/m")
-        .fkey(2).expect("0.00000 12566 37±2.⁳⁻¹⁶ H/m");
+        .fkey(2).expect("0.00000 12566 37±σ2.⁳⁻¹⁶ H/m");
     step("Coulomb constant")
         .fkey(0).expect("ke")
         .fkey(1).expect("8.98755 17862⁳⁹ N·m↑2/C↑2")
-        .fkey(2).expect("8.98755 17862⁳⁹±1.4 N·m↑2/C↑2");
+        .fkey(2).expect("8.98755 17862⁳⁹±σ1.4 N·m↑2/C↑2");
     step("Vacuum characteristic impedance")
         .fkey(0).expect("Z₀")
         .fkey(1).expect("376.73031 3412 Ω")
-        .fkey(2).expect("376.73031 3412±0.00000 006 Ω");
+        .fkey(2).expect("376.73031 3412±σ0.00000 006 Ω");
     step("ε₀q ratio")
         .fkey(0).expect("ε₀q")
         .fkey(1).expect("55 263 493.618 F/(m·C)")
-        .fkey(2).expect("55 263 493.618±0.0088 F/(m·C)");
+        .fkey(2).expect("55 263 493.618±σ0.0088 F/(m·C)");
     step("qε₀ product")
         .fkey(0).expect("qε₀")
         .fkey(1).expect("1.41859 72836 3⁳⁻³⁰ F·C/m")
-        .fkey(2).expect("1.41859 72836 3⁳⁻³⁰±2.3⁳⁻⁴⁰ F·C/m");
+        .fkey(2).expect("1.41859 72836 3⁳⁻³⁰±σ2.3⁳⁻⁴⁰ F·C/m");
     step("Sound reference intensity")
         .fkey(0).expect("I₀")
         .fkey(1).expect("1.⁳⁻¹² W/m↑2")
-        .fkey(2).expect("1.⁳⁻¹²±0 W/m↑2");
+        .fkey(2).expect("1.⁳⁻¹²±σ0 W/m↑2");
 
     // ------------------------------------------------------------------------
     step("Mass constants")
@@ -13726,59 +13726,59 @@ void tests::constants_menu()
     step("Mass unit")
         .fkey(0).expect("u")
         .fkey(1).expect("1.66053 90689 2⁳⁻²⁷ kg")
-        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±5.1⁳⁻³⁷ kg");
+        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±σ5.1⁳⁻³⁷ kg");
     step("Mass unit energy equivalent")
         .fkey(0).expect("uc²")
         .fkey(1).expect("1.49241 80876 9⁳⁻¹⁰ J")
-        .fkey(2).expect("1.49241 80876 9⁳⁻¹⁰±0 J");
+        .fkey(2).expect("1.49241 80876 9⁳⁻¹⁰±σ0 J");
     step("Electron mass")
         .fkey(0).expect("me")
         .fkey(1).expect("9.10938 37139⁳⁻³¹ kg")
-        .fkey(2).expect("9.10938 37139⁳⁻³¹±2.8⁳⁻⁴⁰ kg");
+        .fkey(2).expect("9.10938 37139⁳⁻³¹±σ2.8⁳⁻⁴⁰ kg");
     step("Neutron mass")
         .fkey(0).expect("mn")
         .fkey(1).expect("1.67492 75005 6⁳⁻²⁷ kg")
-        .fkey(2).expect("1.67492 75005 6⁳⁻²⁷±8.5⁳⁻³⁷ kg");
+        .fkey(2).expect("1.67492 75005 6⁳⁻²⁷±σ8.5⁳⁻³⁷ kg");
     step("Proton mass")
         .fkey(0).expect("mp")
         .fkey(1).expect("1.67262 19259 5⁳⁻²⁷ kg")
-        .fkey(2).expect("1.67262 19259 5⁳⁻²⁷±5.2⁳⁻³⁷ kg");
+        .fkey(2).expect("1.67262 19259 5⁳⁻²⁷±σ5.2⁳⁻³⁷ kg");
     step("Hydrogen mass")
         .fkey(0).expect("mH")
         .fkey(1).expect("1.00782 50322 3 u")
-        .fkey(2).expect("1.00782 50322 3±9.⁳⁻¹¹ u");
+        .fkey(2).expect("1.00782 50322 3±σ9.⁳⁻¹¹ u");
     step("Deuterium mass")
         .fkey(0).expect("mD")
         .fkey(1).expect("2.01410 17781 2 u")
-        .fkey(2).expect("2.01410 17781 2±1.2⁳⁻¹⁰ u");
+        .fkey(2).expect("2.01410 17781 2±σ1.2⁳⁻¹⁰ u");
     step("Tritium mass")
         .fkey(0).expect("mT")
         .fkey(1).expect("3.01604 92779 u")
-        .fkey(2).expect("3.01604 92779±0.00000 00024 u");
+        .fkey(2).expect("3.01604 92779±σ0.00000 00024 u");
     step("Helium mass")
         .fkey(0).expect("mHe")
         .fkey(1).expect("4.00260 32541 3 u")
-        .fkey(2).expect("4.00260 32541 3±6.⁳⁻¹¹ u");
+        .fkey(2).expect("4.00260 32541 3±σ6.⁳⁻¹¹ u");
     step("Muon mass")
         .fkey(0).expect("mμ")
         .fkey(1).expect("0.11342 89257 u")
-        .fkey(2).expect("0.11342 89257±0.00000 00025 u");
+        .fkey(2).expect("0.11342 89257±σ0.00000 00025 u");
     step("Tau mass")
         .fkey(0).expect("mτ")
         .fkey(1).expect("1.90754 u")
-        .fkey(2).expect("1.90754±0.00013 u");
+        .fkey(2).expect("1.90754±σ0.00013 u");
     step("Proton / electron mass ratio")
         .fkey(0).expect("mpme")
         .fkey(1).expect("1 836.15267 343")
-        .fkey(2).expect("1 836.15267 343±0.00000 0032");
+        .fkey(2).expect("1 836.15267 343±σ0.00000 0032");
     step("Neutron to proton mass ratio")
         .fkey(0).expect("mnmp")
         .fkey(1).expect("1.00137 84194 6")
-        .fkey(2).expect("1.00137 84194 6±5.1⁳⁻¹⁰");
+        .fkey(2).expect("1.00137 84194 6±σ5.1⁳⁻¹⁰");
     step("Electron relative atomic mass")
         .fkey(0).expect("Are")
         .fkey(1).expect("0.00054 85799 09")
-        .fkey(2).expect("0.00054 85799 09±9.7⁳⁻¹⁵");
+        .fkey(2).expect("0.00054 85799 09±σ9.7⁳⁻¹⁵");
 
 
     // ------------------------------------------------------------------------
@@ -13788,15 +13788,15 @@ void tests::constants_menu()
     step("Classical electron radius")
         .fkey(0).expect("re")
         .fkey(1).expect("2.81794 03205 fm")
-        .fkey(2).expect("2.81794 03205±0.00000 00013 fm");
+        .fkey(2).expect("2.81794 03205±σ0.00000 00013 fm");
     step("Proton charge radius")
         .fkey(0).expect("rp")
         .fkey(1).expect("8.4075⁳⁻¹⁶ m")
-        .fkey(2).expect("8.4075⁳⁻¹⁶±6.4⁳⁻¹⁹ m");
+        .fkey(2).expect("8.4075⁳⁻¹⁶±σ6.4⁳⁻¹⁹ m");
     step("Bohr radius")
         .fkey(0).expect("a0")
         .fkey(1).expect("0.05291 77210 54 nm")
-        .fkey(2).expect("0.05291 77210 54±8.3⁳⁻¹² nm");
+        .fkey(2).expect("0.05291 77210 54±σ8.3⁳⁻¹² nm");
 
     // ------------------------------------------------------------------------
     step("Scattering constants")
@@ -13805,27 +13805,27 @@ void tests::constants_menu()
     step("Thomson cross-section")
         .fkey(0).expect("σe")
         .fkey(1).expect("6.65245 87052⁳⁻²⁹ m↑2")
-        .fkey(2).expect("6.65245 87052⁳⁻²⁹±6.3⁳⁻³⁸ m↑2");
+        .fkey(2).expect("6.65245 87052⁳⁻²⁹±σ6.3⁳⁻³⁸ m↑2");
     step("Electron Compton wavelength")
         .fkey(0).expect("λc")
         .fkey(1).expect("0.00242 63102 35 nm")
-        .fkey(2).expect("0.00242 63102 35±7.5⁳⁻¹³ nm");
+        .fkey(2).expect("0.00242 63102 35±σ7.5⁳⁻¹³ nm");
     step("Proton Compton wavelength")
         .fkey(0).expect("λcp")
         .fkey(1).expect("0.00000 13214 1 nm")
-        .fkey(2).expect("0.00000 13214 1±4.1⁳⁻¹⁶ nm");
+        .fkey(2).expect("0.00000 13214 1±σ4.1⁳⁻¹⁶ nm");
     step("Neutron Compton wavelength")
         .fkey(0).expect("λcn")
         .fkey(1).expect("0.00000 13195 91 nm")
-        .fkey(2).expect("0.00000 13195 91±6.7⁳⁻¹⁶ nm");
+        .fkey(2).expect("0.00000 13195 91±σ6.7⁳⁻¹⁶ nm");
     step("Muon Compton wavelength")
         .fkey(0).expect("λcμ")
         .fkey(1).expect("0.00001 17344 41 nm")
-        .fkey(2).expect("0.00001 17344 41±2.6⁳⁻¹³ nm");
+        .fkey(2).expect("0.00001 17344 41±σ2.6⁳⁻¹³ nm");
     step("Tau Compton wavelength")
         .fkey(0).expect("λcτ")
         .fkey(1).expect("0.00000 06977 71 nm")
-        .fkey(2).expect("0.00000 06977 71±4.7⁳⁻¹¹ nm");
+        .fkey(2).expect("0.00000 06977 71±σ4.7⁳⁻¹¹ nm");
 
 
     // ------------------------------------------------------------------------
@@ -13835,63 +13835,63 @@ void tests::constants_menu()
     step("Planck")
         .fkey(0).expect("h")
         .fkey(1).expect("6.62607 015⁳⁻³⁴ J·s")
-        .fkey(2).expect("6.62607 015⁳⁻³⁴±0 J·s");
+        .fkey(2).expect("6.62607 015⁳⁻³⁴±σ0 J·s");
     step("Dirac")
         .fkey(0).expect("ℏ")
         .fkey(1).expect("1.05457 18176 5⁳⁻³⁴ J·s")
-        .fkey(2).expect("1.05457 18176 5⁳⁻³⁴±0 J·s");
+        .fkey(2).expect("1.05457 18176 5⁳⁻³⁴±σ0 J·s");
     step("fine structure constant")
         .fkey(0).expect("α")
         .fkey(1).expect("0.00729 73525 64")
-        .fkey(2).expect("0.00729 73525 64±1.14⁳⁻¹²");
+        .fkey(2).expect("0.00729 73525 64±σ1.14⁳⁻¹²");
     step("Cs hyperfine transition")
         .fkey(0).expect("ΔfCs")
         .fkey(1).expect("9 192 631 770 Hz")
-        .fkey(2).expect("9 192 631 770±0 Hz");
+        .fkey(2).expect("9 192 631 770±σ0 Hz");
     step("Weak mixing angle")
         .fkey(0).expect("θw")
         .fkey(1).expect("28.183 °")
-        .fkey(2).expect("28.183±0.016 °");
+        .fkey(2).expect("28.183±σ0.016 °");
     step("Planck length")
         .fkey(0).expect("Lpl")
         .fkey(1).expect("1.61625 5⁳⁻³⁵ m")
-        .fkey(2).expect("1.61625 5⁳⁻³⁵±1.8⁳⁻⁴⁰ m");
+        .fkey(2).expect("1.61625 5⁳⁻³⁵±σ1.8⁳⁻⁴⁰ m");
     step("Planck time")
         .fkey(0).expect("Tpl")
         .fkey(1).expect("5.39124 6⁳⁻⁴⁴ s")
-        .fkey(2).expect("5.39124 6⁳⁻⁴⁴±5.9⁳⁻⁴⁹ s");
+        .fkey(2).expect("5.39124 6⁳⁻⁴⁴±σ5.9⁳⁻⁴⁹ s");
     step("Planck mass")
         .fkey(0).expect("Mpl")
         .fkey(1).expect("0.00000 00217 64 kg")
-        .fkey(2).expect("0.00000 00217 64±2.4⁳⁻¹³ kg");
+        .fkey(2).expect("0.00000 00217 64±σ2.4⁳⁻¹³ kg");
     step("Planck energy")
         .fkey(0).expect("Epl")
         .fkey(1).expect("1.22089⁳¹⁹ GeV")
-        .fkey(2).expect("1.22089⁳¹⁹±1.4⁳¹⁴ GeV");
+        .fkey(2).expect("1.22089⁳¹⁹±σ1.4⁳¹⁴ GeV");
     step("Planck temperature")
         .fkey(0).expect("T°pl")
         .fkey(1).expect("1.41678 4⁳³² K")
-        .fkey(2).expect("1.41678 4⁳³²±1.6⁳²⁷ K");
+        .fkey(2).expect("1.41678 4⁳³²±σ1.6⁳²⁷ K");
     step("Planck charge")
         .fkey(0).expect("qpl")
         .fkey(1).expect("1.87554 60384 2⁳⁻¹⁸ C")
-        .fkey(2).expect("1.87554 60384 2⁳⁻¹⁸±1.5⁳⁻²⁸ C");
+        .fkey(2).expect("1.87554 60384 2⁳⁻¹⁸±σ1.5⁳⁻²⁸ C");
     step("Planck momentum")
         .fkey(0).expect("ppl")
         .fkey(1).expect("6.52478 6 kg·m/s")
-        .fkey(2).expect("6.52478 6±0.00007 2 kg·m/s");
+        .fkey(2).expect("6.52478 6±σ0.00007 2 kg·m/s");
     step("Planck force")
         .fkey(0).expect("Fpl")
         .fkey(1).expect("1.21025 6⁳⁴⁴ N")
-        .fkey(2).expect("1.21025 6⁳⁴⁴±2.7⁳³⁹ N");
+        .fkey(2).expect("1.21025 6⁳⁴⁴±σ2.7⁳³⁹ N");
     step("Planck density")
         .fkey(0).expect("ρvpl")
         .fkey(1).expect("5.15485⁳⁹⁶ kg/m↑3")
-        .fkey(2).expect("5.15485⁳⁹⁶±2.3⁳⁹² kg/m↑3");
+        .fkey(2).expect("5.15485⁳⁹⁶±σ2.3⁳⁹² kg/m↑3");
     step("Hartree energy")
         .fkey(0).expect("Eh")
         .fkey(1).expect("4.35974 47222 1⁳⁻¹⁸ J")
-        .fkey(2).expect("4.35974 47222 1⁳⁻¹⁸±4.8⁳⁻³⁰ J");
+        .fkey(2).expect("4.35974 47222 1⁳⁻¹⁸±σ4.8⁳⁻³⁰ J");
 
 
     // ------------------------------------------------------------------------
@@ -13901,107 +13901,107 @@ void tests::constants_menu()
     step("Electronic charge")
         .fkey(0).expect("qe")
         .fkey(1).expect("1.60217 6634⁳⁻¹⁹ C")
-        .fkey(2).expect("1.60217 6634⁳⁻¹⁹±0 C");
+        .fkey(2).expect("1.60217 6634⁳⁻¹⁹±σ0 C");
     step("Rydberg")
         .fkey(0).expect("R∞")
         .fkey(1).expect("10 973 731.5682 m⁻¹")
-        .fkey(2).expect("10 973 731.5682±0.00001 2 m⁻¹");
+        .fkey(2).expect("10 973 731.5682±σ0.00001 2 m⁻¹");
     step("Photon wavelength")
         .fkey(0).expect("λ₀")
         .fkey(1).expect("1 239.84198 433 nm")
-        .fkey(2).expect("1 239.84198 433±0 nm");
+        .fkey(2).expect("1 239.84198 433±σ0 nm");
     step("Photon frequency")
         .fkey(0).expect("f₀")
         .fkey(1).expect("2.41798 92420 8⁳¹⁴ Hz")
-        .fkey(2).expect("2.41798 92420 8⁳¹⁴±0 Hz");
+        .fkey(2).expect("2.41798 92420 8⁳¹⁴±σ0 Hz");
     step("Electron g-factor")
         .fkey(0).expect("ge")
         .fkey(1).expect("-2.00231 93043 6")
-        .fkey(2).expect("-2.00231 93043 6±3.6⁳⁻¹³");
+        .fkey(2).expect("-2.00231 93043 6±σ3.6⁳⁻¹³");
     step("Electron charge/mass ratio")
         .fkey(0).expect("qme")
         .fkey(1).expect("1.75882 00083 8⁳¹¹ C/kg")
-        .fkey(2).expect("1.75882 00083 8⁳¹¹±55. C/kg");
+        .fkey(2).expect("1.75882 00083 8⁳¹¹±σ55. C/kg");
     step("Electron magnetic moment")
         .fkey(0).expect("μe")
         .fkey(1).expect("-9.28476 46917⁳⁻²⁴ J/T")
-        .fkey(2).expect("-9.28476 46917⁳⁻²⁴±2.9⁳⁻³³ J/T");
+        .fkey(2).expect("-9.28476 46917⁳⁻²⁴±σ2.9⁳⁻³³ J/T");
     step("Electron magnetic moment / bohr magneton ratio")
         .fkey(0).expect("μeμB")
         .fkey(1).expect("-1.00115 96521 8")
-        .fkey(2).expect("-1.00115 96521 8±1.1⁳⁻¹³");
+        .fkey(2).expect("-1.00115 96521 8±σ1.1⁳⁻¹³");
     step("Proton magnetic moment")
         .fkey(0).expect("μp")
         .fkey(1).expect("1.41060 67954 5⁳⁻²⁶ J/T")
-        .fkey(2).expect("1.41060 67954 5⁳⁻²⁶±6.⁳⁻³⁶ J/T");
+        .fkey(2).expect("1.41060 67954 5⁳⁻²⁶±σ6.⁳⁻³⁶ J/T");
     step("Neutron magnetic moment")
         .fkey(0).expect("μn")
         .fkey(1).expect("-9.66236 53⁳⁻²⁷ J/T")
-        .fkey(2).expect("-9.66236 53⁳⁻²⁷±2.3⁳⁻³³ J/T");
+        .fkey(2).expect("-9.66236 53⁳⁻²⁷±σ2.3⁳⁻³³ J/T");
     step("Muon magnetic moment")
         .fkey(0).expect("μμ")
         .fkey(1).expect("-4.49044 83⁳⁻²⁶ J/T")
-        .fkey(2).expect("-4.49044 83⁳⁻²⁶±1.⁳⁻³³ J/T");
+        .fkey(2).expect("-4.49044 83⁳⁻²⁶±σ1.⁳⁻³³ J/T");
     step("Bohr magneton")
         .fkey(0).expect("μB")
         .fkey(1).expect("9.27401 00657⁳⁻²⁴ J/T")
-        .fkey(2).expect("9.27401 00657⁳⁻²⁴±2.9⁳⁻³³ J/T");
+        .fkey(2).expect("9.27401 00657⁳⁻²⁴±σ2.9⁳⁻³³ J/T");
     step("Nuclear magneton")
         .fkey(0).expect("μN")
         .fkey(1).expect("5.05078 37393⁳⁻²⁷ J/T")
-        .fkey(2).expect("5.05078 37393⁳⁻²⁷±1.6⁳⁻³⁶ J/T");
+        .fkey(2).expect("5.05078 37393⁳⁻²⁷±σ1.6⁳⁻³⁶ J/T");
     step("Electron gyromagnetic ratio")
         .fkey(0).expect("γe")
         .fkey(1).expect("1.76085 96278 3⁳¹¹ (s·T)⁻¹")
-        .fkey(2).expect("1.76085 96278 3⁳¹¹±55. (s·T)⁻¹");
+        .fkey(2).expect("1.76085 96278 3⁳¹¹±σ55. (s·T)⁻¹");
     step("Proton gyromagnetic ratio")
         .fkey(0).expect("γp")
         .fkey(1).expect("267 522 187.08 (s·T)⁻¹")
-        .fkey(2).expect("267 522 187.08±0.12 (s·T)⁻¹");
+        .fkey(2).expect("267 522 187.08±σ0.12 (s·T)⁻¹");
     step("Neutron gyromagnetic ratio")
         .fkey(0).expect("γn")
         .fkey(1).expect("183 247 175. (s·T)⁻¹")
-        .fkey(2).expect("183 247 175.±44. (s·T)⁻¹");
+        .fkey(2).expect("183 247 175.±σ44. (s·T)⁻¹");
     step("First radiation constant")
         .fkey(0).expect("c1")
         .fkey(1).expect("3.74177 18521 9⁳⁻¹⁶ W·m↑2")
-        .fkey(2).expect("3.74177 18521 9⁳⁻¹⁶±0 W·m↑2");
+        .fkey(2).expect("3.74177 18521 9⁳⁻¹⁶±σ0 W·m↑2");
     step("Second radiation constant")
         .fkey(0).expect("c2")
         .fkey(1).expect("0.01438 77687 75 m·K")
-        .fkey(2).expect("0.01438 77687 75±0 m·K");
+        .fkey(2).expect("0.01438 77687 75±σ0 m·K");
     step("Wien's constant")
         .fkey(0).expect("c3")
         .fkey(1).expect("2.89777 19551 9 mm·K")
-        .fkey(2).expect("2.89777 19551 9±0 mm·K");
+        .fkey(2).expect("2.89777 19551 9±σ0 mm·K");
     step("Wien's frequency constant")
         .fkey(0).expect("c3f")
         .fkey(1).expect("0.05878 92575 76 THz/K")
-        .fkey(2).expect("0.05878 92575 76±0 THz/K");
+        .fkey(2).expect("0.05878 92575 76±σ0 THz/K");
     step("von Klitzing constant")
         .fkey(0).expect("Rk")
         .fkey(1).expect("25 812.80745 93 Ω")
-        .fkey(2).expect("25 812.80745 93±0 Ω");
+        .fkey(2).expect("25 812.80745 93±σ0 Ω");
     step("Conductance quantum")
         .fkey(0).expect("G0")
         .fkey(1).expect("0.00007 74809 17 S")
-        .fkey(2).expect("0.00007 74809 17±0 S");
+        .fkey(2).expect("0.00007 74809 17±σ0 S");
     step("Fermi reduced coupling constant")
         .fkey(0).expect("G0F")
         .fkey(1).expect("0.00001 16637 87 (GeV↑2)⁻¹")
-        .fkey(2).expect("0.00001 16637 87±6.⁳⁻¹² (GeV↑2)⁻¹");
+        .fkey(2).expect("0.00001 16637 87±σ6.⁳⁻¹² (GeV↑2)⁻¹");
     step("Magnetic flux quantum")
         .fkey(0).expect("ø")
         .fkey(1).expect("2.06783 38484 6⁳⁻¹⁵ Wb")
-        .fkey(2).expect("2.06783 38484 6⁳⁻¹⁵±0 Wb");
+        .fkey(2).expect("2.06783 38484 6⁳⁻¹⁵±σ0 Wb");
     step("Josephson constant")
         .fkey(0).expect("KJ")
         .fkey(1).expect("4.83597 84841 7⁳¹⁴ Hz/V")
-        .fkey(2).expect("4.83597 84841 7⁳¹⁴±0 Hz/V");
+        .fkey(2).expect("4.83597 84841 7⁳¹⁴±σ0 Hz/V");
     step("Quantum of circulation")
         .fkey(0).expect("Kc")
         .fkey(1).expect("0.00036 36947 55 m↑2/s")
-        .fkey(2).expect("0.00036 36947 55±1.1⁳⁻¹³ m↑2/s");
+        .fkey(2).expect("0.00036 36947 55±σ1.1⁳⁻¹³ m↑2/s");
 
     // ------------------------------------------------------------------------
     //   Manual evaluation of computer science constants
