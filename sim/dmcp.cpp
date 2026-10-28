@@ -1435,6 +1435,21 @@ void set_reset_state_file(const char * str)
 //   Save the name of the state file to restore on reset
 // ----------------------------------------------------------------------------
 {
+#ifdef ANDROID
+    // A file chosen in the Android file dialog comes back without its
+    // extension, e.g. ".../files/(invalid)". The state is saved to or loaded
+    // from it, but it cannot become the state file of the calculator: it would
+    // not pass is_valid_state_file(), so every save would open the dialog
+    // again and the next start would load the demo state. An empty name
+    // (Clear state) is still accepted.
+    size_t len = str ? strlen(str) : 0;
+    if (len && !(len >= 4 && str[len-4] == '.' && str[len-3] == '4' &&
+                 str[len-2] == '8' && tolower(str[len-1]) == 's'))
+    {
+        record(dmcp, "Not saving %s as state file", str);
+        return;
+    }
+#endif // ANDROID
     ui_save_setting("state", str);
     record(dmcp, "Setting saved state: %s", str);
 }

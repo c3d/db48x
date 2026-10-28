@@ -142,7 +142,15 @@ MainWindow::MainWindow(QWidget *parent, bool console)
     // engine's EXIT_PGM handler in main.cc actually writes a state file
     // (it's a no-op when no path has been configured). The file lives
     // under the app data dir; QDir::setCurrent() is already pointed there.
-    if (ui_read_setting("state", nullptr, 0) == 0)
+    // On Android, a file chosen in the file dialog has no .48S extension and
+    // cannot be the state file: such a setting (written before
+    // set_reset_state_file ignored it) is reset too.
+    QString statePath = QSettings().value("state").toString();
+    if (statePath.isEmpty()
+#ifdef ANDROID
+        || !statePath.endsWith(".48s", Qt::CaseInsensitive)
+#endif // ANDROID
+        )
     {
         QString defaultPath = QString("state/") + PROGRAM_NAME + ".48S";
         ui_save_setting("state", defaultPath.toUtf8().constData());
