@@ -28,7 +28,7 @@
     → z
     «
       IF z 1 < z 118 > OR THEN "ElmData: unknown element" DoError END
-      z 1 - 10 / IP 1 +
+      z 1 - 10 / IP R→I 1 +
       → f
       «
         "/library/Chemistry/ElmD" IF f 10 < THEN "0" + END f →Text + ".48s" +

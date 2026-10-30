@@ -30,7 +30,7 @@
           WHILE IF ipos nlen < THEN fstr ipos 1 + DUP SUB NUM DUP 48 ≥ SWAP 57 ≤ AND ELSE 0 END
           REPEAT num1 10 * fstr ipos 1 + DUP SUB STR→ + 'num1' STO ipos 1 + 'ipos' STO END
           IF num1 0 == THEN 1 ELSE num1 END »
-              2 →LIST 1 →LIST terms SWAP + 'terms' STO
+              2 →LIST terms SWAP SWAP LIST→ DUP 2 + ROLL SWAP 1 + →LIST 'terms' STO
             END
             code1 40 == THEN terms SIZE 1 →LIST gstk + 'gstk' STO END
             code1 41 == THEN
@@ -87,7 +87,7 @@
             IF found 0 > THEN
               accum found accum found GET DUP 2 GET term1 2 GET + 2 SWAP PUT PUT 'accum' STO
             ELSE
-              accum term1 1 →LIST + 'accum' STO
+              accum term1 SWAP LIST→ DUP 2 + ROLL SWAP 1 + →LIST 'accum' STO
             END
           »
         NEXT
