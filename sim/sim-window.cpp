@@ -456,15 +456,24 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 #ifdef ANDROID
 #include "sim-install.h"
 
-void extract_android_assets()
 // ----------------------------------------------------------------------------
-//   On Android, the online help needs to be put in assets
+//   Return the location of the DB48X files on an Android device.
 // ----------------------------------------------------------------------------
+QString android_files_location()
 {
     // On Android the AppDataLocation is completely inaccessible to the user.
-    // Use GenericDataLocation so the user can access and handle the files.
-    QString sandboxDir =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    // Redirect to a USB/PC accessible location.
+    QString location = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    return location;
+}
+
+
+void extract_android_assets()
+// ----------------------------------------------------------------------------
+//   Extract the DB48X files from the assets to their regular = file location.
+// ----------------------------------------------------------------------------
+{
+    QString sandboxDir = android_files_location();
     QDir().mkpath(sandboxDir);
 
     QSettings settings("DB48X", "Emulator");
@@ -1564,9 +1573,7 @@ int ui_file_selector(const char *title,
     bool done = false;
 
 #ifdef ANDROID
-    // Android SAF rejects absolute Linux paths like "/state".
-    // We must use an empty string so the OS opens its default safe location.
-    QString initial_dir = "";
+    QString initial_dir = android_files_location() + "/" + base_dir + "/" + "a_file_name" + ext;
     // Android requires a valid parent context to launch the intent.
     QWidget* parent_widget = MainWindow::theMainWindow();
 #else
@@ -1604,45 +1611,16 @@ int ui_file_selector(const char *title,
         QString name = fi.fileName();
         path = fi.absoluteFilePath();
 #ifdef ANDROID
-        // Create a persistent, private sandbox path that standard C++ can read/write
-        // This requires no permissions and survives app restarts.
+        QString target_directory = android_files_location() + "/" + base_dir;
+        QDir().mkpath(target_directory); // Ensure the directory exists
+        name = fi.completeBaseName() + ext; // Enforce extenstion.
+        QString target_full_path = target_directory + "/" + name;
 
-        // On Android the AppDataLocation is completely inaccessible to the user.
-        // In stead, use what is effectively equivalent to other platforms.
-        // Allow the user to access and handle the files.
-        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-        QDir().mkpath(sandboxDir); // Ensure the directory exists
-        QString sandboxPath = sandboxDir + "/" + name;
+        QMessageBox::information(parent_widget,
+                                 "Using file",
+                                 QString(".../") + base_dir + "/" + name);
 
-        if (!disp_new)
-        {
-            // LOADING (Import): The user selected a file via the Android picker.
-            // Use Qt to copy the Android URI data into our POSIX sandbox file.
-            QFile::remove(sandboxPath);
-            QFile::copy(path, sandboxPath);
-
-            // Tell the DB48X engine to load from the sandbox.
-            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
-        }
-        else
-        {
-            // SAVING (Export): Tell DB48X to save its state to the POSIX sandbox file.
-            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
-
-            // If the DB48X engine succeeded, use Qt to copy the sandbox file
-            // out to the public Android URI the user selected.
-            if (ret == MRET_EXIT) {
-                QFile targetFile(path);
-                if (targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-                    QFile internalFile(sandboxPath);
-                    if (internalFile.open(QIODevice::ReadOnly)) {
-                        targetFile.write(internalFile.readAll());
-                        internalFile.close();
-                    }
-                    targetFile.close();
-                }
-            }
-        }
+        ret = callback(target_full_path.toStdString().c_str(), name.toStdString().c_str(), data);
 #else
         // --- Desktop Behavior ---
         if (QFileInfo("." + suffix) != QFileInfo(ext))

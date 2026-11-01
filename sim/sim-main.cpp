@@ -560,11 +560,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("DB48X");
 
 #ifdef ANDROID
-    // On Android the AppDataLocation is completely inaccessible to the user.
-    // In stead, use what is effectively equivalent to other platforms.
-    // Allow the user to access and handle the files.
-    QString files =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    extern QString android_files_location();
+    QString files = android_files_location();
 #else
     QString files =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
