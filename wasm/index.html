@@ -34,6 +34,9 @@
         margin: 0 auto;
         align-self: center;
         width: 100%;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       #lcdCanvas {
@@ -332,56 +335,165 @@ if (DEBUG) {
     }
 }
 
-// get the mouse/touch position
-const getMousePosition = function(canvas, event) {
+const activePointers = new Map();
+const activeKeyboardKeys = new Map();
+let shiftHeld = false;
+let altHeld = false;
+let syntheticArrow = 0;
+
+const isKeyHeldByPointer = function(key) {
+    for (const heldKey of activePointers.values()) {
+        if (heldKey === key)
+            return true;
+    }
+    return false;
+};
+
+const findKey = function(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let x = (event.clientX - rect.left) / rect.width;
     let y = (event.clientY - rect.top) / rect.height;
-    let xx = x * canvas.width;
-    let yy = y * canvas.height;
-    if (DEBUG) {
-        console.log("clicked x: " + x, " y: " + y + " xx:" + xx + " yy: " + yy);
-    }
+    let bestKey = 0;
+    let bestDist = Infinity;
 
-    // should use html elements for the keys in future
-    for (let i=0; i<key_map.length; i++) {
-        if (x > key_map[i][1] && x < key_map[i][2] &&
-            y > key_map[i][3] && y < key_map[i][4]) {
-            if (DEBUG) {
-                console.log("clicked:", key_map[i][0]);
-            }
-            keyBuffer.push(key_map[i][0]);
+    for (let i = 0; i < key_map.length; i++) {
+        let dx = Math.max(key_map[i][1] - x, x - key_map[i][2], 0) * canvas.width;
+        let dy = Math.max(key_map[i][3] - y, y - key_map[i][4], 0) * canvas.height;
+        let dist = dx * dx + dy * dy;
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestKey = key_map[i][0];
         }
     }
-}
+    if (DEBUG) {
+        console.log("pointer at x:", x, "y:", y, "key:", bestKey);
+    }
+    return bestKey;
+};
 
 const processKey = function() {
-    if (keyBuffer.length > 0) {
+    let processed = false;
+    while (keyBuffer.length > 0) {
         let key = keyBuffer.shift();
         if (DEBUG) {
             console.log("processed key:", key);
         }
         Module.ui_push_key(key);
-        Module.ui_push_key(0);
-        return true;
+        processed = true;
     }
-    return false;
-}
+    return processed;
+};
 
-// add an event listener to the canvas so we can parse the key presses
-canvas_key.addEventListener("mousedown", function (e) {
-    getMousePosition(canvas_key, e);
+canvas_key.addEventListener("pointerdown", function (e) {
+    if (e.pointerType === "mouse" && e.button !== 0)
+        return;
+    e.preventDefault();
+    try {
+        canvas_key.setPointerCapture(e.pointerId);
+    } catch (_) {}
+
+    let key = findKey(canvas_key, e);
+    if (key > 0) {
+        let alreadyHeld = isKeyHeldByPointer(key);
+        activePointers.set(e.pointerId, key);
+        if (!alreadyHeld)
+            keyBuffer.push(key);
+    }
 });
 
-// add an event listener to the canvas so we can parse the key presses
-document.addEventListener("keyup", (event)=>{
-    // check that event.key matches a key in the keystroke_map
-    if (Object.keys(keystroke_map).includes(event.key)) {
-        keyBuffer.push(keystroke_map[event.key]);
-    } else {
-        if (DEBUG) {
-            console.log("Key not found in keystroke_map: ", event.key);
+const releasePointer = function(e) {
+    if (!activePointers.has(e.pointerId))
+        return;
+    let key = activePointers.get(e.pointerId);
+    activePointers.delete(e.pointerId);
+    if (key > 0 && !isKeyHeldByPointer(key))
+        keyBuffer.push(-key);
+};
+
+canvas_key.addEventListener("pointerup", releasePointer);
+canvas_key.addEventListener("lostpointercapture", releasePointer);
+canvas_key.addEventListener("pointercancel", function (e) {
+    if (!activePointers.has(e.pointerId))
+        return;
+    let key = activePointers.get(e.pointerId);
+    activePointers.delete(e.pointerId);
+    if (activePointers.size === 0) {
+        if (Module.ui_cancel_keys) {
+            Module.ui_cancel_keys();
+        } else {
+            keyBuffer.push(99);
+            keyBuffer.push(0);
         }
+    } else if (key > 0 && !isKeyHeldByPointer(key)) {
+        keyBuffer.push(-key);
+    }
+});
+
+const isAlphaKeystroke = function(keyName) {
+    return (keyName.length === 1 && keyName.toLowerCase() >= "a" && keyName.toLowerCase() <= "z") ||
+           /^F[1-6]$/.test(keyName);
+};
+
+document.addEventListener("keydown", (event) => {
+    if (event.repeat)
+        return;
+    if (event.key === "Shift") {
+        shiftHeld = true;
+        return;
+    }
+    if (event.key === "Alt") {
+        altHeld = true;
+        return;
+    }
+    const lookupKey = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (Object.prototype.hasOwnProperty.call(keystroke_map, lookupKey)) {
+        if (isAlphaKeystroke(lookupKey)) {
+            if (shiftHeld && syntheticArrow !== 18) {
+                if (syntheticArrow)
+                    keyBuffer.push(-syntheticArrow);
+                syntheticArrow = 18;
+                keyBuffer.push(18);
+            } else if (!shiftHeld && altHeld && syntheticArrow !== 23) {
+                if (syntheticArrow)
+                    keyBuffer.push(-syntheticArrow);
+                syntheticArrow = 23;
+                keyBuffer.push(23);
+            }
+        } else if (syntheticArrow) {
+            keyBuffer.push(-syntheticArrow);
+            syntheticArrow = 0;
+        }
+        let dmKey = keystroke_map[lookupKey];
+        activeKeyboardKeys.set(event.code || lookupKey, dmKey);
+        keyBuffer.push(dmKey);
+    }
+});
+
+document.addEventListener("keyup", (event) => {
+    if (event.key === "Shift") {
+        shiftHeld = false;
+        if (syntheticArrow === 18) {
+            keyBuffer.push(-18);
+            syntheticArrow = 0;
+        }
+        return;
+    }
+    if (event.key === "Alt") {
+        altHeld = false;
+        if (syntheticArrow === 23) {
+            keyBuffer.push(-23);
+            syntheticArrow = 0;
+        }
+        return;
+    }
+    const lookupKey = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    const codeKey = event.code || lookupKey;
+    if (activeKeyboardKeys.has(codeKey)) {
+        let dmKey = activeKeyboardKeys.get(codeKey);
+        activeKeyboardKeys.delete(codeKey);
+        keyBuffer.push(-dmKey);
+    } else if (Object.prototype.hasOwnProperty.call(keystroke_map, lookupKey)) {
+        keyBuffer.push(-keystroke_map[lookupKey]);
     }
 });
 

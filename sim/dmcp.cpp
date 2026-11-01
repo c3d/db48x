@@ -44,6 +44,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <mutex>
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -316,10 +317,138 @@ int handle_menu(const smenu_t * menu_id, int action, int cur_line)
 }
 
 
-volatile int8_t  keys[4] = { 0 };
-volatile uint    keyrd   = 0;
-volatile uint    keywr   = 0;
-enum {  nkeys = sizeof(keys) / sizeof(keys[0]) };
+struct key_entry
+// ----------------------------------------------------------------------------
+//   A queued key transition and the held-key snapshot at that instant
+// ----------------------------------------------------------------------------
+{
+    int8_t key;
+    int8_t k1;
+    int8_t k2;
+};
+
+enum
+{
+    nkeys        = 32,
+    max_held_key = KEY_DOUBLE_RELEASE
+};
+
+static std::mutex key_mutex;
+static key_entry  keys[nkeys]              = {};
+static volatile uint keyrd                 = 0;
+static volatile uint keywr                 = 0;
+static int8_t     held_order[max_held_key] = {};
+static uint       held_count               = 0;
+static int8_t     active_k1                = 0;
+static int8_t     active_k2                = 0;
+static int8_t     last_pushed_key          = 0;
+
+static void snapshot_held_keys(int8_t &k1, int8_t &k2)
+// ----------------------------------------------------------------------------
+//   Capture up to two currently held keys, prioritizing transient-alpha arrows
+// ----------------------------------------------------------------------------
+{
+    k1 = 0;
+    k2 = 0;
+    if (held_count == 0)
+        return;
+
+    if (held_count == 1)
+    {
+        k1 = held_order[0];
+        if (shift_held && k1 != KEY_UP)
+            k2 = KEY_UP;
+        else if (alt_held && k1 != KEY_DOWN)
+            k2 = KEY_DOWN;
+        return;
+    }
+
+    int8_t arrow = 0;
+    for (uint i = held_count; i > 0; i--)
+    {
+        int8_t hk = held_order[i - 1];
+        if (hk == KEY_UP || hk == KEY_DOWN)
+        {
+            arrow = hk;
+            break;
+        }
+    }
+
+    if (arrow)
+    {
+        k1 = arrow;
+        for (uint i = held_count; i > 0; i--)
+        {
+            int8_t hk = held_order[i - 1];
+            if (hk != arrow)
+            {
+                k2 = hk;
+                break;
+            }
+        }
+    }
+    else
+    {
+        k1 = held_order[held_count - 2];
+        k2 = held_order[held_count - 1];
+    }
+}
+
+
+static void press_held_key(int k)
+// ----------------------------------------------------------------------------
+//   Record that a physical key is currently held down
+// ----------------------------------------------------------------------------
+{
+    if (k <= 0 || k >= max_held_key)
+        return;
+    for (uint i = 0; i < held_count; i++)
+    {
+        if (held_order[i] == k)
+        {
+            for (uint j = i + 1; j < held_count; j++)
+                held_order[j - 1] = held_order[j];
+            held_order[held_count - 1] = int8_t(k);
+            return;
+        }
+    }
+    if (held_count < max_held_key)
+        held_order[held_count++] = int8_t(k);
+}
+
+
+static bool release_held_key(int k)
+// ----------------------------------------------------------------------------
+//   Record that a physical key was released; return true if it was held
+// ----------------------------------------------------------------------------
+{
+    if (k <= 0 || k >= max_held_key)
+        return false;
+    for (uint i = 0; i < held_count; i++)
+    {
+        if (held_order[i] == k)
+        {
+            for (uint j = i + 1; j < held_count; j++)
+                held_order[j - 1] = held_order[j];
+            held_count--;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool key_is_held(int k)
+// ----------------------------------------------------------------------------
+//   Return true if the given physical key is currently held down
+// ----------------------------------------------------------------------------
+{
+    std::lock_guard<std::mutex> lock(key_mutex);
+    for (uint i = 0; i < held_count; i++)
+        if (held_order[i] == k)
+            return true;
+    return false;
+}
 
 #ifdef ANDROID
 // Set by the UI thread; consumed in key_pop() (RPL thread).
@@ -336,6 +465,7 @@ int key_empty()
 //   Return true if the key buffer is empty
 // ----------------------------------------------------------------------------
 {
+    std::lock_guard<std::mutex> lock(key_mutex);
     static bool empty = true;
     if ((keyrd == keywr) != empty)
     {
@@ -355,6 +485,7 @@ int key_remaining()
 //   Return the number of free slots in the key buffer
 // ----------------------------------------------------------------------------
 {
+    std::lock_guard<std::mutex> lock(key_mutex);
     return nkeys - (keywr - keyrd);
 }
 
@@ -364,10 +495,15 @@ int key_pop()
 //   Pop and return the oldest key from the buffer
 // ----------------------------------------------------------------------------
 {
+    std::lock_guard<std::mutex> lock(key_mutex);
     if (keyrd != keywr)
     {
-        int key = keys[keyrd++ % nkeys];
-        record(keys, "Key %d (rd %u wr %u)", key, keyrd, keywr);
+        key_entry entry = keys[keyrd++ % nkeys];
+        int       key   = entry.key;
+        active_k1       = entry.k1;
+        active_k2       = entry.k2;
+        record(keys, "Key %d (rd %u wr %u held %d,%d)",
+               key, keyrd, keywr, active_k1, active_k2);
         record(tests_rpl, "Key %d (rd %u wr %u)", key, keyrd, keywr);
 #ifdef ANDROID
         if (android_next_key_repeating && key > 0)
@@ -391,9 +527,10 @@ int key_tail()
 //   Peek at the most recent key without removing it
 // ----------------------------------------------------------------------------
 {
+    std::lock_guard<std::mutex> lock(key_mutex);
     if (keyrd != keywr)
     {
-        int key = keys[(keyrd + nkeys - 1) % nkeys];
+        int key = keys[(keyrd + nkeys - 1) % nkeys].key;
         return key;
     }
     return -1;
@@ -405,12 +542,15 @@ int key_pop_last()
 //   Discard all but the last key and return it
 // ----------------------------------------------------------------------------
 {
+    std::lock_guard<std::mutex> lock(key_mutex);
     if (keywr - keyrd > 1)
         keyrd = keywr - 1;
     if (keyrd != keywr)
     {
-        int key = keys[keyrd++ % nkeys];
-        return key;
+        key_entry entry = keys[keyrd++ % nkeys];
+        active_k1       = entry.k1;
+        active_k2       = entry.k2;
+        return entry.key;
     }
     return -1;
 }
@@ -421,27 +561,104 @@ void key_pop_all()
 //   Discard all keys in the buffer
 // ----------------------------------------------------------------------------
 {
-    keyrd = 0;
-    keywr = 0;
+    std::lock_guard<std::mutex> lock(key_mutex);
+    keyrd           = 0;
+    keywr           = 0;
+    held_count      = 0;
+    active_k1       = 0;
+    active_k2       = 0;
+    last_pushed_key = 0;
 }
 
 
 int key_push(int k)
 // ----------------------------------------------------------------------------
-//   Push a key code into the key buffer
+//   Push a key code into the key buffer (k<0 releases key -k, 0 releases all)
 // ----------------------------------------------------------------------------
 {
-    record(keys, "Push key %d (wr %u rd %u) shifts=%+s",
-           k, keywr, keyrd,
-           shift_held ? alt_held ? "Shift+Alt" : "Shift"
-           : alt_held ? "Alt" : "None");
+    int    queued_key = k;
+    int8_t k1         = 0;
+    int8_t k2         = 0;
+    bool   has_space  = false;
+
+    {
+        std::lock_guard<std::mutex> lock(key_mutex);
+        record(keys, "Push key %d (wr %u rd %u) shifts=%+s",
+               k, keywr, keyrd,
+               shift_held ? alt_held ? "Shift+Alt" : "Shift"
+               : alt_held ? "Alt" : "None");
+
+        if (k > 0)
+        {
+            if (k < max_held_key)
+                press_held_key(k);
+            else if (k == KEY_DOUBLE_RELEASE)
+                held_count = 0;
+            snapshot_held_keys(k1, k2);
+            queued_key = k;
+        }
+        else if (k == 0)
+        {
+            held_count = 0;
+            k1         = 0;
+            k2         = 0;
+            queued_key = 0;
+        }
+        else
+        {
+            int released = -k;
+            if (released < max_held_key && !release_held_key(released))
+                return keywr - keyrd < nkeys;
+            snapshot_held_keys(k1, k2);
+            queued_key = 0;
+        }
+
+        if (keyrd == keywr)
+        {
+            active_k1 = k1;
+            active_k2 = k2;
+        }
+        last_pushed_key = int8_t(queued_key);
+
+        if (keywr - keyrd < nkeys)
+        {
+            keys[keywr++ % nkeys] = { int8_t(queued_key), k1, k2 };
+            record(keys, "Pushed key %d (wr %u rd %u held %d,%d)",
+                   queued_key, keywr, keyrd, k1, k2);
+        }
+        else
+        {
+            record(keys_warning, "Dropped key %d (wr %u rd %u)",
+                   queued_key, keywr, keyrd);
+        }
+        has_space = keywr - keyrd < nkeys;
+    }
+
     ui_push_key(k);
-    if (keywr - keyrd < nkeys)
-        keys[keywr++ % nkeys] = k;
-    else
-        record(keys_warning, "Dropped key %d (wr %u rd %u)", k, keywr, keyrd);
-    record(keys, "Pushed key %d (wr %u rd %u)", k, keywr, keyrd);
-    return keywr - keyrd < nkeys;
+    return has_space;
+}
+
+
+int key_cancel()
+// ----------------------------------------------------------------------------
+//   Cancel all active keys without triggering delayed release actions
+// ----------------------------------------------------------------------------
+{
+    bool had_active = false;
+    {
+        std::lock_guard<std::mutex> lock(key_mutex);
+        had_active = held_count > 0 || active_k1 != 0 || active_k2 != 0;
+        held_count = 0;
+        active_k1  = 0;
+        active_k2  = 0;
+    }
+    if (had_active)
+    {
+        key_push(KEY_DOUBLE_RELEASE);
+        return key_push(0);
+    }
+    ui_push_key(0);
+    return 1;
 }
 
 
@@ -450,27 +667,17 @@ int read_key(int *k1, int *k2)
 //   Read up to two keys including shift state
 // ----------------------------------------------------------------------------
 {
-    uint count = keywr - keyrd;
-    if (shift_held || alt_held)
+    std::lock_guard<std::mutex> lock(key_mutex);
+    if (active_k1 && active_k2)
     {
-        *k1 = keys[(keywr - 1) % nkeys];
-        if (*k1)
-        {
-            *k2 = shift_held ? KEY_UP : KEY_DOWN;
-            return 2;
-        }
-    }
-
-    if (count > 1)
-    {
-        *k1 = keys[(keywr - 2) % nkeys];
-        *k2 = keys[(keywr - 1) % nkeys];
+        *k1 = active_k1;
+        *k2 = active_k2;
         record(keys, "read_key has two keys %d and %d", *k1, *k2);
         return 2;
     }
-    if (count > 0)
+    if (active_k1)
     {
-        *k1 = keys[(keywr - 1) % nkeys];
+        *k1 = active_k1;
         *k2 = 0;
         return 1;
     }
@@ -484,7 +691,8 @@ int sys_last_key()
 //   Return the most recently pushed key code
 // ----------------------------------------------------------------------------
 {
-    return keys[(keywr - 1) % nkeys];
+    std::lock_guard<std::mutex> lock(key_mutex);
+    return last_pushed_key;
 }
 
 

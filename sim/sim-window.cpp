@@ -45,6 +45,7 @@
 #else
 #include "sim-rpl.h"
 #include "ui_sim-window.h"
+#include <atomic>
 #include <iostream>
 #include <QAudioFormat>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -177,6 +178,8 @@ MainWindow::MainWindow(QWidget *parent, bool console)
 
     QObject::connect(this, SIGNAL(keyResizeSignal(const QRect &)),
                      highlight, SLOT(keyResizeSlot(const QRect &)));
+    QObject::connect(this, SIGNAL(keyHighlightSignal(int, const QRect &)),
+                     highlight, SLOT(keyHighlightSlot(int, const QRect &)));
 
 #ifdef ANDROID
     // On Android, center the stacked widget within the central widget
@@ -537,12 +540,13 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 
         // Mark every pixel as dirty so the RPL thread redraws everything.
         SimScreen::invalidate();
-        key_push(0);
+        clearTouchKeys(true);
     }
     else if ((state == Qt::ApplicationSuspended ||
               state == Qt::ApplicationHidden) &&
              !isSaved) // Check both suspend and hidden + avoid double save
     {
+        clearTouchKeys(true);
         record(sim_window, "Background: auto-save state=%d", int(state));
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)
@@ -803,13 +807,14 @@ static void android_haptic_tap()
 
 void MainWindow::pushKey(int key)
 // ----------------------------------------------------------------------------
-//   When pushing a key, update the highlight rectangle
+//   When pushing or releasing a key, update the highlight rectangles
 // ----------------------------------------------------------------------------
 {
     QRect rect(0, 0, 0, 0);
+    int   target = qAbs(key);
     for (mousemap *ptr = mouseMap; ptr->key; ptr++)
     {
-        if (ptr->keynum == key)
+        if (ptr->keynum == target)
         {
             int w = ui.keyboard->width();
             int h = ui.keyboard->height();
@@ -827,7 +832,7 @@ void MainWindow::pushKey(int key)
            rect.y(),
            rect.width(),
            rect.height());
-    emit keyResizeSignal(rect);
+    emit keyHighlightSignal(key, rect);
 }
 
 
@@ -836,22 +841,64 @@ void Highlight::keyResizeSlot(const QRect &rect)
 //   Receive signal that the widget was resized
 // ----------------------------------------------------------------------------
 {
+    activeRects.clear();
     setGeometry(rect);
+    update();
+}
+
+
+void Highlight::keyHighlightSlot(int key, const QRect &rect)
+// ----------------------------------------------------------------------------
+//   Update active key highlights for multi-touch and single-key presses
+// ----------------------------------------------------------------------------
+{
+    if (key > 0 && key < KEY_DOUBLE_RELEASE && !rect.isNull())
+        activeRects[key] = rect;
+    else if (key < 0)
+        activeRects.remove(-key);
+    else if (key == 0 || key == KEY_DOUBLE_RELEASE)
+        activeRects.clear();
+
+    if (activeRects.isEmpty())
+    {
+        setGeometry(QRect(0, 0, 0, 0));
+    }
+    else
+    {
+        QRect bounds;
+        for (auto it = activeRects.cbegin(); it != activeRects.cend(); ++it)
+            bounds = bounds.isNull() ? it.value() : bounds.united(it.value());
+        setGeometry(bounds);
+    }
+    update();
 }
 
 
 void Highlight::paintEvent(QPaintEvent *)
 // ----------------------------------------------------------------------------
-//   Repaing, showing the highlight
+//   Repaint, showing the highlight around all currently held keys
 // ----------------------------------------------------------------------------
 {
     QRect geo = geometry();
     record(sim_keys, "Repainting %d %d %d %d",
            geo.x(), geo.y(), geo.width(), geo.height());
-    QRect local(3, 3, geo.width()-6, geo.height()-6);
     QPainter p(this);
     QPainterPath path;
-    path.addRoundedRect(local, 8, 8);
+    if (activeRects.isEmpty())
+    {
+        QRect local(3, 3, geo.width() - 6, geo.height() - 6);
+        path.addRoundedRect(local, 8, 8);
+    }
+    else
+    {
+        for (auto it = activeRects.cbegin(); it != activeRects.cend(); ++it)
+        {
+            QRect rel = it.value().translated(-geo.topLeft());
+            QRect local(rel.x() + 3, rel.y() + 3,
+                        rel.width() - 6, rel.height() - 6);
+            path.addRoundedRect(local, 8, 8);
+        }
+    }
     QPen pen(Qt::yellow, 4);
     p.setPen(pen);
     p.drawPath(path);
@@ -969,10 +1016,17 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
     else if ((k >= Qt::Key_A && k <= Qt::Key_Z)    ||
              (k >= Qt::Key_F1 && k <= Qt::Key_F6))
     {
-        if (shift_held)
+        if (shift_held && !key_is_held(KEY_UP))
             key_push(KEY_UP);
-        else if (alt_held)
+        else if (alt_held && !key_is_held(KEY_DOWN))
             key_push(KEY_DOWN);
+    }
+    else
+    {
+        if (shift_held && key_is_held(KEY_UP))
+            key_push(-KEY_UP);
+        if (alt_held && key_is_held(KEY_DOWN))
+            key_push(-KEY_DOWN);
     }
 
     for (int i = 0; keyMap[i] != 0; i += 2)
@@ -995,7 +1049,7 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
 void MainWindow::keyReleaseEvent(QKeyEvent * ev)
 // ----------------------------------------------------------------------------
-//   Released a key - Send a 0 to the simulator
+//   Released a key - Release the corresponding key in the simulator
 // ----------------------------------------------------------------------------
 {
     if (ev->isAutoRepeat())
@@ -1007,16 +1061,22 @@ void MainWindow::keyReleaseEvent(QKeyEvent * ev)
     int k = ev->key();
     record(sim_keys, "Key release %d", k);
     if (k == Qt::Key_Shift)
+    {
         shift_held = false;
+        key_push(-KEY_UP);
+    }
     else if (k == Qt::Key_Alt)
+    {
         alt_held = false;
+        key_push(-KEY_DOWN);
+    }
 
     for (int i = 0; keyMap[i] != 0; i += 2)
     {
         if (k == keyMap[i])
         {
             record(sim_keys, "Key %d found at %d, sending key up", k, i);
-            key_push(0);
+            key_push(-keyMap[i+1]);
             ev->accept();
             return;
         }
@@ -1026,9 +1086,65 @@ void MainWindow::keyReleaseEvent(QKeyEvent * ev)
 }
 
 
+bool MainWindow::isTouchKeyHeld(int key) const
+// ----------------------------------------------------------------------------
+//   Return true if any active touch point is holding the given key
+// ----------------------------------------------------------------------------
+{
+    for (auto it = activeTouches.cbegin(); it != activeTouches.cend(); ++it)
+        if (it.value() == key)
+            return true;
+    return false;
+}
+
+
+QPointF MainWindow::keyCenter(int key) const
+// ----------------------------------------------------------------------------
+//   Return the center point of a key cap in ui.keyboard coordinates
+// ----------------------------------------------------------------------------
+{
+    for (const mousemap *ptr = mouseMap; ptr->key; ptr++)
+    {
+        if (ptr->keynum == key)
+        {
+            qreal x = 0.5 * (ptr->left + ptr->right) * ui.keyboard->width();
+            qreal y = 0.5 * (ptr->top + ptr->bot) * ui.keyboard->height();
+            return QPointF(x, y);
+        }
+    }
+    return QPointF(0, 0);
+}
+
+
+void MainWindow::clearTouchKeys(bool cancel)
+// ----------------------------------------------------------------------------
+//   Clear all tracked touch, mouse, and modifier key states
+// ----------------------------------------------------------------------------
+{
+    activeTouches.clear();
+    testTouchPositions.clear();
+    mouseKey   = 0;
+    shift_held = false;
+    alt_held   = false;
+    if (cancel)
+        key_cancel();
+    else
+        key_push(0);
+}
+
+
+static bool isModifierKey(int keynum)
+// ----------------------------------------------------------------------------
+//   Return true if key is a modifier that should be ordered before letters
+// ----------------------------------------------------------------------------
+{
+    return keynum == KEY_UP || keynum == KEY_DOWN || keynum == KEY_SHIFT;
+}
+
+
 bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 // ----------------------------------------------------------------------------
-//  Filter mouse / keyboard events
+//  Filter mouse / keyboard / multi-touch events
 // ----------------------------------------------------------------------------
 {
     if (ev->type() != QEvent::Resize &&
@@ -1044,62 +1160,139 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
     if (obj == ui.keyboard)
     {
         record(sim_window, "Keyboard event type=%d", int(ev->type()));
+        if (ev->type() == QEvent::TouchCancel)
+        {
+            ev->accept();
+            record(sim_keys, "Touch cancelled (%d active)",
+                   int(activeTouches.size()));
+            clearTouchKeys(true);
+            return true;
+        }
+
         if ((ev->type() == QEvent::TouchBegin) ||
             (ev->type() == QEvent::TouchUpdate) ||
-            (ev->type() == QEvent::TouchEnd) ||
-            (ev->type() == QEvent::TouchCancel))
+            (ev->type() == QEvent::TouchEnd))
         {
-            QTouchEvent *me = static_cast < QTouchEvent * >(ev);
+            ev->accept();
+            QTouchEvent *me = static_cast<QTouchEvent *>(ev);
 #if QT_VERSION < 0x060000
             auto &touchPoints = me->touchPoints();
 #else
             auto &touchPoints = me->points();
 #endif // Qt version 6
-            qsizetype npoints = touchPoints.count();
+            qsizetype    npoints = touchPoints.count();
+            QVector<int> pressedKeys;
+            QVector<int> releasedKeys;
+            QVector<int> seenIds;
 
-            record(sim_keys, "Touch event %d points", npoints);
+            record(sim_keys, "Touch event %d (%d points)",
+                   int(ev->type()), int(npoints));
 
-            for(int k = 0; k < npoints; ++k) {
+            for (int k = 0; k < npoints; ++k)
+            {
+                const auto &pt    = touchPoints.at(k);
+                int         id    = pt.id();
+                auto        state = pt.state();
+                seenIds.append(id);
+
+                bool isReleased = (state & Qt::TouchPointReleased) ||
+                                  (ev->type() == QEvent::TouchEnd);
+                bool isPressed  = !isReleased &&
+                                  ((state & Qt::TouchPointPressed) ||
+                                   !activeTouches.contains(id));
+                if (!isPressed && !isReleased)
+                    continue;
+
+                if (isPressed)
+                {
 #if QT_VERSION < 0x060000
-                QPointF coordinates = touchPoints.at(k).startPos();
+                    QPointF coordinates = pt.startPos();
+                    if (coordinates.x() <= 0 && coordinates.y() <= 0)
+                        coordinates = pt.pos();
 #else
-                QPointF coordinates = touchPoints.at(k).pressPosition();
+                    QPointF coordinates = pt.pressPosition();
+                    if (coordinates.x() <= 0 && coordinates.y() <= 0)
+                        coordinates = pt.position();
+                    if (coordinates.x() <= 0 && coordinates.y() <= 0)
+                        coordinates = pt.scenePosition();
 #endif // Qt version 6
-                qreal relx, rely;
-                int   pressed;
+                    qreal relx = coordinates.x() / (qreal) ui.keyboard->width();
+                    qreal rely = coordinates.y() / (qreal) ui.keyboard->height();
+                    record(sim_keys, "  [%d id=%d] at (%f, %f) pressed",
+                           k, id, relx, rely);
 
-                if(touchPoints.at(k).state() & Qt::TouchPointPressed)
-                    pressed = 1;
-                else if(touchPoints.at(k).
-                        state() & Qt::TouchPointReleased)
-                    pressed = 0;
-                else
-                    continue;   // NOT INTERESTED IN DRAGGING
-
-                relx = coordinates.x() / (qreal) ui.keyboard->width();
-                rely = coordinates.y() / (qreal) ui.keyboard->height();
-                record(sim_keys, "  [%d] at (%f, %f) %+s",
-                       k, relx, rely, pressed ? "pressed" : "released");
-
-                if (!pressed)
-                {
-                    key_push(0);
-                }
-                else
-                {
-                    if (tests::running)
-                        tests::abort_requested = true;
                     if (mousemap *ptr = findKey(relx, rely,
                                                 ui.keyboard->width(),
                                                 ui.keyboard->height()))
                     {
-                        record(sim_keys, "  [%d] found at %d as %d",
-                               k, ptr - mouseMap, ptr->keynum);
-                        key_push(ptr->keynum);
+                        bool alreadyHeld = isTouchKeyHeld(ptr->keynum);
+                        activeTouches[id] = ptr->keynum;
+                        if (!alreadyHeld && !pressedKeys.contains(ptr->keynum))
+                        {
+                            record(sim_keys, "  [%d id=%d] found at %d as %d",
+                                   k, id, int(ptr - mouseMap), ptr->keynum);
+                            pressedKeys.append(ptr->keynum);
+                        }
+                    }
+                }
+                else
+                {
+                    int keynum = activeTouches.take(id);
+                    record(sim_keys, "  [%d id=%d] key %d released",
+                           k, id, keynum);
+                    if (keynum > 0 && !isTouchKeyHeld(keynum) &&
+                        !releasedKeys.contains(keynum))
+                    {
+                        releasedKeys.append(keynum);
+                    }
+                }
+            }
+
+            // Clean up any tracked points that disappeared or on TouchEnd
+            for (auto it = activeTouches.begin(); it != activeTouches.end(); )
+            {
+                if (ev->type() == QEvent::TouchEnd || !seenIds.contains(it.key()))
+                {
+                    int keynum = it.value();
+                    it = activeTouches.erase(it);
+                    if (keynum > 0 && !isTouchKeyHeld(keynum) &&
+                        !releasedKeys.contains(keynum))
+                    {
+                        releasedKeys.append(keynum);
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+
+            // Press modifiers (arrows/shift) before regular keys in same frame
+            for (int pass = 0; pass < 2; ++pass)
+            {
+                bool wantModifier = (pass == 0);
+                for (int keynum : pressedKeys)
+                {
+                    if (isModifierKey(keynum) == wantModifier)
+                    {
+                        if (tests::running)
+                            tests::abort_requested = true;
+                        key_push(keynum);
 #ifdef ANDROID
                         android_haptic_tap();
 #endif
                     }
+                }
+            }
+
+            // Release regular keys before modifiers in same frame
+            for (int pass = 0; pass < 2; ++pass)
+            {
+                bool wantModifier = (pass == 1);
+                for (int keynum : releasedKeys)
+                {
+                    if (isModifierKey(keynum) == wantModifier)
+                        key_push(-keynum);
                 }
             }
 
@@ -1110,6 +1303,11 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
             ev->type() == QEvent::MouseButtonDblClick)
         {
             QMouseEvent *me = static_cast < QMouseEvent * >(ev);
+            if (me->source() != Qt::MouseEventNotSynthesized ||
+                !activeTouches.isEmpty())
+            {
+                return true;
+            }
 #if QT_VERSION < 0x060000
             qreal relx = (qreal) me->x() / (qreal) ui.keyboard->width();
             qreal rely = (qreal) me->y() / (qreal) ui.keyboard->height();
@@ -1118,7 +1316,7 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                 (qreal) me->position().x() / (qreal) ui.keyboard->width();
             qreal rely =
                 (qreal) me->position().y() / (qreal) ui.keyboard->height();
-#endif // Qt vertsion 6
+#endif // Qt version 6
 
             record(sim_keys, "Mouse button press at (%f, %f)", relx, rely);
             if (tests::running)
@@ -1130,7 +1328,10 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                 record(sim_keys, "Mouse coordinates found at %d as %d",
                        ptr - mouseMap, ptr->keynum);
 
-                key_push(ptr->keynum);
+                if (mouseKey && mouseKey != ptr->keynum)
+                    key_push(-mouseKey);
+                mouseKey = ptr->keynum;
+                key_push(mouseKey);
 #ifdef ANDROID
                 android_haptic_tap();
 #endif
@@ -1141,8 +1342,23 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 
         if(ev->type() == QEvent::MouseButtonRelease)
         {
+            QMouseEvent *me = static_cast < QMouseEvent * >(ev);
+            if (me->source() != Qt::MouseEventNotSynthesized ||
+                !activeTouches.isEmpty())
+            {
+                return true;
+            }
             record(sim_keys, "Mouse button released");
-            key_push(0);
+            if (mouseKey)
+            {
+                int k = mouseKey;
+                mouseKey = 0;
+                key_push(-k);
+            }
+            else
+            {
+                key_push(0);
+            }
             return true;
         }
 
@@ -1524,12 +1740,234 @@ void ui_screenshot()
 }
 
 
+void MainWindow::touchPress(int pointId, int key)
+// ----------------------------------------------------------------------------
+//   Synthesize a touch-point press on ui.keyboard for automated tests
+// ----------------------------------------------------------------------------
+{
+    bool    wasEmpty = testTouchPositions.isEmpty();
+    QPointF pos      = keyCenter(key);
+    testTouchPositions[pointId] = pos;
+
+#if QT_VERSION < 0x060000
+    QList<QTouchEvent::TouchPoint> points;
+    Qt::TouchPointStates           states = Qt::TouchPointPressed;
+    for (auto it = testTouchPositions.cbegin();
+         it != testTouchPositions.cend(); ++it)
+    {
+        QTouchEvent::TouchPoint pt(it.key());
+        Qt::TouchPointState st = (it.key() == pointId)
+                               ? Qt::TouchPointPressed
+                               : Qt::TouchPointStationary;
+        states |= st;
+        pt.setState(st);
+        pt.setPos(it.value());
+        pt.setStartPos(it.value());
+        points.append(pt);
+    }
+    QTouchEvent ev(wasEmpty ? QEvent::TouchBegin : QEvent::TouchUpdate,
+                   nullptr, Qt::NoModifier, states, points);
+#else
+    QList<QEventPoint> points;
+    for (auto it = testTouchPositions.cbegin();
+         it != testTouchPositions.cend(); ++it)
+    {
+        QEventPoint::State st = (it.key() == pointId)
+                              ? QEventPoint::Pressed
+                              : QEventPoint::Stationary;
+        points.append(QEventPoint(it.key(), st, it.value(), it.value()));
+    }
+    const QPointingDevice *dev = QPointingDevice::primaryPointingDevice();
+    QTouchEvent ev(wasEmpty ? QEvent::TouchBegin : QEvent::TouchUpdate,
+                   dev, Qt::NoModifier, points);
+#endif
+    QCoreApplication::sendEvent(ui.keyboard, &ev);
+}
+
+
+void MainWindow::touchRelease(int pointId)
+// ----------------------------------------------------------------------------
+//   Synthesize a touch-point release on ui.keyboard for automated tests
+// ----------------------------------------------------------------------------
+{
+    if (!testTouchPositions.contains(pointId))
+        return;
+
+    bool lastPoint = (testTouchPositions.size() == 1);
+#if QT_VERSION < 0x060000
+    QList<QTouchEvent::TouchPoint> points;
+    Qt::TouchPointStates           states = Qt::TouchPointReleased;
+    for (auto it = testTouchPositions.cbegin();
+         it != testTouchPositions.cend(); ++it)
+    {
+        QTouchEvent::TouchPoint pt(it.key());
+        Qt::TouchPointState st = (it.key() == pointId)
+                               ? Qt::TouchPointReleased
+                               : Qt::TouchPointStationary;
+        states |= st;
+        pt.setState(st);
+        pt.setPos(it.value());
+        pt.setStartPos(it.value());
+        points.append(pt);
+    }
+    testTouchPositions.remove(pointId);
+    QTouchEvent ev(lastPoint ? QEvent::TouchEnd : QEvent::TouchUpdate,
+                   nullptr, Qt::NoModifier, states, points);
+#else
+    QList<QEventPoint> points;
+    for (auto it = testTouchPositions.cbegin();
+         it != testTouchPositions.cend(); ++it)
+    {
+        QEventPoint::State st = (it.key() == pointId)
+                              ? QEventPoint::Released
+                              : QEventPoint::Stationary;
+        points.append(QEventPoint(it.key(), st, it.value(), it.value()));
+    }
+    testTouchPositions.remove(pointId);
+    const QPointingDevice *dev = QPointingDevice::primaryPointingDevice();
+    QTouchEvent ev(lastPoint ? QEvent::TouchEnd : QEvent::TouchUpdate,
+                   dev, Qt::NoModifier, points);
+#endif
+    QCoreApplication::sendEvent(ui.keyboard, &ev);
+}
+
+
+void MainWindow::touchChord(int id1, int key1, int id2, int key2)
+// ----------------------------------------------------------------------------
+//   Synthesize two simultaneous touch-point presses in one QTouchEvent
+// ----------------------------------------------------------------------------
+{
+    bool    wasEmpty = testTouchPositions.isEmpty();
+    QPointF pos1     = keyCenter(key1);
+    QPointF pos2     = keyCenter(key2);
+    testTouchPositions[id1] = pos1;
+    testTouchPositions[id2] = pos2;
+
+#if QT_VERSION < 0x060000
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint pt1(id1);
+    pt1.setState(Qt::TouchPointPressed);
+    pt1.setPos(pos1);
+    pt1.setStartPos(pos1);
+    points.append(pt1);
+    QTouchEvent::TouchPoint pt2(id2);
+    pt2.setState(Qt::TouchPointPressed);
+    pt2.setPos(pos2);
+    pt2.setStartPos(pos2);
+    points.append(pt2);
+    QTouchEvent ev(wasEmpty ? QEvent::TouchBegin : QEvent::TouchUpdate,
+                   nullptr, Qt::NoModifier, Qt::TouchPointPressed, points);
+#else
+    QList<QEventPoint> points;
+    points.append(QEventPoint(id1, QEventPoint::Pressed, pos1, pos1));
+    points.append(QEventPoint(id2, QEventPoint::Pressed, pos2, pos2));
+    const QPointingDevice *dev = QPointingDevice::primaryPointingDevice();
+    QTouchEvent ev(wasEmpty ? QEvent::TouchBegin : QEvent::TouchUpdate,
+                   dev, Qt::NoModifier, points);
+#endif
+    QCoreApplication::sendEvent(ui.keyboard, &ev);
+}
+
+
+void MainWindow::touchCancel()
+// ----------------------------------------------------------------------------
+//   Synthesize a QEvent::TouchCancel with an empty point list
+// ----------------------------------------------------------------------------
+{
+    testTouchPositions.clear();
+#if QT_VERSION < 0x060000
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent ev(QEvent::TouchCancel, nullptr, Qt::NoModifier, 0, points);
+#else
+    const QPointingDevice *dev = QPointingDevice::primaryPointingDevice();
+    QTouchEvent ev(QEvent::TouchCancel, dev, Qt::NoModifier);
+#endif
+    QCoreApplication::sendEvent(ui.keyboard, &ev);
+}
+
+
 void ui_push_key(int k)
 // ----------------------------------------------------------------------------
 //   Update display when pushing a key
 // ----------------------------------------------------------------------------
 {
     MainWindow::theMainWindow()->pushKey(k);
+}
+
+
+void ui_touch_press(int point_id, int key)
+// ----------------------------------------------------------------------------
+//   Send a synthetic touch press on the GUI thread
+// ----------------------------------------------------------------------------
+{
+    while (!key_empty())
+        sys_delay(1);
+    std::atomic<bool> done = false;
+    postToThread([&] {
+        bool savedAbort = tests::abort_requested;
+        MainWindow::theMainWindow()->touchPress(point_id, key);
+        tests::abort_requested = savedAbort;
+        done = true;
+    });
+    while (!done || !key_empty())
+        sys_delay(1);
+}
+
+
+void ui_touch_release(int point_id)
+// ----------------------------------------------------------------------------
+//   Send a synthetic touch release on the GUI thread
+// ----------------------------------------------------------------------------
+{
+    while (!key_empty())
+        sys_delay(1);
+    std::atomic<bool> done = false;
+    postToThread([&] {
+        bool savedAbort = tests::abort_requested;
+        MainWindow::theMainWindow()->touchRelease(point_id);
+        tests::abort_requested = savedAbort;
+        done = true;
+    });
+    while (!done || !key_empty())
+        sys_delay(1);
+}
+
+
+void ui_touch_chord(int id1, int key1, int id2, int key2)
+// ----------------------------------------------------------------------------
+//   Send two simultaneous touch presses in one event on the GUI thread
+// ----------------------------------------------------------------------------
+{
+    while (!key_empty())
+        sys_delay(1);
+    std::atomic<bool> done = false;
+    postToThread([&] {
+        bool savedAbort = tests::abort_requested;
+        MainWindow::theMainWindow()->touchChord(id1, key1, id2, key2);
+        tests::abort_requested = savedAbort;
+        done = true;
+    });
+    while (!done || !key_empty())
+        sys_delay(1);
+}
+
+
+void ui_touch_cancel()
+// ----------------------------------------------------------------------------
+//   Send a synthetic touch cancellation on the GUI thread
+// ----------------------------------------------------------------------------
+{
+    while (!key_empty())
+        sys_delay(1);
+    std::atomic<bool> done = false;
+    postToThread([&] {
+        bool savedAbort = tests::abort_requested;
+        MainWindow::theMainWindow()->touchCancel();
+        tests::abort_requested = savedAbort;
+        done = true;
+    });
+    while (!done || !key_empty())
+        sys_delay(1);
 }
 
 
@@ -1897,6 +2335,43 @@ void ui_push_key(int k)
 // ----------------------------------------------------------------------------
 {
 //    key_push(k);
+}
+
+
+void ui_touch_press(int, int key)
+// ----------------------------------------------------------------------------
+//   Fallback touch press for WASM
+// ----------------------------------------------------------------------------
+{
+    key_push(key);
+}
+
+
+void ui_touch_release(int)
+// ----------------------------------------------------------------------------
+//   Fallback touch release for WASM
+// ----------------------------------------------------------------------------
+{
+    key_push(0);
+}
+
+
+void ui_touch_chord(int, int key1, int, int key2)
+// ----------------------------------------------------------------------------
+//   Fallback touch chord for WASM
+// ----------------------------------------------------------------------------
+{
+    key_push(key1);
+    key_push(key2);
+}
+
+
+void ui_touch_cancel()
+// ----------------------------------------------------------------------------
+//   Fallback touch cancel for WASM
+// ----------------------------------------------------------------------------
+{
+    key_cancel();
 }
 
 

@@ -776,6 +776,118 @@ void tests::shift_logic()
         .test(SHIFT, ENTER)
         .alpha(true)
         .lower(true);
+
+    step("Transient uppercase alpha by holding UP")
+        .test(CLEAR)
+        .test(UP, false)
+        .test(H, E, L, L, O)
+        .test(RELEASE)
+        .shift(false)
+        .xshift(false)
+        .alpha(false)
+        .lower(false)
+        .editor("HELLO");
+
+    step("Transient lowercase alpha by holding DOWN")
+        .test(CLEAR)
+        .test(DOWN, false)
+        .test(W, O, R, L, D)
+        .test(RELEASE)
+        .shift(false)
+        .xshift(false)
+        .alpha(false)
+        .lower(false)
+        .editor("world");
+
+    step("Mixing transient uppercase and lowercase")
+        .test(CLEAR)
+        .test(UP, false)
+        .test(H)
+        .test(RELEASE)
+        .test(DOWN, false)
+        .test(E, L, L, O)
+        .test(RELEASE)
+        .alpha(false)
+        .lower(false)
+        .editor("Hello");
+
+    step("Transient alpha restores prior sticky alpha mode")
+        .test(CLEAR, ALPHA, A)
+        .test(DOWN, false)
+        .test(B)
+        .test(RELEASE)
+        .alpha(true)
+        .lower(false)
+        .test(C)
+        .editor("AbC");
+
+    step("Shift before transient alpha is one-shot")
+        .test(CLEAR, SHIFT)
+        .test(UP, false)
+        .test(A, B)
+        .test(RELEASE)
+        .shift(false)
+        .alpha(false)
+        .editor("ΣB");
+
+    step("Shift and xshift inside transient alpha")
+        .test(CLEAR)
+        .test(UP, false)
+        .test(SHIFT, A, SHIFT, SHIFT, A, B)
+        .test(RELEASE)
+        .shift(false)
+        .xshift(false)
+        .alpha(false)
+        .editor("Σ∏B");
+
+    step("Multi-touch QTouchEvent transient alpha")
+        .test(CLEAR);
+    ui_touch_press(1, KEY_UP);
+    ui_touch_press(2, H);
+    ui_touch_release(2);
+    ui_touch_release(1);
+    ui_touch_press(1, KEY_DOWN);
+    ui_touch_press(2, I);
+    ui_touch_release(2);
+    ui_touch_release(1);
+    nokeys()
+        .alpha(false)
+        .lower(false)
+        .editor("Hi");
+
+    step("Multi-touch reverse release order (arrow released first)")
+        .test(CLEAR);
+    ui_touch_press(1, KEY_UP);
+    ui_touch_press(2, A);
+    ui_touch_release(1);
+    ui_touch_release(2);
+    nokeys()
+        .alpha(false)
+        .lower(false)
+        .editor("A");
+
+    step("Multi-touch simultaneous chord orders arrow before letter")
+        .test(CLEAR);
+    ui_touch_chord(1, A, 2, KEY_UP);
+    ui_touch_release(1);
+    ui_touch_release(2);
+    nokeys()
+        .alpha(false)
+        .lower(false)
+        .editor("A");
+
+    step("Multi-touch TouchCancel aborts delayed arrow without moving cursor")
+        .test(CLEAR)
+        .test(UP, false)
+        .test(A, B)
+        .test(RELEASE)
+        .cursor(2);
+    ui_touch_press(1, KEY_UP);
+    ui_touch_cancel();
+    nokeys()
+        .alpha(false)
+        .cursor(2)
+        .editor("AB");
 }
 
 
@@ -19145,8 +19257,9 @@ tests &tests::itest(tests::key k, bool release)
         refresh_count = lcd_updates;
         Stack.catch_up();
         last_key = -k;
-        record(tests, "Releasing key (sending key 0)");
-        key_push(RELEASE);
+        int rel  = (key_is_held(KEY_UP) || key_is_held(KEY_DOWN)) ? -k : RELEASE;
+        record(tests, "Releasing key (sending key %d)", rel);
+        key_push(rel);
         keysync();
     }
 
