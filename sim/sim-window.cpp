@@ -1613,6 +1613,7 @@ int ui_file_selector(const char *title,
 #ifdef ANDROID
         QString target_directory = android_files_location() + "/" + base_dir;
         QDir().mkpath(target_directory); // Ensure the directory exists
+        name = fi.completeBaseName() + ext; // Enforce extenstion.
         QString target_full_path = target_directory + "/" + name;
 
         QMessageBox::information(parent_widget,

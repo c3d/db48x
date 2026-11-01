@@ -10,6 +10,11 @@ You can `Store` stack objects in a file and can `Recall` an object from a file t
 You can work on or with those files with your android device or your computer.
 
 
+DB50X in general uses the Qt AppDataLocation.
+On Android GenericDataLocation is used.
+The former is only accessible by the App.
+The latter is slightly less restricted and also accessible over USB by a PC.
+
 ## On your Android device
 
 The location of these files on Android is `.../Android/data/org.db50x/files/`.
@@ -84,7 +89,8 @@ You tap the SAVE button.
 Android then immediatly creates an empty file with that name in the current location.
 
 DB50X takes over.
-It takes the name of the specified file and saves the state,
+It takes the complete basename of the specified file and enforces the extension.
+It then saves the state,
 not in the file that Android created
 but in a file in the appropriate directory.
 A message about the used file is presented
