@@ -79,6 +79,12 @@ void      ui_refresh();
 uint      ui_refresh_count();
 void      ui_screenshot();
 void      ui_push_key(int k);
+bool      key_is_held(int k);
+int       key_cancel();
+void      ui_touch_press(int point_id, int key);
+void      ui_touch_release(int point_id);
+void      ui_touch_chord(int id1, int key1, int id2, int key2);
+void      ui_touch_cancel();
 void      ui_ms_sleep(uint delay);
 int       ui_file_selector(const char *title,
                            const char *base_dir,

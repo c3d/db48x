@@ -689,7 +689,7 @@ bool user_interface::key(int key, bool repeating, bool talpha)
     if (rt.editing())
         update_mode();
 
-    if (!skey && last != KEY_SHIFT && !transalpha)
+    if (!skey && last != KEY_SHIFT)
     {
         shift = false;
         xshift = false;
@@ -5181,6 +5181,23 @@ bool user_interface::handle_screen_capture(int key)
     if (!key && doubleRelease)
     {
         doubleRelease = false;
+        if (transalpha)
+        {
+            transalpha = false;
+            if (alpha)
+            {
+                alpha = taPrevAlpha;
+                lowercase = taPrevLowerc;
+            }
+            dirtyMenu = true;
+        }
+        delayedArrow = false;
+        last = 0;
+        if (command)
+        {
+            command = nullptr;
+            dirtyCommand = true;
+        }
         return true;
     }
     return false;
@@ -5419,7 +5436,10 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 
                 // Delay processing of up or down until after delay
                 if (longpress)
+                {
+                    delayedArrow = false;
                     return false;
+                }
 
                 taLowercase = key == KEY_DOWN;
                 delayedArrow = true;
@@ -5435,7 +5455,8 @@ bool user_interface::handle_shifts(int &key, bool talpha)
                 alpha = true;
                 lowercase = taLowercase;
                 last = 0;
-                return false;
+                if (key != KEY_SHIFT)
+                    return false;
             }
             else
             {
@@ -5479,7 +5500,8 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         else if (key == KEY_UP || key == KEY_DOWN || key == 0)
         {
             // Ignore up/down or release in trans-alpha mode
-            last = 0;
+            if (key || last != KEY_SHIFT)
+                last = 0;
             return true;
         }
 

@@ -85,16 +85,22 @@ public:
 
 class Highlight : public QWidget
 // ----------------------------------------------------------------------------
-//   Highlight of a key
+//   Highlight of one or more held keys
 // ----------------------------------------------------------------------------
 {
     Q_OBJECT;
+    QMap<int, QRect> activeRects;
+
 public:
-    Highlight(QWidget *parent): QWidget(parent) {}
+    Highlight(QWidget *parent): QWidget(parent), activeRects()
+    {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+    }
     void paintEvent(QPaintEvent *);
 
 public slots:
     void keyResizeSlot(const QRect &rect);
+    void keyHighlightSlot(int key, const QRect &rect);
 };
 
 
@@ -141,6 +147,9 @@ class MainWindow : public QMainWindow
     RPLThread                      rpl;
     TestsThread                    tests;
     Highlight                     *highlight;
+    QMap<int, int>                 activeTouches;
+    QMap<int, QPointF>             testTouchPositions;
+    int                            mouseKey = 0;
     int                            keyboard_width;
     int                            keyboard_height;
 
@@ -169,6 +178,11 @@ public:
     ~MainWindow();
 
     void pushKey(int key);
+    void clearTouchKeys(bool cancel);
+    void touchPress(int pointId, int key);
+    void touchRelease(int pointId);
+    void touchChord(int id1, int key1, int id2, int key2);
+    void touchCancel();
     QPixmap &screen() { return ui.screen->mainPixmap; }
     static MainWindow * theMainWindow() { return mainWindow; }
     static QPixmap &    theScreen()     { return mainWindow->screen(); }
@@ -202,8 +216,11 @@ protected:
 
 signals:
     void        keyResizeSignal(const QRect &rect);
+    void        keyHighlightSignal(int key, const QRect &rect);
 
 private:
+    QPointF     keyCenter(int key) const;
+    bool        isTouchKeyHeld(int key) const;
     void        requestShutdown();
 
     // Audio support

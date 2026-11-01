@@ -96,7 +96,9 @@ The majority of the keys map directly to calculator keys.
 
 Alphabetic keys map directly to the corresponding calculator key. To cycle through alpha modes, use Tab + Enter in the same way you would use Shift + Enter on the physical device.
 
-In addition, the simulator emulates _transient alpha_ mode using Shift or Alt:
+On touchscreens (Android, Windows, Linux, macOS, and the WebAssembly build), you can use multi-touch _transient alpha_ mode directly on the on-screen keyboard by holding ◀ (uppercase) or ▶ (lowercase) with one finger while tapping letter keys with another finger.
+
+In addition, the simulator emulates _transient alpha_ mode on a computer keyboard using Shift or Alt:
 
 | Key(s) | Description |
 | --- | --- |

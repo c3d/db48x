@@ -13,4 +13,5 @@ EMSCRIPTEN_BINDINGS(db48x_module)
     function("ui_lcd_buffer", &ui_lcd_buffer);
     function("ui_init", &ui_init);
     function("ui_push_key", &key_push);
+    function("ui_cancel_keys", &key_cancel);
 }
