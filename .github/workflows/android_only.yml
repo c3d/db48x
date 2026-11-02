@@ -1,0 +1,198 @@
+name: Build DB48X
+
+on:
+  push:
+    branches: [ stable, dev ]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]'
+  pull_request:
+    branches: [ stable, dev ]
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Android DB48x
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Qt for Android
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.7.3'
+        host: 'linux'
+        target: 'android'
+        arch: 'android_arm64_v8a'
+        modules: 'qtmultimedia'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v4
+
+    - name: Cache Android NDK
+      uses: actions/cache@v6
+      id: cache-ndk
+      with:
+        path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
+        key: android-ndk-27.2.12479018
+
+    - name: Install Android NDK
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      run: sdkmanager --install "ndk;27.2.12479018"
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Build Android App Bundle
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
+        export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
+        if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+          mkdir -p "$HOME/.local"
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > "$HOME/.local/android_release.keystore"
+        fi
+        make android
+      env:
+        ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+
+    - name: List generated AAB files
+      run: |
+        echo "Looking for AAB files in workspace:"
+        find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Verify generated AAB
+      run: test -f android/db48x/db48x.aab
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-android
+        if-no-files-found: error
+        path: |
+          android/*.aab
+          android/**/*.aab
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db48x/db48x-debug.apk db48x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db48x.apk
+        archive: false
+        retention-days: 7
+
+  build-color-android:
+    name: Android DB50x
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Qt for Android
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.7.3'
+        host: 'linux'
+        target: 'android'
+        arch: 'android_arm64_v8a'
+        modules: 'qtmultimedia'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v4
+
+    - name: Cache Android NDK
+      uses: actions/cache@v6
+      id: cache-ndk
+      with:
+        path: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
+        key: android-ndk-27.2.12479018
+
+    - name: Install Android NDK
+      if: steps.cache-ndk.outputs.cache-hit != 'true'
+      run: sdkmanager --install "ndk;27.2.12479018"
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Build Android App Bundle
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
+        export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
+        if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+          mkdir -p "$HOME/.local"
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > "$HOME/.local/android_release.keystore"
+        fi
+        make color-dm32-android
+      env:
+        ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+
+    - name: List generated AAB files
+      run: |
+        echo "Looking for AAB files in workspace:"
+        find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Verify generated AAB
+      run: test -f android/db50x/db50x.aab
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-android
+        if-no-files-found: error
+        path: |
+          android/*.aab
+          android/**/*.aab
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db50x/db50x-debug.apk db50x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db50x.apk
+        archive: false
+        retention-days: 7
