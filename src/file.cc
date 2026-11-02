@@ -525,7 +525,12 @@ bool file::unlink(cstring file)
 #ifdef SIMULATOR
     return ::unlink(file) == 0;
 #else // !SIMULATOR
-    return f_unlink(file) == FR_OK;
+    // Like opening a file for writing, removing one writes to the disk
+    sys_disk_write_enable(1);
+    bool ok = f_unlink(file) == FR_OK;
+    if (!current || !current->writing)
+        sys_disk_write_enable(0);
+    return ok;
 #endif // SIMULATOR
 }
 
