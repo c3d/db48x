@@ -12,6 +12,9 @@ The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
   points, [VincentyDir](#vincentydir) the point reached from a given point,
   azimuth and distance, and [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh)
   convert GPS coordinates to and from Earth-centred Cartesian coordinates.
+* On **map grids**: [LL→UTM](#ll→utm) and [UTM→LL](#utm→ll) convert to and from
+  UTM coordinates, [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll) to and from
+  military grid references.
 * On a **sphere**, where the formulas are shorter and angles are enough:
   [RadialFix](#radialfix) finds a position from two bearings, and
   [GCPoint](#gcpoint) a point along a great-circle route.
@@ -39,6 +42,8 @@ The Geodesy subsection computes distances, directions and positions:
 
 * on the WGS-84 ellipsoid: [VincentyInv](#vincentyinv),
   [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
+* on map grids of the same ellipsoid: [LL→UTM](#ll→utm), [UTM→LL](#utm→ll),
+  [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll);
 * on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
 
 
@@ -181,6 +186,120 @@ Four tenths of the way from Los Angeles (LAX, 33°57′N, 118°24′W) to New Yo
 ```rpl
 33.95 -118.4 40.63333333333333 -73.78333333333333 0.4 ⓁGCPoint 2 →LIST
 @ Expecting { 38.66944 7748 ° -101.62616 0313 ° }
+```
+
+
+## LL→UTM
+
+Converts a latitude and longitude on the WGS-84 ellipsoid to Universal Transverse
+Mercator coordinates, the metric grid of many topographic maps and GPS receivers.
+The Earth is cut into 60 zones, each 6° wide, and each zone is projected on its
+own plane, with an easting of 500 000 m on its central meridian.
+
+Stack: `φ` `λ` ▶ `zone` `hem` `east` `north`, where `hem` is the text `"N"` or
+`"S"`. In the southern hemisphere, the northing counts from 10 000 000 m at the
+equator, so that it is never negative.
+
+The latitude must lie from 80°S to 84°N, the range of UTM; beyond it, the function
+stops with an error. The zones follow NGA.SIG.0012, with the wider zones of western
+Norway and of Svalbard. The method is the Krüger series in the form of C. F. F.
+Karney (Journal of Geodesy 85, 2011), to order 4, accurate to far less than a
+millimetre over a zone.
+
+In Montréal; GeographicLib gives zone 18 North, 609 377.347 m and 5 039 449.713 m:
+
+```rpl
+45.5 -73.6 ⓁLL→UTM 4 →LIST
+@ Expecting { 18 "N" 609 377.34742 5 m 5 039 449.713 m }
+```
+
+In Sydney, in the southern hemisphere; GeographicLib gives zone 56 South,
+334 416.394 m and 6 251 925.360 m:
+
+```rpl
+-33.86 151.21 ⓁLL→UTM 4 →LIST
+@ Expecting { 56 "S" 334 416.39399 m 6 251 925.36035 m }
+```
+
+In Svalbard, zones 32, 34 and 36 do not exist: 15.6°E falls in zone 33, which
+spans 9°E to 21°E; GeographicLib gives 513 696.945 m and 8 680 760.053 m:
+
+```rpl
+78.2 15.6 ⓁLL→UTM 4 →LIST
+@ Expecting { 33 "N" 513 696.94541 7 m 8 680 760.0532 m }
+```
+
+
+## UTM→LL
+
+Converts Universal Transverse Mercator coordinates to a latitude and longitude on
+the WGS-84 ellipsoid.
+
+Stack: `zone` `hem` `east` `north` ▶ `φ` `λ`, where `hem` is the text `"N"` or `"S"`.
+Plain numbers are metres.
+
+The coordinates of Sydney in the previous page, rounded to the millimetre, give back
+33.86°S, 151.21°E:
+
+```rpl
+56 "S" 334416.394 6251925.360 ⓁUTM→LL 2 →LIST
+@ Expecting { -33.86000 00032 ° 151.21 ° }
+```
+
+
+## LL→MGRS
+
+Converts a latitude and longitude on the WGS-84 ellipsoid to a Military Grid
+Reference System text. It names the UTM zone, a latitude band, a square of 100 km by
+two letters, then the position inside that square. The system is also used by search
+and rescue services and by the United States National Grid.
+
+Stack: `φ` `λ` `n` ▶ `text`, where `n`, from 0 to 5, is the number of digits of each
+coordinate: 5 names a square of 1 m, 4 of 10 m, 0 of 100 km.
+
+As NGA.SIG.0012 requires, the digits are truncated, not rounded: the text names the
+square that holds the point.
+
+In Montréal, to the metre, then to 100 km; GeographicLib gives 18TXR 09377 39449:
+
+```rpl
+45.5 -73.6 5 ⓁLL→MGRS
+@ Expecting "18T XR 09377 39449"
+```
+
+```rpl
+45.5 -73.6 0 ⓁLL→MGRS
+@ Expecting "18T XR"
+```
+
+In western Norway, where zone 32 is widened; GeographicLib gives 32VKN 96191 01684:
+
+```rpl
+60.4 5.3 5 ⓁLL→MGRS
+@ Expecting "32V KN 96191 01684"
+```
+
+
+## MGRS→LL
+
+Converts a Military Grid Reference System text to a latitude and longitude on the
+WGS-84 ellipsoid: the centre of the square that the text names. Spaces and case do
+not matter.
+
+Stack: `text` ▶ `φ` `λ`.
+
+The square of 1 m that holds 45.5°N, 73.6°W, whose centre is about 0.2 m from it:
+
+```rpl
+"18T XR 09377 39449" ⓁMGRS→LL 2 →LIST
+@ Expecting { 45.49999 80594 ° -73.59999 80952 ° }
+```
+
+The same text in any form, in Sydney:
+
+```rpl
+"56h lh 3441651925" ⓁMGRS→LL 2 →LIST
+@ Expecting { -33.85999 87578 ° 151.21000 1172 ° }
 ```
 
 

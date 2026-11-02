@@ -1,0 +1,62 @@
+«
+@@ ============================================================
+@@ LLtoUTM — latitude and longitude on the WGS-84 ellipsoid to Universal
+@@ Transverse Mercator coordinates. Krüger series in the form of
+@@ C. F. F. Karney, Journal of Geodesy 85 (2011), to order 4; zones as in
+@@ NGA.SIG.0012 (2014), with the exceptions of Norway and Svalbard.
+@@
+@@ Input : φ λ — latitude from 80°S to 84°N, longitude (East positive).
+@@         Plain numbers are degrees; angles with a unit are accepted.
+@@ Output: zone hemisphere E N — zone 1 to 60, "N" or "S", easting and
+@@         northing in metres.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  2 →LIST
+  « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num »
+  MAP LIST→ DROP
+  → lat lon
+  «
+    IF lat -80 < lat 84 > OR THEN
+      "UTM needs a latitude from 80°S to 84°N" DOERR
+    END
+    lon 180 + 360 MOD 180 -
+    → lam
+    «
+      lam 180 + 6 / FLOOR 1 +
+      IF lat 56 ≥ lat 64 < AND lam 3 ≥ AND lam 12 < AND THEN DROP 32 END
+      IF lat 72 ≥ lam 0 ≥ AND lam 42 < AND THEN
+        DROP lam 9 < 31 « lam 21 < 33 « lam 33 < 35 37 IFTE » IFTE » IFTE EVAL
+      END
+      R→I
+      'AngleMode' RCL 'SetAngleUnits' RCL
+      RAD NoAngleUnits
+      Ⓒe12♁GPS →Num √ Ⓒπ →Num 180 /
+      → zon amode aunits ecc rdn
+      «
+        'lat*rdn' EVAL '(lam-(6*zon-183))*rdn' EVAL
+        → phi dlm
+        «
+          'TAN(phi)' EVAL 'SINH(ecc*ATANH(ecc*SIN(phi)))' EVAL
+          → tph sph
+          «
+            'tph*√(1+sph²)-sph*√(1+tph²)' EVAL
+            → tcf
+            «
+              'ATAN(tcf/COS(dlm))' EVAL 'ASINH(SIN(dlm)/√(tcf²+COS(dlm)²))' EVAL
+              → xi eta
+              «
+                zon
+                lat 0 ≥ "N" "S" IFTE
+                '500000+6.36490216616508551E+06*(eta+8.37731820624469832E-4*COS(2*xi)*SINH(2*eta)+7.60852777380208316E-7*COS(4*xi)*SINH(4*eta)+1.19764548261874486E-9*COS(6*xi)*SINH(6*eta)+2.42915021301519471E-12*COS(8*xi)*SINH(8*eta))' EVAL 1_m *
+                '6.36490216616508551E+06*(xi+8.37731820624469832E-4*SIN(2*xi)*COSH(2*eta)+7.60852777380208316E-7*SIN(4*xi)*COSH(4*eta)+1.19764548261874486E-9*SIN(6*xi)*COSH(6*eta)+2.42915021301519471E-12*SIN(8*xi)*COSH(8*eta))' EVAL
+                IF lat 0 < THEN 10000000 + END 1_m *
+              »
+            »
+          »
+        »
+        amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+      »
+    »
+  »
+»

@@ -1,0 +1,51 @@
+«
+@@ ============================================================
+@@ LLtoMGRS — latitude and longitude on the WGS-84 ellipsoid to a Military
+@@ Grid Reference System text. NGA.SIG.0012 (2014), lettering AA.
+@@
+@@ Input : φ λ digits — latitude from 80°S to 84°N, longitude (East
+@@         positive), number of digits for each coordinate, 0 to 5: 5
+@@         gives a square of 1 m, 0 a square of 100 km.
+@@ Output: text such as "18T XR 09377 39449". As the standard requires,
+@@         coordinates are truncated, not rounded: the text names the
+@@         square that holds the point.
+@@ ============================================================
+
+  → lat lon ndg
+  «
+    IF ndg 0 < ndg 5 > OR ndg FP 0 ≠ OR THEN
+      "MGRS digits must be from 0 to 5" DOERR
+    END
+    lat lon ⓁLL→UTM
+    →Num UVAL SWAP →Num UVAL SWAP
+    lat DUP TypeName "unit" == « 1_° CONVERT UVAL » « » IFTE EVAL
+    → zon hem est nth ltd
+    «
+      10 5 ndg - ^
+      "CDEFGHJKLMNPQRSTUVWX" ltd 80 + 8 / FLOOR 19 MIN 1 + R→I DUP SUB
+      zon 3 MOD 1 == "ABCDEFGH" zon 3 MOD 2 == "JKLMNPQR" "STUVWXYZ" IFTE IFTE
+      est 100000 / FLOOR R→I DUP SUB
+      "ABCDEFGHJKLMNPQRSTUV"
+      nth 100000 / FLOOR R→I zon 2 MOD 0 == 5 0 IFTE + 20 MOD 1 + R→I DUP SUB
+      → unt bnd col row
+      «
+        zon →Str bnd + " " + col + row +
+        IF ndg 0 > THEN
+          est 100000 MOD unt / FLOOR R→I
+          nth 100000 MOD unt / FLOOR R→I
+          → eai nai
+          «
+            "" eai 1 ndg START
+              DUP 10 MOD 48 + Code→Char ROT + SWAP 10 / FLOOR
+            NEXT DROP
+            "" nai 1 ndg START
+              DUP 10 MOD 48 + Code→Char ROT + SWAP 10 / FLOOR
+            NEXT DROP
+            → ets nts
+            « " " + ets + " " + nts + »
+          »
+        END
+      »
+    »
+  »
+»

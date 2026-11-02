@@ -1,0 +1,79 @@
+«
+@@ ============================================================
+@@ MGRStoLL — Military Grid Reference System text to latitude and longitude
+@@ on the WGS-84 ellipsoid: the centre of the square the text names.
+@@ NGA.SIG.0012 (2014), lettering AA; the lowest northing of each latitude
+@@ band comes from the same document.
+@@
+@@ Input : text such as "18T XR 09377 39449"; spaces and case do not
+@@         matter.
+@@ Output: φ λ — latitude and longitude (East positive).
+@@ ============================================================
+
+  "" SWAP
+  1 OVER SIZE FOR kk
+    DUP kk kk SUB Char→Code
+    IF DUP 97 ≥ OVER 122 ≤ AND THEN 32 - END
+    IF DUP 32 == THEN DROP ELSE Code→Char ROT SWAP + SWAP END
+  NEXT DROP
+  → txt
+  «
+    1 WHILE
+      txt OVER DUP SUB Char→Code DUP 48 ≥ SWAP 57 ≤ AND
+    REPEAT 1 + END
+    → pos
+    «
+      IF pos 2 < pos 3 > OR txt SIZE pos 2 + < OR THEN
+        "Invalid MGRS reference" DOERR
+      END
+      txt 1 pos 1 - SUB Text→
+      txt pos DUP SUB txt pos 1 + DUP SUB txt pos 2 + DUP SUB
+      txt pos 3 + txt SIZE SUB
+      → zon bnd col row rst
+      «
+        IF zon 1 < zon 60 > OR rst SIZE 2 MOD 0 ≠ OR rst SIZE 10 > OR THEN
+          "Invalid MGRS reference" DOERR
+        END
+        0 0 0
+        "CDEFGHJKLMNPQRSTUVWX" → set « 1 set SIZE FOR kk IF set kk kk SUB bnd == THEN ROT DROP kk ROT ROT END NEXT »
+        zon 3 MOD 1 == "ABCDEFGH" zon 3 MOD 2 == "JKLMNPQR" "STUVWXYZ" IFTE IFTE
+        → set « 1 set SIZE FOR kk IF set kk kk SUB col == THEN SWAP DROP kk SWAP END NEXT »
+        "ABCDEFGHJKLMNPQRSTUV"
+        → set « 1 set SIZE FOR kk IF set kk kk SUB row == THEN DROP kk END NEXT »
+        → ibn ico iro
+        «
+          IF ibn 0 == ico 0 == OR iro 0 == OR THEN
+            "Invalid MGRS reference" DOERR
+          END
+          rst SIZE 2 /
+          → ndg
+          «
+            10 5 ndg - ^
+            → unt
+            «
+              IF ndg 0 > THEN
+                rst 1 ndg SUB Text→ rst ndg 1 + ndg 2 * SUB Text→
+              ELSE
+                0 0
+              END
+              → ean nan
+              «
+                zon ibn 10 ≥ "N" "S" IFTE
+                ico 100000 * ean unt * + unt 2 / +
+                iro 1 - zon 2 MOD 0 == 5 0 IFTE - 20 MOD 100000 *
+                nan unt * + unt 2 / +
+                { 1100 2000 2800 3700 4600 5500 6400 7300 8200 9100 0 800 1700 2600 3500 4400 5300 6200 7000 7900 }
+                ibn GET 1000 *
+                → nmn
+                «
+                  WHILE DUP nmn < REPEAT 2000000 + END
+                »
+                ⓁUTM→LL
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»
