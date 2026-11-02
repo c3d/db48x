@@ -77,8 +77,10 @@ bool renderer::put(cstring s, size_t len)
 //   Put a length-based string
 // ----------------------------------------------------------------------------
 {
+    // Writing to the scratchpad may run the garbage collector and move the text
+    gcutf8 gs = utf8(s);
     for (size_t i = 0; i < len; i++)
-        if (!put(s[i]))
+        if (!put(char(utf8(gs)[i])))
             return false;
     return true;
 }
@@ -218,34 +220,48 @@ bool renderer::put(object::id format, utf8 text, size_t len)
         if (utf8_codepoint(text) == settings::SPACE_UNIT)
             return put('_');
 
+    // Writing to the scratchpad may run the garbage collector and move the text
+    gcutf8 gtext = text;
+    size_t off   = 0;
+
     switch(format)
     {
     case object::ID_LowerCaseNames:
     case object::ID_LowerCase:
-        for (utf8 s = text; size_t(s - text) < len &&  *s; s = utf8_next(s))
-            result = put(unicode(db48x_to_lower(utf8_codepoint(s))));
+        while (off < len && utf8(gtext)[off])
+        {
+            unicode cp = utf8_codepoint(utf8(gtext) + off);
+            result = put(unicode(db48x_to_lower(cp)));
+            off += utf8_size(cp);
+        }
         break;
 
     case object::ID_UpperCaseNames:
     case object::ID_UpperCase:
 
-        for (utf8 s = text; size_t(s - text) < len && *s; s = utf8_next(s))
-            result = put(unicode(db48x_to_upper(utf8_codepoint(s))));
+        while (off < len && utf8(gtext)[off])
+        {
+            unicode cp = utf8_codepoint(utf8(gtext) + off);
+            result = put(unicode(db48x_to_upper(cp)));
+            off += utf8_size(cp);
+        }
         break;
 
     case object::ID_CapitalizedNames:
     case object::ID_Capitalized:
-        for (utf8 s = text; size_t(s - text) < len &&  *s; s = utf8_next(s))
-            result = put(unicode(s == text
-                                 ? db48x_to_upper(utf8_codepoint(s))
-                                 : utf8_codepoint(s)));
+        while (off < len && utf8(gtext)[off])
+        {
+            unicode cp = utf8_codepoint(utf8(gtext) + off);
+            result = put(unicode(off == 0 ? db48x_to_upper(cp) : cp));
+            off += utf8_size(cp);
+        }
         break;
 
     default:
     case object::ID_LongFormNames:
     case object::ID_LongForm:
-        for (cstring p = cstring(text); size_t(utf8(p) - text) < len && *p; p++)
-            result = put(*p);
+        while (off < len && utf8(gtext)[off])
+            result = put(char(utf8(gtext)[off++]));
         break;
     }
 
