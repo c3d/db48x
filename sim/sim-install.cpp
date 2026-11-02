@@ -32,6 +32,8 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QStandardPaths>
 #include <QString>
 
 
@@ -209,5 +211,72 @@ void sim_install_regenerate_help_indices(const QString &destRoot)
         QString idxName = mdName.left(mdName.size() - 3) + ".idx";
         QString idxPath = help.filePath(idxName);
         sim_install_regenerate_help_index(mdPath, idxPath);
+    }
+}
+
+
+QString sim_install_data_dir()
+// ----------------------------------------------------------------------------
+//   Return the writable application data directory (external on Android)
+// ----------------------------------------------------------------------------
+{
+#ifdef ANDROID
+    // Prefer Context.getExternalFilesDir(null) (.../Android/data/<pkg>/files)
+    // so files are reachable over USB on all Android versions. Unlike
+    // GenericDataLocation (which returns /storage/emulated/0 on Android <= 10
+    // and fails without runtime storage permissions), standardLocations for
+    // AppDataLocation always includes getExternalFilesDir() at index 1.
+    const QStringList dirs =
+        QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+    for (int i = 1; i < dirs.size(); ++i)
+    {
+        const QString &candidate = dirs.at(i);
+        if (!candidate.isEmpty() && QDir().mkpath(candidate) &&
+            QFileInfo(candidate).isWritable())
+            return candidate;
+    }
+#endif // ANDROID
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
+
+
+bool sim_install_needed(const QString &destRoot,
+                        const QString &wantedVersion,
+                        const QString &helpFileName)
+// ----------------------------------------------------------------------------
+//   Return true if bundled resources must be (re-)extracted into destRoot
+// ----------------------------------------------------------------------------
+{
+    if (!QFileInfo::exists(destRoot + "/" + helpFileName) ||
+        !QFileInfo::exists(destRoot + "/config/library.csv"))
+        return true;
+
+    QFile stamp(destRoot + "/.assets-version");
+    if (!stamp.open(QIODevice::ReadOnly))
+        return true;
+
+    QString found = QString::fromUtf8(stamp.readAll()).trimmed();
+    stamp.close();
+    if (found.isEmpty())
+        return true;
+
+    return !wantedVersion.isEmpty() && found != wantedVersion;
+}
+
+
+void sim_install_write_stamp(const QString &destRoot,
+                             const QString &wantedVersion)
+// ----------------------------------------------------------------------------
+//   Record the extracted resource version stamp in destRoot
+// ----------------------------------------------------------------------------
+{
+    QFile stamp(destRoot + "/.assets-version");
+    if (stamp.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        QString value = wantedVersion.isEmpty()
+                      ? QStringLiteral("installed")
+                      : wantedVersion;
+        stamp.write(value.toUtf8());
+        stamp.close();
     }
 }

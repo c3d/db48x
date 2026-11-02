@@ -35,5 +35,11 @@ bool sim_install_copy_file(const QString &from,
                            const QString &relativePath,
                            unsigned     perms);
 void sim_install_regenerate_help_indices(const QString &destRoot);
+QString sim_install_data_dir();
+bool sim_install_needed(const QString &destRoot,
+                        const QString &wantedVersion,
+                        const QString &helpFileName);
+void sim_install_write_stamp(const QString &destRoot,
+                             const QString &wantedVersion);
 
 #endif // SIM_INSTALL_H

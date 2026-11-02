@@ -1288,6 +1288,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: Set up JDK 17
@@ -1368,6 +1369,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: Set up JDK 17

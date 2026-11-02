@@ -559,43 +559,23 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("48calc.org");
     QCoreApplication::setApplicationName("DB48X");
 
-#ifdef ANDROID
-    // On Android the AppDataLocation is completely inaccessible to the user.
-    // In stead, use what is effectively equivalent to other platforms.
-    // Allow the user to access and handle the files.
-    QString files =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-#else
-    QString files =
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-#endif
+    QString files = sim_install_data_dir();
 
     // On Android the mere existence of the application data directory does not
     // mean the resources were extracted: the Qt bootstrap creates it before we
     // run, so the existence test never fired and the library was never
     // installed. Stamp the extracted tree with the version there, and
-    // re-extract whenever that stamp is missing or stale, which also refreshes
-    // the resources when the application is updated in place.
+    // re-extract whenever that stamp is missing, required files are absent, or
+    // the version changed.
 #ifdef ANDROID
-    QString  stampPath = files + "/.assets-version";
-    QString  wanted    = DB48X_VERSION;
-    QString  found;
-    QFile    stamp(stampPath);
-    if (stamp.open(QIODevice::ReadOnly))
-    {
-        found = QString::fromUtf8(stamp.readAll()).trimmed();
-        stamp.close();
-    }
-    if (getenv("DB48X_INSTALL") || found != wanted)
+    QString wanted = DB48X_VERSION;
+    if (getenv("DB48X_INSTALL") ||
+        sim_install_needed(files, wanted, HELPFILE_NAME))
         install = true;
     if (install)
     {
         copy(":/", files);
-        if (stamp.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        {
-            stamp.write(wanted.toUtf8());
-            stamp.close();
-        }
+        sim_install_write_stamp(files, wanted);
     }
 #else // !ANDROID
     // On a desktop the data directory is created by us alone, so its absence
