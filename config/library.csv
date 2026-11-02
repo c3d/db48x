@@ -681,6 +681,14 @@
 	"LL→MGRS",	"=/library/Navigation/LLtoMGRS.48s"
 	"MGRS→LL",	"=/library/Navigation/MGRStoLL.48s"
 	"WMM",		"=/library/Navigation/WMM.48s"
+	"TrackLen",	"=/library/Navigation/TrackLen.48s"
+	"PolyArea",	"=/library/Navigation/PolyArea.48s"
+	"LLH→ENU",	"=/library/Navigation/LLHtoENU.48s"
+	"ENU→LLH",	"=/library/Navigation/ENUtoLLH.48s"
+	"UTC→GPS",	"=/library/Navigation/UTCtoGPS.48s"
+	"GPS→UTC",	"=/library/Navigation/GPStoUTC.48s"
+	"LL→DMS",	"=/library/Navigation/LLtoDMS.48s"
+	"LL→DDM",	"=/library/Navigation/LLtoDDM.48s"
 
 "Navigation/Route"
 

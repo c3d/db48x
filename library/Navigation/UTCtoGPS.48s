@@ -1,0 +1,27 @@
+«
+@@ ============================================================
+@@ UTCtoGPS — UTC date and time to GPS week and time of week. GPS time
+@@ started on 1980-01-06 at 0h UTC and is 18 s ahead of UTC since 2017-01-01.
+@@ 
+@@ Input : date time — date as YYYYMMDD, UTC time as HH.MMSS.
+@@ Output: week tow — week number without rollover, seconds in the week.
+@@ Dates before 2017 have other leap seconds, and stop with an error. A leap
+@@ second added after 2026 would need a new offset here.
+@@ ============================================================
+
+  → dat tme
+  «
+    dat DUP TypeName "unit" == « UVAL » « » IFTE EVAL
+    → dnm
+    «
+      IF dnm 20170101 < THEN "UTCtoGPS needs a date from 2017 on" DOERR END
+      dnm 19800106 DDays DUP TypeName "unit" == « UVAL » « » IFTE EVAL
+      86400 * tme HMS→ 3600 * + 18 +
+      → scd
+      «
+        scd 604800 / FLOOR R→I
+        scd 604800 MOD 1_s *
+      »
+    »
+  »
+»

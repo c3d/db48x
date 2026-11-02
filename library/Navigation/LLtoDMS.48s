@@ -1,0 +1,48 @@
+«
+@@ ============================================================
+@@ LLtoDMS — latitude and longitude as a text in degrees, minutes and seconds, to 0.01″.
+@@ 
+@@ Input : φ λ — plain numbers are degrees; angles with a unit are accepted.
+@@ Output: text with hemispheres, such as "45°30′00.00″N 73°36′00.00″W".
+@@ ============================================================
+
+  → lat lon
+  «
+    lat « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL
+      → vlu
+      «
+        vlu ABS 360000 * 0.5 + FLOOR R→I
+        → ttl
+        «
+          ttl 360000 / FLOOR R→I
+          ttl 360000 MOD 6000 / FLOOR R→I
+          ttl 6000 MOD 100 / FLOOR R→I
+          ttl 100 MOD
+          → dgs mnt scs cts
+          «
+            dgs →Str "°" + mnt →Str mnt 10 < "0" "" IFTE SWAP + + "′" + scs →Str scs 10 < "0" "" IFTE SWAP + + "." + cts →Str cts 10 < "0" "" IFTE SWAP + + "″" +
+          »
+          vlu 0 < "S" "N" IFTE +
+        »
+      »
+    " " +
+    lon « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL
+      → vlu
+      «
+        vlu ABS 360000 * 0.5 + FLOOR R→I
+        → ttl
+        «
+          ttl 360000 / FLOOR R→I
+          ttl 360000 MOD 6000 / FLOOR R→I
+          ttl 6000 MOD 100 / FLOOR R→I
+          ttl 100 MOD
+          → dgs mnt scs cts
+          «
+            dgs →Str "°" + mnt →Str mnt 10 < "0" "" IFTE SWAP + + "′" + scs →Str scs 10 < "0" "" IFTE SWAP + + "." + cts →Str cts 10 < "0" "" IFTE SWAP + + "″" +
+          »
+          vlu 0 < "W" "E" IFTE +
+        »
+      »
+    +
+  »
+»

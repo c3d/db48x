@@ -1,0 +1,22 @@
+«
+@@ ============================================================
+@@ TrackLen — length of a track on the WGS-84 ellipsoid, the sum of the
+@@ geodesic distances between successive points, by VincentyInv.
+@@ 
+@@ Input : a list of at least two points, each { φ λ } or, as in a route,
+@@         { "name" φ λ }. Plain numbers are degrees.
+@@ Output: the length of the track.
+@@ ============================================================
+
+  → pts
+  «
+    IF pts SIZE 2 < THEN "A track needs at least two points" DOERR END
+    0
+    1 pts SIZE 1 - FOR kk
+      pts kk GET DUP SIZE 1 - GET pts kk GET DUP SIZE GET
+      pts kk 1 + GET DUP SIZE 1 - GET pts kk 1 + GET DUP SIZE GET
+      ⓁVincentyInv DROP DROP 1_m CONVERT UVAL +
+    NEXT
+    1_m *
+  »
+»

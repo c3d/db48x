@@ -1,0 +1,28 @@
+«
+@@ ============================================================
+@@ GPStoUTC — GPS week and time of week to UTC date and time. GPS time
+@@ started on 1980-01-06 at 0h UTC and is 18 s ahead of UTC since 2017-01-01.
+@@ 
+@@ Input : week tow — week number without rollover, seconds in the week; a
+@@         time with a unit is accepted.
+@@ Output: date time — date as YYYYMMDD, UTC time as HH.MMSS.
+@@ Dates before 2017 have other leap seconds, and stop with an error.
+@@ ============================================================
+
+  IF DUP TypeName "unit" == THEN 1_s CONVERT UVAL END
+  → wek tow
+  «
+    wek 604800 * tow + 18 -
+    → scd
+    «
+      scd 86400 / FLOOR R→I
+      scd 86400 MOD
+      → dys rmn
+      «
+        IF scd 1167264000 < THEN "GPStoUTC needs a date from 2017 on" DOERR END
+        19800106 dys Date+
+        rmn 3600 / →HMS
+      »
+    »
+  »
+»

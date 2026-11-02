@@ -15,8 +15,13 @@ The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
 * On **map grids**: [LL→UTM](#ll→utm) and [UTM→LL](#utm→ll) convert to and from
   UTM coordinates, [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll) to and from
   military grid references.
+* On **tracks and areas**: [TrackLen](#tracklen) sums a track, and
+  [PolyArea](#polyarea) gives the area of a polygon.
+* In a **local frame**: [LLH→ENU](#llh→enu) and [ENU→LLH](#enu→llh).
 * On the **magnetic field**: [WMM](#wmm) gives the magnetic declination at a point
   and date.
+* On **time**: [UTC→GPS](#utc→gps) and [GPS→UTC](#gps→utc).
+* As **text**: [LL→DMS](#ll→dms) and [LL→DDM](#ll→ddm) format a position.
 * On a **sphere**, where the formulas are shorter and angles are enough:
   [RadialFix](#radialfix) finds a position from two bearings, and
   [GCPoint](#gcpoint) a point along a great-circle route.
@@ -46,7 +51,11 @@ The Geodesy subsection computes distances, directions and positions:
   [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
 * on map grids of the same ellipsoid: [LL→UTM](#ll→utm), [UTM→LL](#utm→ll),
   [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll);
+* for tracks and areas: [TrackLen](#tracklen) and [PolyArea](#polyarea);
+* in a local frame: [LLH→ENU](#llh→enu) and [ENU→LLH](#enu→llh);
 * for the magnetic field: [WMM](#wmm);
+* for GPS time: [UTC→GPS](#utc→gps) and [GPS→UTC](#gps→utc);
+* as text: [LL→DMS](#ll→dms) and [LL→DDM](#ll→ddm);
 * on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
 
 
@@ -340,6 +349,157 @@ H = 15 927.0 nT, F = 51 825.7 nT:
 ```rpl
 -80 240 100_km 2027.5 ⓁWMM 4 →LIST
 @ Expecting { 67.93164 32316 ° -72.10227 82777 ° 15 927.00798 6 nT 51 825.69071 72 nT }
+```
+
+
+## TrackLen
+
+The length of a track on the WGS-84 ellipsoid: the sum of the geodesic distances
+between successive points, computed with the method of T. Vincenty.
+
+Stack: `points` ▶ `s`. Each point of the list is `{ φ λ }` or, as in a route,
+`{ "name" φ λ }`. At least two points are needed.
+
+From Montréal to Québec, Saguenay and Sept-Îles; GeographicLib gives 806 199.048 m:
+
+```rpl
+{ { 45.5 -73.6 } { 46.8 -71.2 } { 48.4 -71.05 } { 50.2 -66.4 } } ⓁTrackLen
+@ Expecting 806 199.04823 4 m
+```
+
+A route of the Route subsection can be used directly, for instance `Route ⓁTrackLen`.
+
+
+## PolyArea
+
+The area of a polygon on the WGS-84 ellipsoid. The polygon closes by itself, and its
+corners may be listed in either direction.
+
+Stack: `corners` ▶ `A`. Each corner of the list is `{ φ λ }` or `{ "name" φ λ }`. At
+least three corners are needed, and the edges must not cross each other.
+
+The method is the spherical excess on the sphere of the same area, using authalic
+latitudes (J. P. Snyder, *Map Projections: A Working Manual*, 1987). Its edges are great
+circles of that sphere, not geodesics of the ellipsoid. Against GeographicLib, the
+difference is too small to see for a field of 1 km, about 0.002 % for a square of 10°
+or a province, 0.04 % for a square of 60°, and 0.16 % for a triangle spanning an ocean.
+
+A field of about 1 km on a side; GeographicLib gives 1 016 253.002 m²:
+
+```rpl
+{ { 45.5 -73.6 } { 45.5 -73.587 } { 45.509 -73.587 } { 45.509 -73.6 } } ⓁPolyArea
+@ Expecting 1 016 253.00234 m↑2
+```
+
+A square of 10° north of the equator; GeographicLib gives 1.227 877 × 10¹² m²:
+
+```rpl
+{ { 0 0 } { 0 10 } { 10 10 } { 10 0 } } ⓁPolyArea
+@ Expecting 1.22785 73630 7⁳¹² m↑2
+```
+
+
+## LLH→ENU
+
+The position of a point in the local East, North, Up frame of an origin, both given
+by latitude, longitude and height on the WGS-84 ellipsoid. It suits short distances:
+`U` is measured along the vertical of the origin, not of the point.
+
+Stack: `φ0` `λ0` `h0` `φ` `λ` `h` ▶ `E` `N` `U`.
+
+The method is the rotation of the difference of Earth-centred coordinates, as in
+IOGP Guidance Note 7-2.
+
+A point about 1.4 km from Montréal, checked with a separate computation:
+
+```rpl
+45.5 -73.6 30 45.51 -73.59 130 ⓁLLH→ENU 3 →LIST
+@ Expecting { 781.45816 607 m 1 111.48778 824 m 99.85521 00381 m }
+```
+
+
+## ENU→LLH
+
+The latitude, longitude and height of a point given in the local East, North, Up frame
+of an origin on the WGS-84 ellipsoid.
+
+Stack: `φ0` `λ0` `h0` `E` `N` `U` ▶ `φ` `λ` `h`.
+
+The previous example in reverse:
+
+```rpl
+45.5 -73.6 30 781.4581660693741 1111.4877882355224 99.85521003776165 ⓁENU→LLH 3 →LIST
+@ Expecting { 45.51 ° -73.59 ° 130. m }
+```
+
+
+## UTC→GPS
+
+Converts a UTC date and time to GPS week and time of week. GPS time started on 6 January
+1980 at midnight UTC, and it has no leap seconds: it has been 18 seconds ahead of UTC
+since 1 January 2017.
+
+Stack: `date` `time` ▶ `week` `tow`, with the date as `YYYYMMDD` and the time as
+`HH.MMSS`. The week number has no rollover, and `tow` is the time since the start of
+the week, on Sunday.
+
+Before 2017 the offset was smaller, so the function stops with an error. A leap second
+added later would require a new offset here.
+
+```rpl
+20261102 12.00 ⓁUTC→GPS 2 →LIST
+@ Expecting { 2 443 129 618 s }
+```
+
+
+## GPS→UTC
+
+Converts a GPS week and time of week to a UTC date and time.
+
+Stack: `week` `tow` ▶ `date` `time`. The range is that of UTC→GPS. The offset of 18 s
+may fall on the previous day:
+
+```rpl
+2443 129618 ⓁGPS→UTC 2 →LIST
+@ Expecting { Mon 2/Nov/2026 12:00:00 }
+```
+
+```rpl
+2443 5_s ⓁGPS→UTC 2 →LIST
+@ Expecting { Sat 31/Oct/2026 23:59:47 }
+```
+
+
+## LL→DMS
+
+A latitude and longitude as a text in degrees, minutes and seconds, to 0.01″, with the
+letters of the hemispheres.
+
+Stack: `φ` `λ` ▶ `text`.
+
+```rpl
+-33.86 151.21 ⓁLL→DMS
+@ Expecting "33°51′36.00″S 151°12′36.00″E"
+```
+
+Rounding carries over to the minutes and the degrees:
+
+```rpl
+59.999999 0.0001 ⓁLL→DMS
+@ Expecting "60°00′00.00″N 0°00′00.36″E"
+```
+
+
+## LL→DDM
+
+A latitude and longitude as a text in degrees and decimal minutes, to 0.001′, the form
+that many GPS receivers show.
+
+Stack: `φ` `λ` ▶ `text`.
+
+```rpl
+45.5 -73.6 ⓁLL→DDM
+@ Expecting "45°30.000′N 73°36.000′W"
 ```
 
 
