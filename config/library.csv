@@ -680,6 +680,7 @@
 	"UTM→LL",	"=/library/Navigation/UTMtoLL.48s"
 	"LL→MGRS",	"=/library/Navigation/LLtoMGRS.48s"
 	"MGRS→LL",	"=/library/Navigation/MGRStoLL.48s"
+	"WMM",		"=/library/Navigation/WMM.48s"
 
 "Navigation/Route"
 

@@ -1,0 +1,126 @@
+«
+@@ ============================================================
+@@ WMM — the World Magnetic Model 2025 of NOAA and the British Geological
+@@ Survey: magnetic declination and field at a point. Coefficients and
+@@ equations from the WMM2025 technical report, in the public domain.
+@@
+@@ Input : φ λ h t — latitude, longitude (East positive), height above the
+@@         WGS-84 ellipsoid, decimal year from 2025 to 2030. Plain numbers
+@@         are degrees and metres; angles and lengths with a unit are
+@@         accepted.
+@@ Output: D I H F — declination (East positive), inclination (down
+@@         positive), horizontal intensity, total intensity.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  → yrs
+  «
+    IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END →Num
+    → hgt
+    «
+      2 →LIST
+      « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num »
+      MAP LIST→ DROP hgt yrs
+    »
+  »
+  → lat lon hgt yrs
+  «
+    IF yrs 2025 < yrs 2030 > OR THEN
+      "WMM2025 is valid from 2025 to 2030" DOERR
+    END
+    IF lat -90 < lat 90 > OR THEN "Latitude must be from -90° to 90°" DOERR END
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    Ⓒa♁GPS →Num UVAL Ⓒe12♁GPS →Num Ⓒπ →Num 180 /
+    → amode aunits axa ecc rdn
+    «
+      'lat*rdn' EVAL 'lon*rdn' EVAL
+      → phi lam
+      «
+        'axa/√(1-ecc*SIN(phi)²)' EVAL
+        → rcv
+        «
+          '(rcv+hgt)*COS(phi)' EVAL '(rcv*(1-ecc)+hgt)*SIN(phi)' EVAL
+          → ppp zzz
+          «
+            '√(ppp²+zzz²)' EVAL
+            → rgc
+            «
+              'zzz/rgc' EVAL 'ppp/rgc' EVAL 1E-10 MAX
+              '6371200/rgc' EVAL yrs 2025 - 0 0 0 1
+              {
+      { { -29351.8 0.0 12.0 0.0 } { -2556.6 0.0 -11.6 0.0 } { 1361.0 0.0 -1.3 0.0 } { 895.0 0.0 -1.6 0.0 } { -233.2 0.0 0.6 0.0 } { 64.4 0.0 -0.2 0.0 } { 79.5 0.0 -0.0 0.0 } { 23.2 0.0 -0.1 0.0 } { 4.6 0.0 -0.0 0.0 } { -1.3 0.0 0.1 0.0 } { 2.9 0.0 0.0 0.0 } { -2.0 0.0 0.0 0.0 } }
+      { { -1410.8 4545.4 9.7 -21.5 } { 2951.1 -3133.6 -5.2 -27.7 } { -2404.1 -56.6 -4.2 4.0 } { 799.5 278.6 -2.4 -1.1 } { 368.9 45.4 1.4 -0.5 } { 63.8 -18.4 -0.4 0.3 } { -77.0 -48.9 -0.1 0.6 } { 10.8 7.1 0.2 -0.2 } { 7.8 -24.8 -0.1 -0.3 } { -6.4 3.3 0.0 0.0 } { -1.5 0.0 -0.0 -0.0 } { -0.2 -1.3 0.0 -0.0 } }
+      { { 1649.3 -815.1 -8.0 -12.1 } { 1243.8 237.5 0.4 -0.3 } { 55.7 -133.9 -6.0 4.1 } { 187.2 220.2 0.0 2.2 } { 76.9 16.8 0.9 -1.6 } { -8.8 -14.4 -0.1 0.5 } { -17.5 -12.6 0.0 0.5 } { 3.0 12.2 0.1 0.3 } { 0.2 0.0 0.1 -0.0 } { -2.5 2.9 0.0 0.1 } { 0.3 0.7 -0.0 0.0 } }
+      { { 453.6 -549.5 -15.6 -4.1 } { -281.1 212.0 5.6 1.6 } { -138.7 -122.9 0.6 0.4 } { -115.7 48.8 1.2 -0.4 } { 59.3 -1.0 0.5 -0.8 } { 2.0 11.4 0.5 -0.4 } { -0.2 8.3 0.3 -0.3 } { 2.0 2.4 0.1 -0.2 } { 2.4 -0.6 0.0 -0.0 } { 1.2 1.0 -0.0 -0.1 } }
+      { { 12.1 -375.6 -7.0 -4.4 } { -142.0 43.0 2.2 1.7 } { -40.9 -59.8 -0.9 0.9 } { 15.8 23.4 -0.1 0.0 } { -21.7 -9.7 -0.1 0.4 } { -2.5 -3.3 -0.3 0.3 } { -1.0 5.3 -0.0 0.1 } { -0.6 0.2 0.0 0.1 } { -1.3 -1.4 -0.0 0.1 } }
+      { { 20.9 106.1 0.9 1.9 } { 14.9 10.9 0.3 0.7 } { 2.5 -7.4 -0.8 -1.0 } { 16.9 12.7 0.3 -0.5 } { -13.1 -5.2 0.0 0.2 } { -0.6 -9.1 -0.3 -0.1 } { -0.1 0.5 -0.1 -0.0 } { 0.6 -0.0 -0.0 -0.0 } }
+      { { -60.7 72.7 0.9 0.9 } { -11.1 -25.1 -0.8 0.6 } { 15.0 0.7 0.2 -0.6 } { 2.4 7.2 0.3 -0.1 } { -0.9 0.4 0.0 0.1 } { -0.6 -0.3 0.0 -0.0 } { 0.6 0.6 0.1 -0.0 } }
+      { { 14.2 -2.3 0.8 -0.2 } { -16.8 -5.2 -0.0 0.3 } { 8.6 -0.6 -0.1 -0.2 } { 1.5 -4.2 -0.1 0.0 } { -0.1 -1.2 -0.0 0.1 } { 0.5 -0.1 -0.0 -0.0 } }
+      { { 0.9 3.9 0.2 0.2 } { -8.7 0.8 0.1 0.4 } { 0.9 -3.8 -0.1 -0.1 } { 1.1 -1.7 -0.1 -0.0 } { -0.1 0.8 0.0 0.0 } }
+      { { -12.9 10.0 -0.1 0.1 } { -2.7 0.9 -0.0 0.2 } { -1.0 -2.9 -0.1 0.0 } { -0.4 0.1 0.0 -0.0 } }
+      { { -3.9 -9.1 -0.0 -0.0 } { -0.2 -1.8 -0.1 0.0 } { -0.2 -1.0 -0.1 -0.0 } }
+      { { 2.6 -2.3 -0.1 0.0 } { -1.3 0.1 -0.0 0.0 } }
+      { { -0.7 0.2 -0.1 -0.1 } }
+              }
+              → sph cph arr dty sxx syy szz pmm cft
+              «
+                0 12 FOR mdx
+                  IF mdx 1 == THEN cph 'pmm' STO END
+                  IF mdx 1 > THEN
+                    'pmm*cph*√((2*mdx-1)/(2*mdx))' EVAL 'pmm' STO
+                  END
+                  'COS(mdx*lam)' EVAL 'SIN(mdx*lam)' EVAL 0 0 cft mdx 1 + GET
+                  → cmm smm paa pbb lst
+                  «
+                    mdx 12 FOR ndx
+                      IF ndx mdx == THEN pmm ELSE
+                        '((2*ndx-1)*sph*paa-√((ndx-1)²-mdx²)*pbb)/√(ndx²-mdx²)' EVAL
+                      END
+                      → pcc
+                      «
+                        IF ndx 0 > THEN
+                          lst ndx mdx 1 MAX - 1 + GET LIST→ DROP
+                          → gcf hcf gdt hdt
+                          «
+                            'gcf+dty*gdt' EVAL 'hcf+dty*hdt' EVAL
+                            '(√(ndx²-mdx²)*paa-ndx*sph*pcc)/cph' EVAL
+                            arr ndx 2 + ^
+                            → gnm hnm dpn kfc
+                            «
+                              'sxx-kfc*(gnm*cmm+hnm*smm)*dpn' EVAL 'sxx' STO
+                              'syy+kfc*mdx*(gnm*smm-hnm*cmm)*pcc/cph' EVAL 'syy' STO
+                              'szz-(ndx+1)*kfc*(gnm*cmm+hnm*smm)*pcc' EVAL 'szz' STO
+                            »
+                          »
+                        END
+                        paa 'pbb' STO pcc 'paa' STO
+                      »
+                    NEXT
+                  »
+                NEXT
+                'ASIN(sph)-phi' EVAL
+                → dlt
+                «
+                  'sxx*COS(dlt)-szz*SIN(dlt)' EVAL 'sxx*SIN(dlt)+szz*COS(dlt)' EVAL
+                  → xgd zgd
+                  «
+                    '√(xgd²+syy²)' EVAL
+                    → hzt
+                    «
+                      '(syy)∠(xgd)' EVAL 180 * Ⓒπ →Num / 1_° *
+                      '(zgd)∠(hzt)' EVAL 180 * Ⓒπ →Num / 1_° *
+                      hzt 1_nT *
+                      '√(hzt²+zgd²)' EVAL 1_nT *
+                    »
+                  »
+                »
+              »
+            »
+          »
+        »
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+  »
+»

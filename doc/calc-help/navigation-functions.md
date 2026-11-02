@@ -15,6 +15,8 @@ The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
 * On **map grids**: [LL→UTM](#ll→utm) and [UTM→LL](#utm→ll) convert to and from
   UTM coordinates, [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll) to and from
   military grid references.
+* On the **magnetic field**: [WMM](#wmm) gives the magnetic declination at a point
+  and date.
 * On a **sphere**, where the formulas are shorter and angles are enough:
   [RadialFix](#radialfix) finds a position from two bearings, and
   [GCPoint](#gcpoint) a point along a great-circle route.
@@ -44,6 +46,7 @@ The Geodesy subsection computes distances, directions and positions:
   [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
 * on map grids of the same ellipsoid: [LL→UTM](#ll→utm), [UTM→LL](#utm→ll),
   [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll);
+* for the magnetic field: [WMM](#wmm);
 * on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
 
 
@@ -300,6 +303,43 @@ The same text in any form, in Sydney:
 ```rpl
 "56h lh 3441651925" ⓁMGRS→LL 2 →LIST
 @ Expecting { -33.85999 87578 ° 151.21000 1172 ° }
+```
+
+
+## WMM
+
+The World Magnetic Model 2025 of NOAA and the British Geological Survey: the
+magnetic declination at a point, which turns a true course into a magnetic course,
+and the direction and strength of the Earth's magnetic field.
+
+Stack: `φ` `λ` `h` `t` ▶ `D` `I` `H` `F`. The inputs are the latitude, the longitude
+(East positive), the height above the WGS-84 ellipsoid, and the date as a decimal
+year, for instance 2027.5 for the middle of 2027. The results are the declination
+(East positive), the inclination (down positive), the horizontal intensity and the
+total intensity.
+
+The model is valid from 2025 to 2030; outside these years, the function stops with
+an error. It describes the field of the Earth's core and upper crust only, so local
+anomalies and magnetic disturbances can move a compass further. According to NOAA,
+compasses become unreliable where the horizontal intensity falls below 2 000 nT, close
+to the magnetic poles, and call for caution below 6 000 nT.
+
+The function sums 90 terms of a spherical harmonic series, up to degree 12.
+
+Two test values of NOAA: at 80°N, 0°E, at sea level in 2025, it gives D = 1.28°,
+I = 83.21°, H = 6 523.2 nT, F = 55 178.5 nT:
+
+```rpl
+80 0 0 2025 ⓁWMM 4 →LIST
+@ Expecting { 1.28148 21161 3 ° 83.21057 95425 ° 6 523.23096 913 nT 55 178.45461 93 nT }
+```
+
+At 80°S, 120°W, 100 km high in 2027.5, it gives D = 67.93°, I = -72.10°,
+H = 15 927.0 nT, F = 51 825.7 nT:
+
+```rpl
+-80 240 100_km 2027.5 ⓁWMM 4 →LIST
+@ Expecting { 67.93164 32316 ° -72.10227 82777 ° 15 927.00798 6 nT 51 825.69071 72 nT }
 ```
 
 
