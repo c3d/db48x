@@ -302,7 +302,8 @@ PARSE_BODY(integer)
                 continue;
             }
 
-            v = value[*s++];
+            v = s < last ? value[*s] : NODIGIT;
+            s++;
             if (v == NODIGIT)
                 break;
 
@@ -365,7 +366,8 @@ PARSE_BODY(integer)
             // We may cause garbage collection in bignum arithmetic
             gcbytes gs    = s;
             gcbytes ge    = endp;
-            size_t  count = endp - s;
+            size_t  count = (endp ? endp : last) - s;
+            bool    stop  = false;
 
             switch (type)
             {
@@ -393,7 +395,10 @@ PARSE_BODY(integer)
                 v = value[*gs];
                 ++gs;
                 if (v == NODIGIT)
+                {
+                    stop = true;
                     break;
+                }
 
                 if (v >= base)
                 {
@@ -401,9 +406,14 @@ PARSE_BODY(integer)
                     if (type == ID_bignum || type == ID_neg_bignum)
                     {
                         if (v == 0xE) // Exponent, switch to decimal
+                        {
                             err = WARN;
+                        }
                         else
+                        {
+                            stop = true;
                             break;
+                        }
                     }
                     rt.based_digit_error().source(s - 1);
                     return err;
@@ -416,6 +426,10 @@ PARSE_BODY(integer)
 
             s    = gs;
             endp = ge;
+
+            // Like the loop above, leave s one past the character that stopped
+            if (!endp && !stop)
+                s++;
         }
 
 
@@ -430,6 +444,7 @@ PARSE_BODY(integer)
         size_t sz = utf8(s) - utf8(p.source);
         number = big ? object_p(bresult) : rt.make<integer>(type, result);
         s = utf8(p.source) + sz;
+        last = p.source + p.length;
 
         if (!number)
             return ERROR;
@@ -574,7 +589,7 @@ PARSE_BODY(integer)
     } while (is_fraction || is_dms);
 
     // Check if we finish with something indicative of a fraction or real number
-    if (!endp)
+    if (!endp && s < byte_p(p.source + p.length))
     {
         if (*s == '.' || (*s == ',' && !p.precedence) ||
             utf8_codepoint(s) == Settings.ExponentSeparator())
