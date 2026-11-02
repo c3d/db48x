@@ -1,4 +1,4 @@
-name: Build DB48X
+name: Build DB48X Android only
 
 on:
   push:
