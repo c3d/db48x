@@ -1288,6 +1288,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: Set up JDK 17
@@ -1354,8 +1355,18 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          android/build/outputs/apk/**/*.apk
-          help/
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db48x/db48x-debug.apk db48x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db48x.apk
+        archive: false
         retention-days: 7
 
   build-color-android:
@@ -1368,6 +1379,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: Set up JDK 17
@@ -1434,8 +1446,18 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          android/build/outputs/apk/**/*.apk
-          help/
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db50x/db50x-debug.apk db50x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db50x.apk
+        archive: false
         retention-days: 7
 
   build-dm42-firmware:
