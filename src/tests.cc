@@ -980,6 +980,15 @@ void tests::data_types()
     cstring string = "\"Hello World\"";
     test(CLEAR, string, ENTER).type(ID_text).expect(string);
 
+    step("Compiling a text stops at the end of the text")
+        .test(CLEAR, "1 →Text Text→", ENTER)
+        .type(ID_integer).expect("1")
+        .test(CLEAR, "12 →Text Text→", ENTER)
+        .type(ID_integer).expect("12")
+        .test(CLEAR, "\"\" 1 300 START \".\" + NEXT DROP GC 12 →Text Text→",
+              ENTER)
+        .type(ID_integer).expect("12");
+
     step("Text containing quotes")
         .test(CLEAR, RSHIFT, ENTER,
               SHIFT, SHIFT, ENTER, DOWN,
