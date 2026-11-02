@@ -2,7 +2,7 @@ name: Build DB48X Android only
 
 on:
   push:
-    branches: [ stable, dev ]
+    branches: [ stable, dev, android-apk ]
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]'
   pull_request:
