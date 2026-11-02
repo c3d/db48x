@@ -458,20 +458,14 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 
 void extract_android_assets()
 // ----------------------------------------------------------------------------
-//   On Android, the online help needs to be put in assets
+//   On Android, ensure bundled resources are extracted into the data directory
 // ----------------------------------------------------------------------------
 {
-    // On Android the AppDataLocation is completely inaccessible to the user.
-    // Use GenericDataLocation so the user can access and handle the files.
-    QString sandboxDir =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    QString sandboxDir = sim_install_data_dir();
     QDir().mkpath(sandboxDir);
 
-    QSettings settings("DB48X", "Emulator");
     QString currentAssetVersion = DB48X_VERSION;
-    QString savedAssetVersion = settings.value("AssetVersion", "").toString();
-
-    if (savedAssetVersion != currentAssetVersion)
+    if (sim_install_needed(sandboxDir, currentAssetVersion, HELPFILE_NAME))
     {
         // The RPL engine opens its files with fopen(), so Qt resources are
         // invisible to it: they must exist as real files. Extract the whole
@@ -503,9 +497,7 @@ void extract_android_assets()
         }
 
         sim_install_regenerate_help_indices(sandboxDir);
-
-
-        settings.setValue("AssetVersion", currentAssetVersion);
+        sim_install_write_stamp(sandboxDir, currentAssetVersion);
     }
 
     QDir::setCurrent(sandboxDir);
@@ -1608,9 +1600,9 @@ int ui_file_selector(const char *title,
         // This requires no permissions and survives app restarts.
 
         // On Android the AppDataLocation is completely inaccessible to the user.
-        // In stead, use what is effectively equivalent to other platforms.
-        // Allow the user to access and handle the files.
-        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+        // Use the external application files directory when writable so the
+        // user can access and handle the files across all Android versions.
+        QString sandboxDir = sim_install_data_dir();
         QDir().mkpath(sandboxDir); // Ensure the directory exists
         QString sandboxPath = sandboxDir + "/" + name;
 
