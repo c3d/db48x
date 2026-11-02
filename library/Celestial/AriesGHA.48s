@@ -1,0 +1,21 @@
+«
+@@ ============================================================
+@@ AriesGHA — Greenwich hour angle of the first point of Aries, from the
+@@ approximate Greenwich mean sidereal time of the US Naval Observatory.
+@@ 
+@@ Input : date time — date as YYYYMMDD, UT time as HH.MMSS.
+@@ Output: the Greenwich hour angle of Aries.
+@@ It is the mean value: it differs from the almanac by up to about 0.3′.
+@@ ============================================================
+
+  → dat tme
+  «
+    dat DUP TypeName "unit" == « UVAL » « » IFTE EVAL 20000101 DDays
+    DUP TypeName "unit" == « UVAL » « » IFTE EVAL
+    tme HMS→ 24 / + 0.5 - →Num
+    → ddd
+    «
+      '(15*(18.697374558+24.06570982441908*ddd))' EVAL 360 MOD 1_° *
+    »
+  »
+»

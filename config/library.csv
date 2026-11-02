@@ -699,6 +699,15 @@
 	"WPNext",	"=/library/Navigation/WPNext.48s"
 	"WPDirect",	"=/library/Navigation/WPDirect.48s"
 
+"Celestial Navigation"
+
+	"AriesGHA",	"=/library/Celestial/AriesGHA.48s"
+	"SunGP",	"=/library/Celestial/SunGP.48s"
+	"SightRed",	"=/library/Celestial/SightRed.48s"
+	"Sextant",	"=/library/Celestial/Sextant.48s"
+	"MeridLat",	"=/library/Celestial/MeridLat.48s"
+	"LOPFix",	"=/library/Celestial/LOPFix.48s"
+
 "Aeronautics"
 
 "Aeronautics/Flight Management"

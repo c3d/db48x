@@ -321,7 +321,7 @@ The World Magnetic Model 2025 of NOAA and the British Geological Survey: the
 magnetic declination at a point, which turns a true course into a magnetic course,
 and the direction and strength of the Earth's magnetic field.
 
-Stack: `φ` `λ` `h` `t` ▶ `D` `I` `H` `F`. The inputs are the latitude, the longitude
+Stack: `φ` `λ` `h` `t` ▶ `D`, I, `H`, `F`. The inputs are the latitude, the longitude
 (East positive), the height above the WGS-84 ellipsoid, and the date as a decimal
 year, for instance 2027.5 for the middle of 2027. The results are the declination
 (East positive), the inclination (down positive), the horizontal intensity and the
@@ -439,7 +439,7 @@ Converts a UTC date and time to GPS week and time of week. GPS time started on 6
 1980 at midnight UTC, and it has no leap seconds: it has been 18 seconds ahead of UTC
 since 1 January 2017.
 
-Stack: `date` `time` ▶ `week` `tow`, with the date as `YYYYMMDD` and the time as
+Stack: date, time ▶ `week` `tow`, with the date as `YYYYMMDD` and the time as
 `HH.MMSS`. The week number has no rollover, and `tow` is the time since the start of
 the week, on Sunday.
 
@@ -456,7 +456,7 @@ added later would require a new offset here.
 
 Converts a GPS week and time of week to a UTC date and time.
 
-Stack: `week` `tow` ▶ `date` `time`. The range is that of UTC→GPS. The offset of 18 s
+Stack: `week` `tow` ▶ date, time. The range is that of UTC→GPS. The offset of 18 s
 may fall on the previous day:
 
 ```rpl
@@ -686,4 +686,163 @@ Route « 1 GET » MAP RouteLeg +
 
 See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
 
+
+## Celestial NavigationLibrary
+
+The Celestial Navigation section of the Function Library finds a position from the
+altitudes of the Sun and the stars:
+
+* [AriesGHA](#ariesgha) and [SunGP](#sungp) give the Greenwich hour angles and the
+  declination of the Sun;
+* [Sextant](#sextant) corrects a sextant altitude;
+* [SightRed](#sightred) computes the altitude and azimuth expected from an assumed
+  position;
+* [LOPFix](#lopfix) finds the position from several sights, and
+  [MeridLat](#meridlat) the latitude from a meridian altitude.
+
+The Celestial Navigation section of the Equation Library holds the same formulas.
+The Moon, the planets and a star catalogue are not included: their Greenwich hour
+angles and declinations come from an almanac, or from the service of the US Naval
+Observatory, which also gave the reference values of these pages.
+
+
+## AriesGHA
+
+The Greenwich hour angle of the first point of Aries, from which the hour angle of a
+star follows: add its sidereal hour angle.
+
+Stack: date as YYYYMMDD, UT time as HH.MMSS ▶ `GHA`.
+
+The value is the mean one, from the approximate sidereal time formula of the US Naval
+Observatory. It can differ from the almanac by a few tenths of an arc minute. On
+2 November 2026 at 12:00 UT, the USNO gives 221.778235°, a difference of 0.13′:
+
+```rpl
+20261102 12.00 ⓁAriesGHA
+@ Expecting 221.77610 2707 °
+```
+
+
+## SunGP
+
+The geographical position of the Sun: its Greenwich hour angle, its declination, and
+its semidiameter, from the approximate formulas of the US Naval Observatory.
+
+Stack: date as YYYYMMDD, UT time as HH.MMSS ▶ `GHA` `δ` `SD`.
+
+The USNO states about 1′ within two centuries of 2000, that is about a nautical mile of
+position. On the dates below, the USNO gives 4.110467°, -14.837829° and 0.268635° for
+the first, and 97.030789°, 23.437309° and 0.262316° for the second:
+
+```rpl
+20261102 12.00 ⓁSunGP 3 →LIST
+@ Expecting { 4.11254 12203 7 ° -14.83488 22968 ° 16.12055 67085 arcmin }
+```
+
+```rpl
+20260621 18.30 ⓁSunGP 3 →LIST
+@ Expecting { 97.03027 65818 ° 23.43491 40059 ° 15.73993 05698 arcmin }
+```
+
+
+## Sextant
+
+The observed altitude from a sextant altitude. It applies the index correction, the
+dip of the horizon, the refraction, the semidiameter and the parallax.
+
+![Sextant altitude](img/SextantAltitude.bmp)
+
+Stack: `Hs` `IC` `HE` `SD` `HP` ▶ `Ho`, with the sextant altitude, the index
+correction, the height of eye, the semidiameter and the horizontal parallax.
+Plain numbers are degrees for `Hs`, arc minutes for `IC`, `SD` and `HP`, and metres for
+`HE`.
+
+`SD` is positive for the lower limb, negative for the upper limb, and zero for a star.
+`HP` is about 0.15′ for the Sun and 60′ for the Moon. With a bubble sextant, or an
+artificial horizon, `HE` is 0.
+
+The dip is 1.76′√h, h in metres, as in Bowditch. The refraction follows the formula of
+G. G. Bennett (1982) for standard air: it is not reliable below about 5°, and
+atmospheric conditions change it.
+
+The Sun's lower limb at 45°30′, with an index correction of +2′, from 10 m; this
+result is computed, not from a published example:
+
+```rpl
+'45_°+30_arcmin' 2_arcmin 10_m 16_arcmin 0.15_arcmin ⓁSextant
+@ Expecting 45.69266 54988 °
+```
+
+
+## SightRed
+
+Sight reduction: the computed altitude and the true azimuth of a body seen from an
+assumed position, from the formulas of Bowditch, appendix B.
+
+![Position triangle](img/PositionTriangle.bmp)
+
+Stack: `φ` `λ` `GHA` `δ` ▶ `Hc` `Zn`, where `φ` and `λ` are the assumed position,
+East positive, and `GHA` and `δ` the Greenwich hour angle and declination of the body.
+
+The Sun from Montréal; the USNO gives 3.138076° and 114.941856°:
+
+```rpl
+45.5 -73.6 4.110467 -14.837829 ⓁSightRed 2 →LIST
+@ Expecting { 3.13807 56645 4 ° 114.94185 6868 ° }
+```
+
+Canopus from Sydney; the USNO gives 7.827592° and 151.033424°:
+
+```rpl
+-33.86 151.21 81.164278 -52.71505 ⓁSightRed 2 →LIST
+@ Expecting { 7.82759 19399 8 ° 151.03342 4621 ° }
+```
+
+Bowditch, §403, example 1, gives an azimuth of 097.7°:
+
+```rpl
+33.4 0 '316_°+41.2_arcmin' '20_°+13.8_arcmin' ⓁSightRed 2 →LIST
+@ Expecting { 49.49282 8747 ° 97.71043 67843 ° }
+```
+
+
+## MeridLat
+
+The latitude from a meridian altitude, when the body bears due North or South.
+
+Stack: `Ho` `δ`, then the text `"S"` or `"N"` for the direction of the body ▶ `φ`.
+
+The result is computed; a body to the south with a declination of 10°N, at 64.6°:
+
+```rpl
+64.6 10 "S" ⓁMeridLat
+@ Expecting 35.4 °
+```
+
+
+## LOPFix
+
+The position from two or more lines of position, by least squares on their intercepts
+and azimuths from an assumed position.
+
+![Line of position](img/LineOfPosition.bmp)
+
+Stack: `φ` `λ` `lines` ▶ `φ` `λ`. Each element of `lines` is `{ Zn a }`, the true
+azimuth and the intercept, positive toward the body. Plain numbers are degrees and
+nautical miles. Parallel lines stop with an error.
+
+The lines are treated as straight: with intercepts above about 30 NM, reduce the sights
+again from the result, and repeat.
+
+Three stars seen from a true position of 45.5°N, 73.6°W, using the hour angles of the
+USNO, from an assumed position at 45.7°N, 73.2°W. A second pass gives back the true
+position to within a metre; this example shows the first:
+
+```rpl
+45.7 -73.2 { { 93.400 -16.097 } { 26.561 -18.257 } { 296.550 9.657 } } ⓁLOPFix 2 →LIST
+@ Expecting { 45.49979 40144 ° -73.60135 20881 ° }
+```
+
+
+See also: [UTC→GPS](#utc→gps) for times, and [WMM](#wmm) for the magnetic declination.
 
