@@ -58,7 +58,7 @@ converges to about 0.006 mm. It does not converge for nearly antipodal points,
 about 20 000 km apart: the function then stops with an error rather than return
 a wrong value.
 
-From Flinders Peak to Buninyong, in Australia, the classic test of
+**1)** From Flinders Peak to Buninyong, in Australia, the classic test of
 Geoscience Australia: 54 972.271 m, azimuth 306°52′05.37″:
 
 ```rpl
@@ -67,7 +67,7 @@ Geoscience Australia: 54 972.271 m, azimuth 306°52′05.37″:
 @ Expecting { 54 972.27113 87 m 306.86815 9203 ° 307.17363 0629 ° }
 ```
 
-From New York (JFK, 40°38′23″N, 73°46′44″W) to Singapore (Changi, 1°21′33″N,
+**2)** From New York (JFK, 40°38′23″N, 73°46′44″W) to Singapore (Changi, 1°21′33″N,
 103°59′22″E); GeographicLib gives 15 347 628 m and 3°18′29.9″:
 
 ```rpl
@@ -319,7 +319,7 @@ position and the ground speed (knots if a plain number; 0 to skip `ETE` and
 When the present position is abeam or past the end of the active leg, the
 next leg becomes active, and the results refer to it.
 
-Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque.
+**1)** Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque.
 The examples drop the `ETA`, which depends on the time they are run:
 
 ```rpl
@@ -331,7 +331,7 @@ The examples drop the `ETA`, which depends on the time they are run:
 @ Expecting { To:"ABQ" Brg:80.99381 77706 ° Dist:368.36060 6014 nmi XTD:11.28267 43886 nmi ETE:0:49:07 }
 ```
 
-East of Albuquerque, the first leg is behind: the second leg, to New York,
+**2)** East of Albuquerque, the first leg is behind: the second leg, to New York,
 becomes active, and `RouteLeg`, added at the end, is 2:
 
 ```rpl

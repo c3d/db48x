@@ -37,7 +37,7 @@ negative. A negative weight removes a load, for instance the fuel burnt
 before landing. Weights and arms may carry units, or be plain numbers in
 consistent units.
 
-The loading of the FAA example: empty aircraft 2 100 lb at 78.3 in, front
+**1)** The loading of the FAA example: empty aircraft 2 100 lb at 78.3 in, front
 seats 340 lb at 85 in, rear seats 350 lb at 121 in, 75 gal of fuel, that is
 450 lb, at 75 in, and 80 lb of baggage at 150 in. The book finds 3 320 lb and
 a CG of 84.8 in (*Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
@@ -48,7 +48,7 @@ chapter 10):
 @ Expecting CG:84.76807 22892 in
 ```
 
-With plain numbers, and the negative arm of an oil tank ahead of the datum.
+**2)** With plain numbers, and the negative arm of an oil tank ahead of the datum.
 The book prints a moment of 122 086 and a CG of 74.0, because its moment of
 the empty aircraft, 69 393, differs from 1 011.9 × 68.6 = 69 416.34 (same
 handbook):
@@ -75,7 +75,7 @@ The limits are where the envelope crosses the weight `W`, interpolated
 linearly between its points: the envelope must be convex, as center of
 gravity envelopes are. A weight above or below the envelope is an error.
 
-The envelope of the FAA example: from 77.0 to 85.7 in up to 2 475 lb, then a
+**1)** The envelope of the FAA example: from 77.0 to 85.7 in up to 2 475 lb, then a
 forward limit rising to 77.5 in at 2 525 lb and to 82.1 in at 2 950 lb, and
 an aft limit of 85.7 in at 2 525 lb and 84.7 in at 2 950 lb; the lower edge,
 1 500 lb, is chosen for the example. At 2 799 lb, the limits are 80.47 and
@@ -87,7 +87,7 @@ Aeronautical Knowledge*, chapter 10):
 @ Expecting Inside:1
 ```
 
-The same loading with its CG at 80 in is too far forward:
+**2)** The same loading with its CG at 80 in is too far forward:
 
 ```rpl
 { { 77.0 1500 } { 77.0 2475 } { 77.5 2525 } { 82.1 2950 } { 84.7 2950 } { 85.7 2525 } { 85.7 1500 } } 2799 80 ⓁWBEnv
@@ -119,7 +119,7 @@ final courses. From Albuquerque to New York the course goes from 67.9° to
 fuel for taxi and the reserve are in the Fuel Required equation of the
 Equation Library; `→HMS` shows a time in hours, minutes and seconds.
 
-From Los Angeles to New York through Albuquerque, at 250 kt and 12 gal/h,
+**1)** From Los Angeles to New York through Albuquerque, at 250 kt and 12 gal/h,
 with a wind from 270° at 30 kt on the first leg and from 300° at 50 kt on
 the second:
 
@@ -129,7 +129,7 @@ the second:
 @ Expecting Fuel:92.02427 83446 gal
 ```
 
-The same route with one wind, from 270° at 30 kt, for the whole flight:
+**2)** The same route with one wind, from 270° at 30 kt, for the whole flight:
 
 ```rpl
 { { "LAX" 33.9425 -118.4081 } { "ABQ" 35.0402 -106.6090 } { "JFK" 40.6398 -73.7789 } } 'Route' STO
@@ -157,7 +157,7 @@ The true airspeed and the wind speed come from the method of Ed Williams
 speed along each heading. Ground speeds too far from each other to come
 from one airspeed and one wind are an error.
 
-At 120 kt, with a wind from 040° at 20 kt, the ground speeds on 000°, 120°
+**1)** At 120 kt, with a wind from 040° at 20 kt, the ground speeds on 000°, 120°
 and 240° are 105.47, 118.18 and 138.96 kt:
 
 ```rpl
@@ -165,7 +165,7 @@ and 240° are 105.47, 118.18 and 138.96 kt:
 @ Expecting WS:19.99976 68283 knot
 ```
 
-The same flight on 030°, 150° and 270°:
+**2)** The same flight on 030°, 150° and 270°:
 
 ```rpl
 30_° 100.36395 128.22518 133.73623 ⓁTAS3GS
@@ -195,7 +195,7 @@ Flight test measurements give the coefficients through the Lift and Drag
 Polar equations of the Equation Library: the lift is the weight, the drag is
 the thrust in level flight.
 
-Three points taken exactly on the polar `CD = 0.03 + 0.055·CL²` of a
+**1)** Three points taken exactly on the polar `CD = 0.03 + 0.055·CL²` of a
 textbook example give it back (J. G. Leishman, *Introduction to Aerospace
 Flight Vehicles*, Embry-Riddle Aeronautical University, *Takeoff & Landing
 Performance*):
@@ -205,7 +205,7 @@ Performance*):
 @ Expecting CLmd:0.73854 89458 76
 ```
 
-Five points of a light airplane, read to three significant digits:
+**2)** Five points of a light airplane, read to three significant digits:
 
 ```rpl
 { { 0.3 0.0248 } { 0.5 0.0332 } { 0.7 0.0459 } { 0.9 0.0628 } { 1.1 0.0839 } } ⓁPolarFit
@@ -236,7 +236,7 @@ speed, tagged `VxStall`, as the handbook says that Vx is frequently just
 above the stall speed (*Pilot's Handbook of Aeronautical Knowledge*,
 FAA-H-8083-25C, chapter 11).
 
-An airplane of 2 550 lb, with a wing of 174 ft², a polar of `CD0` 0.0319 and
+**1)** An airplane of 2 550 lb, with a wing of 174 ft², a polar of `CD0` 0.0319 and
 `Kind` 0.0610515, 180 hp at 0.8 of efficiency, at sea level. The source finds
 1 257 ft/min at 58.8 kt (J. G. Leishman, *Climbing, Ceiling & Gliding*); the
 best angle is at the stall speed:
@@ -246,7 +246,7 @@ best angle is at the stall speed:
 @ Expecting FPAmax:13.66030 53597 °
 ```
 
-The same airplane with half the power, in air of 0.9 kg/m³: Vx is now
+**2)** The same airplane with half the power, in air of 0.9 kg/m³: Vx is now
 above the stall speed of 60.7 kt:
 
 ```rpl
@@ -277,7 +277,7 @@ the integrals of `GS/a` and `1/a` over the ground speed, by Simpson's rule.
 The Takeoff Ground Roll equation estimates the same distance with the forces
 averaged at 70 % of the liftoff speed.
 
-An airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², rolling
+**1)** An airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², rolling
 at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway, lifting off at
 176.7 ft/s. The exact solution for a constant thrust is 3 289.2 ft and
 36.1 s:
@@ -287,7 +287,7 @@ at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway, lifting off at
 @ Expecting sLO:3 289.14666 856 ft
 ```
 
-The same takeoff against a headwind of 10 kt. The rule of the square of the
+**2)** The same takeoff against a headwind of 10 kt. The rule of the square of the
 speed ratio gives 2 678 ft:
 
 ```rpl
@@ -295,7 +295,7 @@ speed ratio gives 2 678 ft:
 @ Expecting sLO:2 707.12691 754 ft
 ```
 
-With a propeller thrust falling from 1 300 lbf at rest to 1 000 lbf at
+**3)** With a propeller thrust falling from 1 300 lbf at rest to 1 000 lbf at
 liftoff, at sea level:
 
 ```rpl

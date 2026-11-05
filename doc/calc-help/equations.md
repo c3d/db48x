@@ -304,7 +304,7 @@ if 'r < L/10' then
 end
 @ Keep
 ```
-Verify relative difference under condition `5_cm << 3_m` with the example of [E Field Infinite Line](#E Field Infinite Line)
+**Example 3**. Verify relative difference under condition `5_cm << 3_m` with the example of [E Field Infinite Line](#E Field Infinite Line)
 ```rpl
 Er0 Er %Ch
 @ Expecting -0.05550 93020 85
@@ -1183,7 +1183,7 @@ if 'r < L/10' then
 end
 @ Save variables for later use
 ```
-Verify relative difference under condition 10_cm << 3_m with the example of [B Field In Infinite Solenoid](#B Field In Infinite Solenoid)
+**Example 3**. Verify relative difference under condition 10_cm << 3_m with the example of [B Field In Infinite Solenoid](#B Field In Infinite Solenoid)
 ```rpl
 B0 B %Ch
 @ Expecting -0.01388 59960 4
@@ -1612,12 +1612,14 @@ k=20_N/m  m=5_kg
 
 ![Simple Pendulum](img/SimplePendulum.bmp)
 
-* To calculate `[ω_(r/s);Treal_s;T_s;f_Hz]` (Angular frequency; Real period for large amplitude; Period for small amplitude; Frequency) from 2 known variables:
+* **Example 1**. To calculate `[ω_(r/s);Treal_s;T_s;f_Hz]` (Angular frequency; Real period for large amplitude; Period for small amplitude; Frequency) from 2 known variables:
 ```rpl
 L=15_cm  θmax=80_°
 @ Expecting [ ω=8.08564 57173 6 r/s  Treal=0.88361 42622 96 s   T=0.77707 89775 87 s  f=1.28687 04840 1 Hz ]
 'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])'
 ```
+
+* **Example 2**.
 ```rpl
 @ Without Treal, MSOLVER works fine for the remaining 3 unknowns:
 L=15_cm  θmax=80_°
@@ -1681,7 +1683,7 @@ We are considering here a damped mass-spring oscillator where the external drivi
 
 ![Driven Damped Oscillations](img/DrivenDampedOscillations2BW.bmp)
 
-* To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
+* **Example 1**. To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
 ω=14.99_r/s  ω₀=15_r/s  θ=25_°  t=500_s  k=10_N/m  b=0.2_(kg/s)  xh=10_cm  Fd=0.9_N
 @ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s φ=-89.74526 88301 ° xp=0.30019 71665 48 m x=-22.26611 11734 cm v=301.81823 6224 cm/s a=50.03197 40728 m/s↑2 E=0.45032 15149 87 J Q=3.33333 33333 3 ]
@@ -1689,7 +1691,7 @@ We are considering here a damped mass-spring oscillator where the external drivi
 @ Save E for comparison
 ```
 
-Verify relative difference with the total energy of the case [Underdamped Oscillations](#Underdamped Oscillations)
+**Example 2**. Verify relative difference with the total energy of the case [Underdamped Oscillations](#Underdamped Oscillations)
 ```rpl
 E₀ E %Ch
 @ Expecting 698.44219 2445
@@ -2529,7 +2531,7 @@ Tday=86400_s  R=6371e3_m  h1=5200_m  h2=8860_m  M=5.972168e24_kg  φ=15_°
 @ Save result for later use
 ```
 * **Consequence** To check the validity of a well-known APPROXIMATION which is valid when `Δh/R < 0.1%` => special relativity corrections are negligible which means `ABS(γv1/γv2-1) < 0.1%` => `γ21=γG1/γG2` Then the APPROXIMATE RESULT is `γG1/γG2 ≈ 1 + gloc*Δh/Ⓒc^2` with `gloc=ⒸG*M/R^2`. Let's verify precisely these relations in 3 steps with the final CONSEQUENCE:
-* **2b)** The prerequisite conditions & their direct consequence are given by:
+* **Example 2b)** The prerequisite conditions & their direct consequence are given by:
 ```rpl
 Δh='ABS((h2_m)-(h1_m))'  gloc='ⒸG*(M_kg)/((R_m)+(h1_m))^2'  approx1='ABS(γG1/γG2-1)'  approx2='gloc*Δh/Ⓒc^2'
 "2a) Prerequisite CONDITIONS:"
@@ -4530,14 +4532,14 @@ through the error function: `CDF=0.5·(1+erf((X-μ)/(sx·√2)))`.
 
 ![Normal Distribution](img/Norml_Distribution.bmp)
 
-* To calculate: `[PDF;CDF;CDFc]` from `μ`, `sx`, `X`:
+* **Example 1**. To calculate: `[PDF;CDF;CDFc]` from `μ`, `sx`, `X`:
 ```rpl
 μ=0  sx=1  X=1.645
 @ Expecting [ PDF=0.10311 08110 92 CDF=0.95001 50944 61 CDFc=0.04998 49055 39 ]
 'ROOT(ⒺNorml;[PDF;CDF;CDFc];[1;0.5;0.5])'
 ```
 
-* To obtain the quantile, give `CDF` and ask for `X`:
+* **Example 2**. To obtain the quantile, give `CDF` and ask for `X`:
 ```rpl
 μ=0  sx=1  CDF=0.95
 @ Expecting [ X=1.64485 36269 5 ]
@@ -4704,14 +4706,14 @@ costs.
 
 ![Chi-Square Distribution](img/Chi2_Distribution.bmp)
 
-* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `df`, `X`:
+* **Example 1**. To calculate: `[PDF;CDF;CDFc;μ;sx]` from `df`, `X`:
 ```rpl
 df=4  X=4
 @ Expecting [ PDF=0.13533 52832 37 CDF=0.59399 41502 9 CDFc=0.40600 58497 1 μ=4 sx=2.82842 71247 5 ]
 'ROOT(ⒺChi2;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
 ```
 
-* The quantile, by giving `CDF` and asking for `X`. This is the slowest entry of
+* **Example 2**. The quantile, by giving `CDF` and asking for `X`. This is the slowest entry of
   the section, about 700 ms, since each step of the search integrates the
   density afresh:
 ```rpl
@@ -4831,14 +4833,14 @@ equations then return nothing rather than an error.
 
 ![Generalized Extreme Value Distribution](img/GEV_Distribution.bmp)
 
-* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `xi`, `X`:
+* **Example 1**. To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `xi`, `X`:
 ```rpl
 x0=0  sc=1  xi=0.2  X=1
 @ Expecting [ CDF=0.66906 26526 68 PDF=0.22406 77286 51 CDFc=0.33093 73473 32 μ=0.82114 85686 27 sx=1.82867 04356 7 ]
 'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
 ```
 
-* The Gumbel case, `xi=0`, where the mean is Euler's constant and the standard
+* **Example 2**. The Gumbel case, `xi=0`, where the mean is Euler's constant and the standard
   deviation is `sc·π/√6`:
 ```rpl
 x0=0  sc=1  xi=0  X=1
@@ -4859,14 +4861,14 @@ for a quantile.
 
 ![Gamma Distribution](img/Gamma_Distribution.bmp)
 
-* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `a`, `sc`, `X`:
+* **Example 1**. To calculate: `[CDF;PDF;CDFc;μ;sx]` from `a`, `sc`, `X`:
 ```rpl
 a=2  sc=3  X=3
 @ Expecting [ CDF=0.26424 11176 57 PDF=0.12262 64803 9 CDFc=0.73575 88823 43 μ=6 sx=4.24264 06871 2 ]
 'ROOT(ⒺGamma;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
 ```
 
-* The inverse, here the median, obtained by giving CDF and asking for X:
+* **Example 2**. The inverse, here the median, obtained by giving CDF and asking for X:
 ```rpl
 a=2  sc=3  CDF=0.5
 @ Expecting [ X=5.03504 09700 5 PDF=0.10443 92303 83 CDFc=0.5 μ=6 sx=4.24264 06871 2 ]
@@ -4889,14 +4891,14 @@ the standard deviation down to 0.72.
 
 ![Truncated Normal Distribution](img/NormTrunc_Distribution.bmp)
 
-* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `Xmin`, `Xmax`, `X`:
+* **Example 1**. To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `Xmin`, `Xmax`, `X`:
 ```rpl
 x0=0  sc=1  Xmin=-1  Xmax=2  X=0
 @ Expecting [ CDF=0.41698 87514 29 PDF=0.48735 02384 7 CDFc=0.58301 12485 71 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
 'ROOT(ⒺNormTrunc;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
 ```
 
-* The 95th percentile, which falls well short of the 1.645 of the parent law:
+* **Example 2**. The 95th percentile, which falls well short of the 1.645 of the parent law:
 ```rpl
 x0=0  sc=1  Xmin=-1  Xmax=2  CDF=0.95
 @ Expecting [ X=1.52459 66827 8 PDF=0.15244 22014 83 CDFc=0.05 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
@@ -4918,14 +4920,14 @@ deviation only above 2; below those the two entries return Ⓒ?.
 
 ![Student t Distribution](img/Student_Distribution.bmp)
 
-* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `df`, `X`:
+* **Example 1**. To calculate: `[CDF;PDF;CDFc;μ;sx]` from `df`, `X`:
 ```rpl
 df=4  X=1
 @ Expecting [ CDF=0.81304 95168 5 PDF=0.21466 25258 4 CDFc=0.18695 04831 5 μ=0 sx=1.41421 35623 7 ]
 'ROOT(ⒺStudent;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0;1])'
 ```
 
-* The 97.5th percentile, the critical value of the two-sided test at 5 per cent:
+* **Example 2**. The 97.5th percentile, the critical value of the two-sided test at 5 per cent:
 ```rpl
 df=4  CDF=0.975
 @ Expecting [ X=2.77644 51052 ]
@@ -4943,14 +4945,14 @@ exists only for `dfd` above 2 and the standard deviation only above 4.
 
 ![Fisher F Distribution](img/Fisher_Distribution.bmp)
 
-* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `dfn`, `dfd`, `X`:
+* **Example 1**. To calculate: `[CDF;PDF;CDFc;μ;sx]` from `dfn`, `dfd`, `X`:
 ```rpl
 dfn=4  dfd=6  X=1
 @ Expecting [ CDF=0.5248 PDF=0.41472 CDFc=0.4752 μ=1.5 sx=2.12132 03435 6 ]
 'ROOT(ⒺFisher;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
 ```
 
-* The 95th percentile, the critical value of the test:
+* **Example 2**. The 95th percentile, the critical value of the test:
 ```rpl
 dfn=4  dfd=6  CDF=0.95
 @ Expecting [ X=4.53367 69502 8 ]
@@ -4970,14 +4972,14 @@ climbs without ever settling.
 
 ![Levy Distribution](img/Levy_Distribution.bmp)
 
-* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+* **Example 1**. To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
 ```rpl
 x0=0  sc=1  X=1
 @ Expecting [ PDF=0.24197 07245 19 CDF=0.31731 05078 63 CDFc=0.68268 94921 37 ]
 'ROOT(ⒺLevy;[PDF;CDF;CDFc];[0.5;0.5;0.5])'
 ```
 
-* To obtain the median, give `CDF` and ask for `X`:
+* **Example 2**. To obtain the median, give `CDF` and ask for `X`:
 ```rpl
 x0=0  sc=1  CDF=0.5
 @ Expecting [ X=2.19810 93383 2 ]
@@ -5212,14 +5214,14 @@ The great circle is the shortest route between two points of a sphere.
   accurate for short distances; each course comes from its North component,
   `x1` or `x2`.
 
-* To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
+* **Example 1**. To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
 ```rpl
 φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
 @ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi x1=0.23851 69937 16 TC1=65.89216 65527 ° x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
 'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
 ```
 
-* To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
+* **Example 2**. To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
 ```rpl
 φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
 @ Expecting [ Δφ=2 ° Δλ=-85 ° hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi x1=-0.28643 54215 54 TC1=252.98680 2724 ° x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
@@ -5301,14 +5303,14 @@ same triangle serves a ship in a current.
 * For a current, give its drift as `WS`, and as `WD` the direction opposite to
   its set: a current setting towards 170° acts as a wind from 350°.
 
-* To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
+* **Example 1**. To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
 ```rpl
 TC=90_° V=120_knot WD=45_° WS=40_knot
 @ Expecting [ WCA=-13.63302 22254 ° TH=76.36697 77746 ° GS=88.33476 66494 knot ]
 'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
 ```
 
-* To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
+* **Example 2**. To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
 ```rpl
 TC=31_° V=115_knot WD=360_° WS=10_knot
 @ Expecting [ WCA=-2.56690 27668 6 ° TH=28.43309 72331 ° GS=106.31293 6833 knot ]
@@ -5535,21 +5537,21 @@ takeoff or a landing stays within the crosswind the aircraft can handle.
 * Solved the other way, the entry gives the strongest wind acceptable from a
   given direction for a given crosswind limit.
 
-* To calculate: `[HW;XW]` (Headwind; Crosswind) for a wind from 060° at 20 kt on runway 03 [2]:
+* **Example 1**. To calculate: `[HW;XW]` (Headwind; Crosswind) for a wind from 060° at 20 kt on runway 03 [2]:
 ```rpl
 WS=20_knot WD=60_° RWY=30_°
 @ Expecting [ HW=17.32050 80757 knot XW=10. knot ]
 'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
 ```
 
-* To calculate: `[HW;XW]` for a wind from 140° at 25 kt on runway 17. The book reads 22 kt and 13 kt on its crosswind chart; the crosswind comes from the left [1, chapter 11, sample problem 10]:
+* **Example 2**. To calculate: `[HW;XW]` for a wind from 140° at 25 kt on runway 17. The book reads 22 kt and 13 kt on its crosswind chart; the crosswind comes from the left [1, chapter 11, sample problem 10]:
 ```rpl
 WS=25_knot WD=140_° RWY=170_°
 @ Expecting [ HW=21.65063 50946 knot XW=-12.5 knot ]
 'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
 ```
 
-* To calculate: `[WS;HW]` (Strongest wind; its headwind) for a demonstrated crosswind of 15 kt, with the wind 30° off the runway:
+* **Example 3**. To calculate: `[WS;HW]` (Strongest wind; its headwind) for a demonstrated crosswind of 15 kt, with the wind 30° off the runway:
 ```rpl
 XW=15_knot WD=30_° RWY=0_°
 @ Expecting [ WS=30. knot HW=25.98076 21135 knot ]
@@ -5619,14 +5621,14 @@ a reserve for the time `TRes`, and the fuel for start-up and taxi.
 * Main results: the trip fuel `Trip`, the reserve `Rsv`, the fuel required
   `FReq`, and `Extra`, the fuel on board `FOB` beyond what is required.
 
-* To calculate: `Trip` (Trip fuel) for 400 nmi at 100 kt, that is 4 h, at 5 gal/h [1, chapter 16]:
+* **Example 1**. To calculate: `Trip` (Trip fuel) for 400 nmi at 100 kt, that is 4 h, at 5 gal/h [1, chapter 16]:
 ```rpl
 FFR=5_gal/h ETE=4_h
 @ Expecting Trip=20 gal
 'ROOT(ⒺFuel Required;Trip;1_gal)'
 ```
 
-* To calculate: `[Trip;Rsv;FReq;Extra]` (Trip fuel; Reserve; Fuel required; Extra fuel) for a 30 min flight at 8 gal/h, with the 30 min VFR day reserve, 1 gal for taxi and 38 gal on board [1, chapter 16; 3]:
+* **Example 2**. To calculate: `[Trip;Rsv;FReq;Extra]` (Trip fuel; Reserve; Fuel required; Extra fuel) for a 30 min flight at 8 gal/h, with the 30 min VFR day reserve, 1 gal for taxi and 38 gal on board [1, chapter 16; 3]:
 ```rpl
 FFR=8_gal/h ETE=0.5_h TRes=0.5_h Taxi=1_gal FOB=38_gal
 @ Expecting [ Trip=4. gal Rsv=4. gal FReq=9. gal Extra=29. gal ]
@@ -5704,14 +5706,14 @@ aft.
 * Solved for `Wsh`, the entry gives the weight to move to bring the center of
   gravity back within a limit.
 
-* To calculate: `[ΔCG;CGn]` (Change of CG; New CG) when 100 lb move from station 30 to station 150, in an aircraft of 8 000 lb with its CG at 77 in [1, chapter 10]:
+* **Example 1**. To calculate: `[ΔCG;CGn]` (Change of CG; New CG) when 100 lb move from station 30 to station 150, in an aircraft of 8 000 lb with its CG at 77 in [1, chapter 10]:
 ```rpl
 Wsh=100_lb Dsh=120_in Wt=8000_lb CG=77_in
 @ Expecting [ ΔCG=1.5 in CGn=78.5 in ]
 'ROOT(ⒺWeight Shift;[ΔCG;CGn];[1_in;1_in])'
 ```
 
-* To calculate: `[ΔCG;Wsh]` (Change of CG; Weight to move) to bring the CG of a 7 800 lb aircraft from 81.5 in back to its aft limit of 80.5 in, by moving cargo 120 in forward [1, chapter 10]:
+* **Example 2**. To calculate: `[ΔCG;Wsh]` (Change of CG; Weight to move) to bring the CG of a 7 800 lb aircraft from 81.5 in back to its aft limit of 80.5 in, by moving cargo 120 in forward [1, chapter 10]:
 ```rpl
 Dsh=-120_in Wt=7800_lb CG=81.5_in CGn=80.5_in
 @ Expecting [ ΔCG=-1. in Wsh=65. lb ]
@@ -5727,14 +5729,14 @@ center of gravity.
   a weight `Wch`, negative when removed, is added at the arm `Arm` to an
   aircraft of weight `Wt` whose center of gravity is at `CG`.
 
-* To calculate: `[Wn;CGn]` (New weight; New CG) when 140 lb are added at station 150 to an aircraft of 6 860 lb with its CG at 80 in [1, chapter 10]:
+* **Example 1**. To calculate: `[Wn;CGn]` (New weight; New CG) when 140 lb are added at station 150 to an aircraft of 6 860 lb with its CG at 80 in [1, chapter 10]:
 ```rpl
 Wt=6860_lb CG=80_in Wch=140_lb Arm=150_in
 @ Expecting [ Wn=7 000 lb CGn=81.4 in ]
 'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
 ```
 
-* To calculate: `[Wn;CGn]` when 100 lb are removed from station 150 in an aircraft of 6 100 lb with its CG at 80 in. The book rounds the change of CG to 1.2 in, and finds 78.8 in [1, chapter 10]:
+* **Example 2**. To calculate: `[Wn;CGn]` when 100 lb are removed from station 150 in an aircraft of 6 100 lb with its CG at 80 in. The book rounds the change of CG to 1.2 in, and finds 78.8 in [1, chapter 10]:
 ```rpl
 Wt=6100_lb CG=80_in Wch=-100_lb Arm=150_in
 @ Expecting [ Wn=6 000 lb CGn=78.83333 33333 in ]
@@ -5750,14 +5752,14 @@ of the mean aerodynamic chord `MAC`, counted from its leading edge `LEMAC`.
 
 * Main result: `PMAC`, the center of gravity `CG` in percent of `MAC`.
 
-* To calculate: `PMAC` (CG in % MAC) for a CG at 161 in, with the leading edge of the MAC at 144 in and a MAC of 62 in. The book gives 27.4 % [4, chapter 3]:
+* **Example 1**. To calculate: `PMAC` (CG in % MAC) for a CG at 161 in, with the leading edge of the MAC at 144 in and a MAC of 62 in. The book gives 27.4 % [4, chapter 3]:
 ```rpl
 CG=161_in LEMAC=144_in MAC=62_in
 @ Expecting PMAC=27.41935 48387
 'ROOT(ⒺCG in % MAC;PMAC;1)'
 ```
 
-* To calculate: `CG` for a CG at 27.4 % of the same MAC. The book writes 160.9 in, cutting off the digits instead of rounding them [4, chapter 3]:
+* **Example 2**. To calculate: `CG` for a CG at 27.4 % of the same MAC. The book writes 160.9 in, cutting off the digits instead of rounding them [4, chapter 3]:
 ```rpl
 PMAC=27.4 LEMAC=144_in MAC=62_in
 @ Expecting CG=160.988 in
@@ -5783,14 +5785,14 @@ the performance charts, and the flight level above the transition altitude.
 * The rule of thumb, 1 000 ft per inHg or about 27 ft per hPa, is close to
   this exact formula near sea level.
 
-* To calculate: `[ΔHp;Hp]` (Correction; Pressure altitude) for a field at 5 883 ft with an altimeter setting of 30.10 inHg. The book finds 5 718 ft [1, chapter 11, sample problem 1]:
+* **Example 1**. To calculate: `[ΔHp;Hp]` (Correction; Pressure altitude) for a field at 5 883 ft with an altimeter setting of 30.10 inHg. The book finds 5 718 ft [1, chapter 11, sample problem 1]:
 ```rpl
 Hind=5883_ft QNH=30.10_inHg
 @ Expecting [ ΔHp=-164.90698 7072 ft Hp=5 718.09301 293 ft ]
 'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
 ```
 
-* To calculate: `[ΔHp;Hp]` at sea level with an altimeter setting of 28.0 inHg. The table of the book gives +1 824 ft [1, chapter 11, figure 11-3]:
+* **Example 2**. To calculate: `[ΔHp;Hp]` at sea level with an altimeter setting of 28.0 inHg. The table of the book gives +1 824 ft [1, chapter 11, figure 11-3]:
 ```rpl
 Hind=0_ft QNH=28.0_inHg
 @ Expecting [ ΔHp=1 824.91706 57 ft Hp=1 824.91706 57 ft ]
@@ -5806,14 +5808,14 @@ often entered with `ΔISA`.
 * `ΔISA` is a temperature difference: enter it in `K`, never in `°C` or
   `°F`.
 
-* To calculate: `[Tstd;OAT]` (Standard temperature; Outside air temperature) at 6 000 ft, 36 °F above standard, that is 20 K. The result, 296.26 K, is 23.11 °C [1, chapter 11, sample problem 7]:
+* **Example 1**. To calculate: `[Tstd;OAT]` (Standard temperature; Outside air temperature) at 6 000 ft, 36 °F above standard, that is 20 K. The result, 296.26 K, is 23.11 °C [1, chapter 11, sample problem 7]:
 ```rpl
 Hp=6000_ft ΔISA=20_K
 @ Expecting [ Tstd=276.2628 K OAT=296.2628 K ]
 'ROOT(ⒺISA Deviation;[Tstd;OAT];[1_K;1_K])'
 ```
 
-* To calculate: `[Tstd;ΔISA]` (Standard temperature; Deviation) at sea level with 22 °C [1, chapter 11, sample problem 5]:
+* **Example 2**. To calculate: `[Tstd;ΔISA]` (Standard temperature; Deviation) at sea level with 22 °C [1, chapter 11, sample problem 5]:
 ```rpl
 Hp=0_ft OAT=22_°C
 @ Expecting [ Tstd=288.15 K ΔISA=7. K ]
@@ -5833,14 +5835,14 @@ much higher.
 * The rule of thumb, `Hd ≈ Hp + 118.6 ft/K·ΔISA` (the FAA rounds it to
   120 ft per °C), is close to it for moderate deviations.
 
-* To calculate: `[Tstd;θr;Hd]` (Standard temperature; Temperature ratio; Density altitude) at a pressure altitude of 8 000 ft and 18 °C. The source gives 10 145 ft, and 10 236 ft by the rule of thumb [2]:
+* **Example 1**. To calculate: `[Tstd;θr;Hd]` (Standard temperature; Temperature ratio; Density altitude) at a pressure altitude of 8 000 ft and 18 °C. The source gives 10 145 ft, and 10 236 ft by the rule of thumb [2]:
 ```rpl
 Hp=8000_ft OAT=18_°C
 @ Expecting [ Tstd=272.3004 K θr=0.93525 81143 74 Hd=10 144.65994 68 ft ]
 'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
 ```
 
-* To calculate: `[Tstd;θr;Hd]` at a pressure altitude of 6 300 m and 32 °C. The result, 26 693.5 ft, is 8 136 m, as in the source [6]:
+* **Example 2**. To calculate: `[Tstd;θr;Hd]` at a pressure altitude of 6 300 m and 32 °C. The result, 26 693.5 ft, is 8 136 m, as in the source [6]:
 ```rpl
 Hp=6300_m OAT=32_°C
 @ Expecting [ Tstd=247.2 K θr=0.81009 33966 9 Hd=26 693.49310 57 ft ]
@@ -5858,14 +5860,14 @@ density altitude computed for dry air.
 * Steps: `Tc`, the temperature in °C as a plain number, and the factors `fe`
   and `fHp` of the formula.
 
-* To calculate: `[Tc;fe;fHp;ΔHd]` (Temperature; Factors; Humidity correction) at sea level, 30 °C and 100 % humidity. The source gives 565 ft [2]:
+* **Example 1**. To calculate: `[Tc;fe;fHp;ΔHd]` (Temperature; Factors; Humidity correction) at sea level, 30 °C and 100 % humidity. The source gives 565 ft [2]:
 ```rpl
 Hp=0_ft OAT=30_°C RH=1
 @ Expecting [ Tc=30. fe=6.98538 58062 5 fHp=1. ΔHd=565.12469 7111 ft ]
 'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
 ```
 
-* To calculate: `[Tc;fe;fHp;ΔHd]` at 5 000 ft, 40 °C and 80 % humidity. The source gives 977 ft [2]:
+* **Example 2**. To calculate: `[Tc;fe;fHp;ΔHd]` at 5 000 ft, 40 °C and 80 % humidity. The source gives 977 ft [2]:
 ```rpl
 Hp=5000_ft OAT=40_°C RH=0.8
 @ Expecting [ Tc=40. fe=12.16052 37341 fHp=1.20217 14995 ΔHd=977.38190 267 ft ]
@@ -5975,21 +5977,21 @@ speed that follows it at a given ground speed.
 * The rules of thumb: a 3° glide path is about 318 ft per nautical mile, and
   its vertical speed about 5 times the ground speed.
 
-* To calculate: `[Grd;GPct;Gft;VS]` (Gradient; Percent; ft/nmi; Vertical speed) for a 3° climb at 120 kt. The FAA table gives 318 ft/nmi and 637 ft/min [7]:
+* **Example 1**. To calculate: `[Grd;GPct;Gft;VS]` (Gradient; Percent; ft/nmi; Vertical speed) for a 3° climb at 120 kt. The FAA table gives 318 ft/nmi and 637 ft/min [7]:
 ```rpl
 FPA=3_° GS=120_knot
 @ Expecting [ Grd=0.05240 77792 83 GPct=5.24077 79283 Gft=318.43571 9498 VS=636.87143 8531 ft/min ]
 'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
 ```
 
-* To calculate: `[Grd;FPA;GPct;VS]` for a departure procedure requiring 200 ft/nmi, at 120 kt. The FAA table gives 3.29 % and 400 ft/min [7]:
+* **Example 2**. To calculate: `[Grd;FPA;GPct;VS]` for a departure procedure requiring 200 ft/nmi, at 120 kt. The FAA table gives 3.29 % and 400 ft/min [7]:
 ```rpl
 Gft=200 GS=120_knot
 @ Expecting [ Grd=0.03291 57667 15 FPA=1.88525 38508 1 ° GPct=3.29157 66714 6 VS=399.99999 9708 ft/min ]
 'ROOT(ⒺClimb & Descent Gradient;[Grd;FPA;GPct;VS];[0.1;1_°;1;1_ft/min])'
 ```
 
-* To calculate: `[Grd;GPct;Gft;VS]` for a 3° descent at 90 kt. The FAA table gives 478 ft/min [7]:
+* **Example 3**. To calculate: `[Grd;GPct;Gft;VS]` for a 3° descent at 90 kt. The FAA table gives 478 ft/min [7]:
 ```rpl
 FPA=-3_° GS=90_knot
 @ Expecting [ Grd=-0.05240 77792 83 GPct=-5.24077 79283 Gft=-318.43571 9498 VS=-477.65357 8899 ft/min ]
@@ -6009,14 +6011,14 @@ path angle, or at a given vertical speed.
   in descent. Give `VS` instead of `FPA` to descend at a set vertical speed.
 * The rule of thumb, 3 nmi per 1 000 ft, corresponds to a 3° path.
 
-* To calculate: `[Grd;ΔH;DTOD;VS;TTOD]` (Gradient; Height to lose; Distance; Vertical speed; Time) for a descent from 9 500 to 2 000 ft on a 3° path at 120 kt. The rule of thumb gives 22.5 nmi:
+* **Example 1**. To calculate: `[Grd;ΔH;DTOD;VS;TTOD]` (Gradient; Height to lose; Distance; Vertical speed; Time) for a descent from 9 500 to 2 000 ft on a 3° path at 120 kt. The rule of thumb gives 22.5 nmi:
 ```rpl
 Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
 @ Expecting [ Grd=-0.05240 77792 83 ΔH=7 500 ft DTOD=23.55263 41621 nmi VS=-636.87143 8531 ft/min TTOD=11.77631 7081 min ]
 'ROOT(ⒺTop of Descent;[Grd;ΔH;DTOD;VS;TTOD];[0.1;1_ft;1_nmi;1_ft/min;1_min])'
 ```
 
-* To calculate: `[Grd;FPA;ΔH;DTOD;TTOD]` for the same descent at 500 ft/min and 150 kt:
+* **Example 2**. To calculate: `[Grd;FPA;ΔH;DTOD;TTOD]` for the same descent at 500 ft/min and 150 kt:
 ```rpl
 Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
 @ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
@@ -6176,21 +6178,21 @@ times the wing area times the lift coefficient.
   level [1, chapter 5]: it is the pressure that is halved there. The density
   ratio of the standard atmosphere is 0.57.
 
-* To calculate: `[DRat;qd;Lift;CL]` (Density ratio; Dynamic pressure; Lift; Lift coefficient) for a Cessna 172 of 2 100 lb at 120 kt, in air of 0.00216 slug/ft³, with a wing of 174 ft². The source gives 0.272 [2]:
+* **Example 1**. To calculate: `[DRat;qd;Lift;CL]` (Density ratio; Dynamic pressure; Lift; Lift coefficient) for a Cessna 172 of 2 100 lb at 120 kt, in air of 0.00216 slug/ft³, with a wing of 174 ft². The source gives 0.272 [2]:
 ```rpl
 Wt=2100_lb TAS=120_knot ρa=0.00216_slug/ft^3 Sw=174_ft^2 nLF=1
 @ Expecting [ DRat=0.90874 95899 83 qd=2 121.23984 487 Pa Lift=2 100. lbf CL=0.27241 86027 28 ]
 'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
 ```
 
-* To calculate: `[DRat;qd;Lift;CL]` for an airliner of 16 000 kg at 253 kt, in air of 0.9048 kg/m³, with a wing of 60 m². The source gives 0.341 [2]:
+* **Example 2**. To calculate: `[DRat;qd;Lift;CL]` for an airliner of 16 000 kg at 253 kt, in air of 0.9048 kg/m³, with a wing of 60 m². The source gives 0.341 [2]:
 ```rpl
 Wt=16000_kg TAS=253_knot ρa=0.9048_kg/m^3 Sw=60_m^2 nLF=1
 @ Expecting [ DRat=0.73861 22448 98 qd=7 663.73716 447 Pa Lift=35 273.96194 96 lbf CL=0.34123 12570 94 ]
 'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
 ```
 
-* To calculate: `[ρa;Lift;qd;TAS]` (Density; Lift; Dynamic pressure; True airspeed) to fly the same Cessna at a lift coefficient of 0.5, at a density ratio of 0.7385:
+* **Example 3**. To calculate: `[ρa;Lift;qd;TAS]` (Density; Lift; Dynamic pressure; True airspeed) to fly the same Cessna at a lift coefficient of 0.5, at a density ratio of 0.7385:
 ```rpl
 Wt=2100_lb DRat=0.7385 Sw=174_ft^2 nLF=1 CL=0.5
 @ Expecting [ ρa=0.90466 25 kg/m↑3 Lift=2 100. lbf qd=1 155.73038 918 Pa TAS=98.25654 49074 knot ]
@@ -6214,14 +6216,14 @@ wing.
 * The Drag Force equation of the Forces and Energy section gives the drag
   of any body from its drag coefficient.
 
-* To calculate: `[AR;Kind;CD;LD;Drag]` (Aspect ratio; Induced drag factor; Drag coefficient; Lift to drag ratio; Drag) for the Cessna 172 of the Lift entry: 36 ft of span, `CD0` 0.02 and an Oswald factor of 0.81. The source gives 7.45, 0.0239 and 11.38, from rounded coefficients [2]:
+* **Example 1**. To calculate: `[AR;Kind;CD;LD;Drag]` (Aspect ratio; Induced drag factor; Drag coefficient; Lift to drag ratio; Drag) for the Cessna 172 of the Lift entry: 36 ft of span, `CD0` 0.02 and an Oswald factor of 0.81. The source gives 7.45, 0.0239 and 11.38, from rounded coefficients [2]:
 ```rpl
 bw=36_ft Sw=174_ft^2 CD0=0.02 eO=0.81 CL=0.272419 Lift=2100_lbf
 @ Expecting [ AR=7.44827 58620 7 Kind=0.05276 05549 8 CD=2.39154 72192 2⁳⁻² LD=11.39091 03617 Drag=184.35752 1332 lbf ]
 'ROOT(ⒺDrag Polar;[AR;Kind;CD;LD;Drag];[1;0.1;0.1;10;1_lbf])'
 ```
 
-* To calculate: `[AR;Kind;LD;CD;CD0]` for an airplane of 2 105 lb that needs 245 lbf of thrust in level flight at a lift coefficient of 0.315, with a wing of 30 ft by 5.25 ft and an Oswald factor of 0.75. The source gives `CD0` 0.0293 [2]:
+* **Example 2**. To calculate: `[AR;Kind;LD;CD;CD0]` for an airplane of 2 105 lb that needs 245 lbf of thrust in level flight at a lift coefficient of 0.315, with a wing of 30 ft by 5.25 ft and an Oswald factor of 0.75. The source gives `CD0` 0.0293 [2]:
 ```rpl
 Lift=2105_lbf Drag=245_lbf CL=0.315 bw=30_ft Sw=157.5_ft^2 eO=0.75
 @ Expecting [ AR=5.71428 57142 9 Kind=0.07427 23067 76 LD=8.59183 67346 9 CD=0.03666 27078 38 CD0=0.02929 30381 99 ]
@@ -6241,14 +6243,14 @@ The speeds that follow from the drag polar.
   propeller airplane and the minimum sink rate; it is about 76 % of `Vmd`.
 * These speeds are true airspeeds; with `DRat=1`, calibrated airspeeds.
 
-* To calculate: `[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj]` (Density; Maximum lift to drag ratio; Its lift coefficient; Speeds of minimum drag, of minimum power, of best jet range) for an airplane of 2 550 lb with a wing of 174 ft², `CD0` 0.0319 and `Kind` 0.0610515, at sea level. The source gives `Vmp` 58.8 kt, with a density of 0.002378 slug/ft³ [2]:
+* **Example 1**. To calculate: `[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj]` (Density; Maximum lift to drag ratio; Its lift coefficient; Speeds of minimum drag, of minimum power, of best jet range) for an airplane of 2 550 lb with a wing of 174 ft², `CD0` 0.0319 and `Kind` 0.0610515, at sea level. The source gives `Vmp` 58.8 kt, with a density of 0.002378 slug/ft³ [2]:
 ```rpl
 Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
 @ Expecting [ ρa=1.225 kg/m↑3 LDmax=11.32991 08712 CLmd=0.72284 83135 81 Vmd=77.38532 25844 knot Vmp=58.80012 96453 knot Vbrj=101.84481 2037 knot ]
 'ROOT(ⒺCharacteristic Speeds;[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj];[1_kg/m^3;10;1;100_knot;100_knot;100_knot])'
 ```
 
-* To calculate: `[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj]` for a jet of 5 000 lb with a wing of 180 ft², `CD0` 0.018 and `Kind` 0.095, in air of 0.001066 slug/ft³. The source gives 270 kt for the best range [2]:
+* **Example 2**. To calculate: `[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj]` for a jet of 5 000 lb with a wing of 180 ft², `CD0` 0.018 and `Kind` 0.095, in air of 0.001066 slug/ft³. The source gives 270 kt for the best range [2]:
 ```rpl
 Wt=5000_lb Sw=180_ft^2 CD0=0.018 Kind=0.095 ρa=0.001066_slug/ft^3
 @ Expecting [ DRat=0.44848 47513 53 LDmax=12.09127 08352 CLmd=0.43528 57500 66 Vmd=205.00969 5811 knot Vmp=155.77368 2781 knot Vbrj=269.80793 306 knot ]
@@ -6272,14 +6274,14 @@ flight.
 * With `DRat=1`, the stall speed is a calibrated airspeed, the one of the
   flight manual; with the density of the day, a true airspeed.
 
-* To calculate: `[ρa;Vst]` (Density; Stall speed) for an airplane of 20 000 lb with a wing of 340 ft² and a `CLmax` of 1.7, at a density ratio of 0.7385. The source gives 117.6 kt [2]:
+* **Example 1**. To calculate: `[ρa;Vst]` (Density; Stall speed) for an airplane of 20 000 lb with a wing of 340 ft² and a `CLmax` of 1.7, at a density ratio of 0.7385. The source gives 117.6 kt [2]:
 ```rpl
 Wt=20000_lb Sw=340_ft^2 CLmax=1.7 DRat=0.7385
 @ Expecting [ ρa=0.90466 25 kg/m↑3 Vst=117.64203 9787 knot ]
 'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
 ```
 
-* To calculate: `[ρa;Vst]` for an airplane of 5 200 lb with a wing of 160 ft² and a `CLmax` of 2.1 in landing configuration, at sea level. The source gives 67.6 kt [2]:
+* **Example 2**. To calculate: `[ρa;Vst]` for an airplane of 5 200 lb with a wing of 160 ft² and a `CLmax` of 2.1 in landing configuration, at sea level. The source gives 67.6 kt [2]:
 ```rpl
 Wt=5200_lb Sw=160_ft^2 CLmax=2.1 DRat=1
 @ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot ]
@@ -6297,14 +6299,14 @@ root of the load factor.
   flight.
 * 60° of bank gives 2 G; a stall speed of 50 kt becomes 100 kt at 4 G.
 
-* To calculate: `[nLF;Vstn]` (Load factor; Stall speed) at 45° of bank, for a stall speed of 57 kt. The table of the handbook gives 68 kt [1, chapter 11]:
+* **Example 1**. To calculate: `[nLF;Vstn]` (Load factor; Stall speed) at 45° of bank, for a stall speed of 57 kt. The table of the handbook gives 68 kt [1, chapter 11]:
 ```rpl
 φb=45_° Vst=57_knot
 @ Expecting [ nLF=1.41421 35623 7 Vstn=67.78480 55552 knot ]
 'ROOT(ⒺLoad Factor & Accelerated Stall;[nLF;Vstn];[1;100_knot])'
 ```
 
-* To calculate: `[φb;Vstn]` (Bank angle; Stall speed) for a load factor of 3, with a stall speed of 45 kt. The handbook says that a bank of 72° gives 3 G, and that the speed must stay above 75 kt; 72° gives 3.24 G [1, chapter 5]:
+* **Example 2**. To calculate: `[φb;Vstn]` (Bank angle; Stall speed) for a load factor of 3, with a stall speed of 45 kt. The handbook says that a bank of 72° gives 3 G, and that the speed must stay above 75 kt; 72° gives 3.24 G [1, chapter 5]:
 ```rpl
 nLF=3 Vst=45_knot
 @ Expecting [ φb=70.52877 93655 ° Vstn=77.94228 63406 knot ]
@@ -6322,14 +6324,14 @@ best glide, approach) change with the square root of the weight.
   `Vref` given for the weight `Wt0`.
 * A lighter aircraft has a lower maneuvering speed.
 
-* To calculate: `nlim` (Limit load factor) when the maneuvering speed is 1.7 times the stall speed. The handbook says 3 G [1, chapter 5]:
+* **Example 1**. To calculate: `nlim` (Limit load factor) when the maneuvering speed is 1.7 times the stall speed. The handbook says 3 G [1, chapter 5]:
 ```rpl
 Vst=60_knot VA=102_knot
 @ Expecting nlim=2.89
 'ROOT(ⒺManeuvering Speed & Weight;nlim;3)'
 ```
 
-* To calculate: `Vadj` (Adjusted speed) at 2 800 lb, for an approach speed of 70 kt at 2 950 lb. The table of the handbook gives 68 kt [1, chapter 11]:
+* **Example 2**. To calculate: `Vadj` (Adjusted speed) at 2 800 lb, for an approach speed of 70 kt at 2 950 lb. The table of the handbook gives 68 kt [1, chapter 11]:
 ```rpl
 Vref=70_knot Wt=2800_lb Wt0=2950_lb
 @ Expecting Vadj=68.19712 20626 knot
@@ -6391,14 +6393,14 @@ the aircraft.
   feet: the exact constant is 11.294, and the radii of the handbook are 0.3 %
   too large.
 
-* To calculate: `[nLF;TRad;TRate;Ttrn]` (Load factor; Radius; Rate; Time for 360°) at 120 kt and 30° of bank. The handbook gives 2 215 ft, 5.25 °/s and 68.6 s [1, chapter 5]:
+* **Example 1**. To calculate: `[nLF;TRad;TRate;Ttrn]` (Load factor; Radius; Rate; Time for 360°) at 120 kt and 30° of bank. The handbook gives 2 215 ft, 5.25 °/s and 68.6 s [1, chapter 5]:
 ```rpl
 TAS=120_knot φb=30_°
 @ Expecting [ nLF=1.15470 05383 8 TRad=2 208.33240 015 ft TRate=5.25488 18154 °/s Ttrn=68.50772 53203 s ]
 'ROOT(ⒺLevel Turn;[nLF;TRad;TRate;Ttrn];[1;1_ft;1_°/s;1_s])'
 ```
 
-* To calculate: `[φb;nLF;TRad;Ttrn]` (Bank angle; Load factor; Radius; Time) for a standard rate turn at 100 kt. The source gives 15.4° [3]:
+* **Example 2**. To calculate: `[φb;nLF;TRad;Ttrn]` (Bank angle; Load factor; Radius; Time) for a standard rate turn at 100 kt. The source gives 15.4° [3]:
 ```rpl
 TAS=100_knot TRate=3_°/s
 @ Expecting [ φb=15.35884 67547 ° nLF=1.03703 68440 1 TRad=3 223.47938 108 ft Ttrn=120 s ]
@@ -6441,14 +6443,14 @@ its lift to drag ratio: the glide ratio is the lift to drag ratio.
 * The time is the distance over the ground speed; the time along the path,
   `ΔH` over `VS`, is 0.2 % longer at a glide ratio of 15.
 
-* To calculate: `[FPA;Dgl;VS;Tgl]` (Flight path angle; Distance; Vertical speed; Time) for Air Transat flight 236, the Airbus A330 that ran out of fuel over the Atlantic on 24 August 2001 and that captain Robert Piché glided to Lajes, in the Azores. The source models it as a glide from 30 000 ft at 195 kt, at a lift to drag ratio of 15, and finds about 74 nmi and 22.8 min [2]:
+* **Example 1**. To calculate: `[FPA;Dgl;VS;Tgl]` (Flight path angle; Distance; Vertical speed; Time) for Air Transat flight 236, the Airbus A330 that ran out of fuel over the Atlantic on 24 August 2001 and that captain Robert Piché glided to Lajes, in the Azores. The source models it as a glide from 30 000 ft at 195 kt, at a lift to drag ratio of 15, and finds about 74 nmi and 22.8 min [2]:
 ```rpl
 LD=15 ΔH=30000_ft TAS=195_knot GS=195_knot
 @ Expecting [ FPA=-3.81407 48342 9 ° Dgl=74.06047 5162 nmi VS=-1 313.57586 727 ft/min Tgl=22.78783 85114 min ]
 'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
 ```
 
-* To calculate: `[FPA;Dgl;VS;Tgl]` for a glider at a glide ratio of 30, losing 3 400 ft at 50 kt against a headwind of 10 kt:
+* **Example 2**. To calculate: `[FPA;Dgl;VS;Tgl]` for a glider at a glide ratio of 30, losing 3 400 ft at 50 kt against a headwind of 10 kt:
 ```rpl
 LD=30 ΔH=3400_ft TAS=50_knot GS=40_knot
 @ Expecting [ FPA=-1.90915 2433 ° Dgl=13.42963 28294 nmi VS=-168.68729 6563 ft/min Tgl=20.14444 92441 min ]
@@ -6514,14 +6516,14 @@ climb.
 * A climb at 10° needs a thrust equal to the drag plus 17 % of the weight
   [1, chapter 5].
 
-* To calculate: `VS` (Vertical speed) for an airplane of 2 550 lb with 180 hp at 0.8 of propeller efficiency, needing 46.9 hp at its speed of minimum power. The source gives 1 257 ft/min [2]:
+* **Example 1**. To calculate: `VS` (Vertical speed) for an airplane of 2 550 lb with 180 hp at 0.8 of propeller efficiency, needing 46.9 hp at its speed of minimum power. The source gives 1 257 ft/min [2]:
 ```rpl
 Pav=180_hp ηp=0.8 Preq=46.8836_hp Wt=2550_lb
 @ Expecting VS=1 256.80047 059 ft/min
 'ROOT(ⒺRate & Angle of Climb;VS;1000_ft/min)'
 ```
 
-* To calculate: `FPA` (Flight path angle) for an airplane of 2 000 lb with 400 lbf of thrust and 200 lbf of drag:
+* **Example 2**. To calculate: `FPA` (Flight path angle) for an airplane of 2 000 lb with 400 lbf of thrust and 200 lbf of drag:
 ```rpl
 Wt=2000_lb Thr=400_lbf Drag=200_lbf
 @ Expecting FPA=5.73917 04772 7 °
@@ -6538,14 +6540,14 @@ to zero at the absolute ceiling `Habs`, the time to climb has a closed form.
 * Two rates of climb read in the flight manual at two altitudes give `ROC0`
   and `Habs`.
 
-* To calculate: `[Hsc;Tclb]` (Service ceiling; Time to climb) from 1 000 to 9 000 ft, for a rate of climb of 973.5 ft/min at sea level and an absolute ceiling of 20 072 ft. The source gives 11.2 min [2]:
+* **Example 1**. To calculate: `[Hsc;Tclb]` (Service ceiling; Time to climb) from 1 000 to 9 000 ft, for a rate of climb of 973.5 ft/min at sea level and an absolute ceiling of 20 072 ft. The source gives 11.2 min [2]:
 ```rpl
 ROC0=973.5_ft/min Habs=20072.2_ft Hini=1000_ft Hfin=9000_ft
 @ Expecting [ Hsc=18 010.34072 93 ft Tclb=11.21227 34995 min ]
 'ROOT(ⒺTime to Climb & Ceilings;[Hsc;Tclb];[1_ft;1_min])'
 ```
 
-* To calculate: `Hsc` (Service ceiling) for a rate of climb of 1 235 ft/min at sea level and an absolute ceiling of 14 790 ft. The source gives 13 593 ft [2]:
+* **Example 2**. To calculate: `Hsc` (Service ceiling) for a rate of climb of 1 235 ft/min at sea level and an absolute ceiling of 14 790 ft. The source gives 13 593 ft [2]:
 ```rpl
 ROC0=1235_ft/min Habs=14790.4_ft
 @ Expecting Hsc=13 592.79676 11 ft
@@ -6573,14 +6575,14 @@ of the fuel on board.
 * The Endurance & Range entry of Flight Management works with a volume of
   fuel; `ρfuel` converts.
 
-* To calculate: `[FFm;Endur]` (Fuel flow; Endurance) for a Cessna 172 using 79.6 hp at 0.45 lb/(hp·h), with 48 lb of fuel. The source gives 35.8 lb/h and 1.34 h [2]:
+* **Example 1**. To calculate: `[FFm;Endur]` (Fuel flow; Endurance) for a Cessna 172 using 79.6 hp at 0.45 lb/(hp·h), with 48 lb of fuel. The source gives 35.8 lb/h and 1.34 h [2]:
 ```rpl
 BSFC=0.45_lb/(hp*h) Psh=79.573_hp Wfuel=48_lb
 @ Expecting [ FFm=35.80785 lb/h Endur=1.34048 81890 4 h ]
 'ROOT(ⒺFuel Flow;[FFm;Endur];[1_lb/h;1_h])'
 ```
 
-* To calculate: `FFm` for a jet with 1 374 lbf of thrust at 0.5 lb/(lbf·h). The source gives 687 lb/h [2]:
+* **Example 2**. To calculate: `FFm` for a jet with 1 374 lbf of thrust at 0.5 lb/(lbf·h). The source gives 687 lb/h [2]:
 ```rpl
 TSFC=0.5_h^-1 Thr=1373.97_lbf
 @ Expecting FFm=686.985 lb/h
@@ -6633,14 +6635,14 @@ lift coefficient, the jet climbs as it gets lighter.
   specific consumption `TSFC` and the weights `Wini` and `Wfin`; and the range
   `Rng` at the true airspeed `TAS`.
 
-* To calculate: `Endur` (Endurance) for a business jet from 18 815 to 13 215 lb, with a lift to drag ratio of 16.85 and 0.6 lb/(lbf·h). The source gives 9.9 h [2]:
+* **Example 1**. To calculate: `Endur` (Endurance) for a business jet from 18 815 to 13 215 lb, with a lift to drag ratio of 16.85 and 0.6 lb/(lbf·h). The source gives 9.9 h [2]:
 ```rpl
 LD=16.85 Wini=18815_lb Wfin=13215_lb TSFC=0.6_h^-1
 @ Expecting Endur=9.92189 43507 h
 'ROOT(ⒺBreguet Jet;Endur;1_h)'
 ```
 
-* To calculate: `[Endur;Rng]` (Endurance; Range) in a cruise climb for the jet of Jet Range at Constant Altitude, at 269.8 kt, from 5 000 to 4 000 lb. At constant altitude it flies 596.5 nmi:
+* **Example 2**. To calculate: `[Endur;Rng]` (Endurance; Range) in a cruise climb for the jet of Jet Range at Constant Altitude, at 269.8 kt, from 5 000 to 4 000 lb. At constant altitude it flies 596.5 nmi:
 ```rpl
 LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1 TAS=269.808_knot
 @ Expecting [ Endur=2.33660 30688 8 h Rng=630.43420 0807 nmi ]

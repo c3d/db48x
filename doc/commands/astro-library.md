@@ -31,6 +31,9 @@ and the atmospheres of three planets. It has three submenus:
 * [Planet Atmospheres](#planet-atmosphereslibrary): temperature, pressure and
   density versus altitude on the Earth, Mars and Venus.
 
+Four short example programs, [AstroExamples](#astroexampleslibrary), are in
+LIB → Demo → Astronomy.
+
 ## Ephemeris Orbital ElementsLibrary
 
 Orbital elements from a Julian Day, as vectors `[a e I L ϖ Ω]`:
@@ -109,8 +112,8 @@ design of interplanetary trajectories. It has two submenus:
 
 ## AstroExamplesLibrary
 
-Four short programs showing how to build your own RPL program from the
-astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
+Four short programs, in LIB → Demo → Astronomy, showing how to build your
+own RPL program from the astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
 computes a value for today's date, displays it and leaves it tagged on the
 stack. They are meant to be read and adapted.
 
@@ -347,14 +350,14 @@ and differences against each body's velocity. The example below reproduces the
 Earth→Mars leg of NASA's **Mars 2020 (Perseverance)** mission — departure in the
 late-July 2020 window, ~200-day cruise.
 
-`t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
+**1)** `t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
 
 ```rpl
 2459050.5 2459250.5 'Ⓛ♁Pf' 'Ⓛ♂Pf' ⓁTrCost     @ (Earth→Mars ~200 d — Mars 2020 / Perseverance)
 @ Expecting { 6.37381 3392 3.64458 48380 2 2.72922 85539 7 }
 ```
 
-The Moon plugs in identically:
+**2)** The Moon plugs in identically:
 
 ```rpl
 2459050.5 2459250.5 'Ⓛ☾Hf' 'Ⓛ♂Pf' ⓁTrCost     @ (Moon→Mars)
