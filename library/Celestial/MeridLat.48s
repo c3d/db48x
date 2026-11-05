@@ -1,0 +1,21 @@
+«
+@@ ============================================================
+@@ MeridLat — latitude from a meridian altitude, when the body bears due North
+@@ or South.
+@@ 
+@@ Input : Ho Dec drn — observed altitude, declination, and the direction of the
+@@         body, the text "S" or "N". Plain numbers are degrees; angles with a unit
+@@         are accepted.
+@@ Output: φ — latitude.
+@@ ============================================================
+
+  → hob dcl drn
+  «
+    IF drn "S" == drn "N" == OR NOT THEN "Direction must be S or N" DOERR END
+    hob →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END dcl →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END
+    → hox dcx
+    «
+      IF drn "S" == THEN dcx 90 + hox - ELSE dcx 90 - hox + END 1_° *
+    »
+  »
+»

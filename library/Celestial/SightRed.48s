@@ -1,0 +1,29 @@
+«
+@@ ============================================================
+@@ SightRed — sight reduction: computed altitude and true azimuth of a body
+@@ from an assumed position. Bowditch, The American Practical Navigator,
+@@ appendix B.
+@@ 
+@@ Input : φ λ GHA Dec — assumed latitude and longitude (East positive), Greenwich
+@@         hour angle and declination of the body. Plain numbers are degrees;
+@@         angles with a unit are accepted.
+@@ Output: Hc Zn — computed altitude, true azimuth from North.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  4 →LIST « →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END » MAP LIST→ DROP
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  Ⓒπ →Num 180 /
+  → lat lon gha dcl amode aunits rdn
+  «
+    'lat*rdn' EVAL 'dcl*rdn' EVAL '(gha+lon)*rdn' EVAL
+    → phi dlt lha
+    «
+      'ASIN(SIN(phi)*SIN(dlt)+COS(phi)*COS(dlt)*COS(lha))/rdn' EVAL 1_° *
+      '((-COS(dlt)*SIN(lha))∠(SIN(dlt)*COS(phi)-COS(dlt)*SIN(phi)*COS(lha)))/rdn' EVAL
+      360 MOD 1_° *
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

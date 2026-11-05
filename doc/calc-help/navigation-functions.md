@@ -12,6 +12,16 @@ The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
   points, [VincentyDir](#vincentydir) the point reached from a given point,
   azimuth and distance, and [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh)
   convert GPS coordinates to and from Earth-centred Cartesian coordinates.
+* On **map grids**: [LL→UTM](#ll→utm) and [UTM→LL](#utm→ll) convert to and from
+  UTM coordinates, [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll) to and from
+  military grid references.
+* On **tracks and areas**: [TrackLen](#tracklen) sums a track, and
+  [PolyArea](#polyarea) gives the area of a polygon.
+* In a **local frame**: [LLH→ENU](#llh→enu) and [ENU→LLH](#enu→llh).
+* On the **magnetic field**: [WMM](#wmm) gives the magnetic declination at a point
+  and date.
+* On **time**: [UTC→GPS](#utc→gps) and [GPS→UTC](#gps→utc).
+* As **text**: [LL→DMS](#ll→dms) and [LL→DDM](#ll→ddm) format a position.
 * On a **sphere**, where the formulas are shorter and angles are enough:
   [RadialFix](#radialfix) finds a position from two bearings, and
   [GCPoint](#gcpoint) a point along a great-circle route.
@@ -39,6 +49,13 @@ The Geodesy subsection computes distances, directions and positions:
 
 * on the WGS-84 ellipsoid: [VincentyInv](#vincentyinv),
   [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
+* on map grids of the same ellipsoid: [LL→UTM](#ll→utm), [UTM→LL](#utm→ll),
+  [LL→MGRS](#ll→mgrs) and [MGRS→LL](#mgrs→ll);
+* for tracks and areas: [TrackLen](#tracklen) and [PolyArea](#polyarea);
+* in a local frame: [LLH→ENU](#llh→enu) and [ENU→LLH](#enu→llh);
+* for the magnetic field: [WMM](#wmm);
+* for GPS time: [UTC→GPS](#utc→gps) and [GPS→UTC](#gps→utc);
+* as text: [LL→DMS](#ll→dms) and [LL→DDM](#ll→ddm);
 * on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
 
 
@@ -181,6 +198,308 @@ Four tenths of the way from Los Angeles (LAX, 33°57′N, 118°24′W) to New Yo
 ```rpl
 33.95 -118.4 40.63333333333333 -73.78333333333333 0.4 ⓁGCPoint 2 →LIST
 @ Expecting { 38.66944 7748 ° -101.62616 0313 ° }
+```
+
+
+## LL→UTM
+
+Converts a latitude and longitude on the WGS-84 ellipsoid to Universal Transverse
+Mercator coordinates, the metric grid of many topographic maps and GPS receivers.
+The Earth is cut into 60 zones, each 6° wide, and each zone is projected on its
+own plane, with an easting of 500 000 m on its central meridian.
+
+Stack: `φ` `λ` ▶ `zone` `hem` `east` `north`, where `hem` is the text `"N"` or
+`"S"`. In the southern hemisphere, the northing counts from 10 000 000 m at the
+equator, so that it is never negative.
+
+The latitude must lie from 80°S to 84°N, the range of UTM; beyond it, the function
+stops with an error. The zones follow NGA.SIG.0012, with the wider zones of western
+Norway and of Svalbard. The method is the Krüger series in the form of C. F. F.
+Karney (Journal of Geodesy 85, 2011), to order 4, accurate to far less than a
+millimetre over a zone.
+
+In Montréal; GeographicLib gives zone 18 North, 609 377.347 m and 5 039 449.713 m:
+
+```rpl
+45.5 -73.6 ⓁLL→UTM 4 →LIST
+@ Expecting { 18 "N" 609 377.34742 5 m 5 039 449.713 m }
+```
+
+In Sydney, in the southern hemisphere; GeographicLib gives zone 56 South,
+334 416.394 m and 6 251 925.360 m:
+
+```rpl
+-33.86 151.21 ⓁLL→UTM 4 →LIST
+@ Expecting { 56 "S" 334 416.39399 m 6 251 925.36035 m }
+```
+
+In Svalbard, zones 32, 34 and 36 do not exist: 15.6°E falls in zone 33, which
+spans 9°E to 21°E; GeographicLib gives 513 696.945 m and 8 680 760.053 m:
+
+```rpl
+78.2 15.6 ⓁLL→UTM 4 →LIST
+@ Expecting { 33 "N" 513 696.94541 7 m 8 680 760.0532 m }
+```
+
+
+## UTM→LL
+
+Converts Universal Transverse Mercator coordinates to a latitude and longitude on
+the WGS-84 ellipsoid.
+
+Stack: `zone` `hem` `east` `north` ▶ `φ` `λ`, where `hem` is the text `"N"` or `"S"`.
+Plain numbers are metres.
+
+The coordinates of Sydney in the previous page, rounded to the millimetre, give back
+33.86°S, 151.21°E:
+
+```rpl
+56 "S" 334416.394 6251925.360 ⓁUTM→LL 2 →LIST
+@ Expecting { -33.86000 00032 ° 151.21 ° }
+```
+
+
+## LL→MGRS
+
+Converts a latitude and longitude on the WGS-84 ellipsoid to a Military Grid
+Reference System text. It names the UTM zone, a latitude band, a square of 100 km by
+two letters, then the position inside that square. The system is also used by search
+and rescue services and by the United States National Grid.
+
+Stack: `φ` `λ` `n` ▶ `text`, where `n`, from 0 to 5, is the number of digits of each
+coordinate: 5 names a square of 1 m, 4 of 10 m, 0 of 100 km.
+
+As NGA.SIG.0012 requires, the digits are truncated, not rounded: the text names the
+square that holds the point.
+
+In Montréal, to the metre, then to 100 km; GeographicLib gives 18TXR 09377 39449:
+
+```rpl
+45.5 -73.6 5 ⓁLL→MGRS
+@ Expecting "18T XR 09377 39449"
+```
+
+```rpl
+45.5 -73.6 0 ⓁLL→MGRS
+@ Expecting "18T XR"
+```
+
+In western Norway, where zone 32 is widened; GeographicLib gives 32VKN 96191 01684:
+
+```rpl
+60.4 5.3 5 ⓁLL→MGRS
+@ Expecting "32V KN 96191 01684"
+```
+
+
+## MGRS→LL
+
+Converts a Military Grid Reference System text to a latitude and longitude on the
+WGS-84 ellipsoid: the centre of the square that the text names. Spaces and case do
+not matter.
+
+Stack: `text` ▶ `φ` `λ`.
+
+The square of 1 m that holds 45.5°N, 73.6°W, whose centre is about 0.2 m from it:
+
+```rpl
+"18T XR 09377 39449" ⓁMGRS→LL 2 →LIST
+@ Expecting { 45.49999 80594 ° -73.59999 80952 ° }
+```
+
+The same text in any form, in Sydney:
+
+```rpl
+"56h lh 3441651925" ⓁMGRS→LL 2 →LIST
+@ Expecting { -33.85999 87578 ° 151.21000 1172 ° }
+```
+
+
+## WMM
+
+The World Magnetic Model 2025 of NOAA and the British Geological Survey: the
+magnetic declination at a point, which turns a true course into a magnetic course,
+and the direction and strength of the Earth's magnetic field.
+
+Stack: `φ` `λ` `h` `t` ▶ `D`, I, `H`, `F`. The inputs are the latitude, the longitude
+(East positive), the height above the WGS-84 ellipsoid, and the date as a decimal
+year, for instance 2027.5 for the middle of 2027. The results are the declination
+(East positive), the inclination (down positive), the horizontal intensity and the
+total intensity.
+
+The model is valid from 2025 to 2030; outside these years, the function stops with
+an error. It describes the field of the Earth's core and upper crust only, so local
+anomalies and magnetic disturbances can move a compass further. According to NOAA,
+compasses become unreliable where the horizontal intensity falls below 2 000 nT, close
+to the magnetic poles, and call for caution below 6 000 nT.
+
+The function sums 90 terms of a spherical harmonic series, up to degree 12.
+
+Two test values of NOAA: at 80°N, 0°E, at sea level in 2025, it gives D = 1.28°,
+I = 83.21°, H = 6 523.2 nT, F = 55 178.5 nT:
+
+```rpl
+80 0 0 2025 ⓁWMM 4 →LIST
+@ Expecting { 1.28148 21161 3 ° 83.21057 95425 ° 6 523.23096 913 nT 55 178.45461 93 nT }
+```
+
+At 80°S, 120°W, 100 km high in 2027.5, it gives D = 67.93°, I = -72.10°,
+H = 15 927.0 nT, F = 51 825.7 nT:
+
+```rpl
+-80 240 100_km 2027.5 ⓁWMM 4 →LIST
+@ Expecting { 67.93164 32316 ° -72.10227 82777 ° 15 927.00798 6 nT 51 825.69071 72 nT }
+```
+
+
+## TrackLen
+
+The length of a track on the WGS-84 ellipsoid: the sum of the geodesic distances
+between successive points, computed with the method of T. Vincenty.
+
+Stack: `points` ▶ `s`. Each point of the list is `{ φ λ }` or, as in a route,
+`{ "name" φ λ }`. At least two points are needed.
+
+From Montréal to Québec, Saguenay and Sept-Îles; GeographicLib gives 806 199.048 m:
+
+```rpl
+{ { 45.5 -73.6 } { 46.8 -71.2 } { 48.4 -71.05 } { 50.2 -66.4 } } ⓁTrackLen
+@ Expecting 806 199.04823 4 m
+```
+
+A route of the Route subsection can be used directly, for instance `Route ⓁTrackLen`.
+
+
+## PolyArea
+
+The area of a polygon on the WGS-84 ellipsoid. The polygon closes by itself, and its
+corners may be listed in either direction.
+
+Stack: `corners` ▶ `A`. Each corner of the list is `{ φ λ }` or `{ "name" φ λ }`. At
+least three corners are needed, and the edges must not cross each other.
+
+The method is the spherical excess on the sphere of the same area, using authalic
+latitudes (J. P. Snyder, *Map Projections: A Working Manual*, 1987). Its edges are great
+circles of that sphere, not geodesics of the ellipsoid. Against GeographicLib, the
+difference is too small to see for a field of 1 km, about 0.002 % for a square of 10°
+or a province, 0.04 % for a square of 60°, and 0.16 % for a triangle spanning an ocean.
+
+A field of about 1 km on a side; GeographicLib gives 1 016 253.002 m²:
+
+```rpl
+{ { 45.5 -73.6 } { 45.5 -73.587 } { 45.509 -73.587 } { 45.509 -73.6 } } ⓁPolyArea
+@ Expecting 1 016 253.00234 m↑2
+```
+
+A square of 10° north of the equator; GeographicLib gives 1.227 877 × 10¹² m²:
+
+```rpl
+{ { 0 0 } { 0 10 } { 10 10 } { 10 0 } } ⓁPolyArea
+@ Expecting 1.22785 73630 7⁳¹² m↑2
+```
+
+
+## LLH→ENU
+
+The position of a point in the local East, North, Up frame of an origin, both given
+by latitude, longitude and height on the WGS-84 ellipsoid. It suits short distances:
+`U` is measured along the vertical of the origin, not of the point.
+
+Stack: `φ0` `λ0` `h0` `φ` `λ` `h` ▶ `E` `N` `U`.
+
+The method is the rotation of the difference of Earth-centred coordinates, as in
+IOGP Guidance Note 7-2.
+
+A point about 1.4 km from Montréal, checked with a separate computation:
+
+```rpl
+45.5 -73.6 30 45.51 -73.59 130 ⓁLLH→ENU 3 →LIST
+@ Expecting { 781.45816 607 m 1 111.48778 824 m 99.85521 00381 m }
+```
+
+
+## ENU→LLH
+
+The latitude, longitude and height of a point given in the local East, North, Up frame
+of an origin on the WGS-84 ellipsoid.
+
+Stack: `φ0` `λ0` `h0` `E` `N` `U` ▶ `φ` `λ` `h`.
+
+The previous example in reverse:
+
+```rpl
+45.5 -73.6 30 781.4581660693741 1111.4877882355224 99.85521003776165 ⓁENU→LLH 3 →LIST
+@ Expecting { 45.51 ° -73.59 ° 130. m }
+```
+
+
+## UTC→GPS
+
+Converts a UTC date and time to GPS week and time of week. GPS time started on 6 January
+1980 at midnight UTC, and it has no leap seconds: it has been 18 seconds ahead of UTC
+since 1 January 2017.
+
+Stack: date, time ▶ `week` `tow`, with the date as `YYYYMMDD` and the time as
+`HH.MMSS`. The week number has no rollover, and `tow` is the time since the start of
+the week, on Sunday.
+
+Before 2017 the offset was smaller, so the function stops with an error. A leap second
+added later would require a new offset here.
+
+```rpl
+20261102 12.00 ⓁUTC→GPS 2 →LIST
+@ Expecting { 2 443 129 618 s }
+```
+
+
+## GPS→UTC
+
+Converts a GPS week and time of week to a UTC date and time.
+
+Stack: `week` `tow` ▶ date, time. The range is that of UTC→GPS. The offset of 18 s
+may fall on the previous day:
+
+```rpl
+2443 129618 ⓁGPS→UTC 2 →LIST
+@ Expecting { Mon 2/Nov/2026 12:00:00 }
+```
+
+```rpl
+2443 5_s ⓁGPS→UTC 2 →LIST
+@ Expecting { Sat 31/Oct/2026 23:59:47 }
+```
+
+
+## LL→DMS
+
+A latitude and longitude as a text in degrees, minutes and seconds, to 0.01″, with the
+letters of the hemispheres.
+
+Stack: `φ` `λ` ▶ `text`.
+
+```rpl
+-33.86 151.21 ⓁLL→DMS
+@ Expecting "33°51′36.00″S 151°12′36.00″E"
+```
+
+Rounding carries over to the minutes and the degrees:
+
+```rpl
+59.999999 0.0001 ⓁLL→DMS
+@ Expecting "60°00′00.00″N 0°00′00.36″E"
+```
+
+
+## LL→DDM
+
+A latitude and longitude as a text in degrees and decimal minutes, to 0.001′, the form
+that many GPS receivers show.
+
+Stack: `φ` `λ` ▶ `text`.
+
+```rpl
+45.5 -73.6 ⓁLL→DDM
+@ Expecting "45°30.000′N 73°36.000′W"
 ```
 
 
@@ -367,4 +686,163 @@ Route « 1 GET » MAP RouteLeg +
 
 See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
 
+
+## Celestial NavigationLibrary
+
+The Celestial Navigation section of the Function Library finds a position from the
+altitudes of the Sun and the stars:
+
+* [AriesGHA](#ariesgha) and [SunGP](#sungp) give the Greenwich hour angles and the
+  declination of the Sun;
+* [Sextant](#sextant) corrects a sextant altitude;
+* [SightRed](#sightred) computes the altitude and azimuth expected from an assumed
+  position;
+* [LOPFix](#lopfix) finds the position from several sights, and
+  [MeridLat](#meridlat) the latitude from a meridian altitude.
+
+The Celestial Navigation section of the Equation Library holds the same formulas.
+The Moon, the planets and a star catalogue are not included: their Greenwich hour
+angles and declinations come from an almanac, or from the service of the US Naval
+Observatory, which also gave the reference values of these pages.
+
+
+## AriesGHA
+
+The Greenwich hour angle of the first point of Aries, from which the hour angle of a
+star follows: add its sidereal hour angle.
+
+Stack: date as YYYYMMDD, UT time as HH.MMSS ▶ `GHA`.
+
+The value is the mean one, from the approximate sidereal time formula of the US Naval
+Observatory. It can differ from the almanac by a few tenths of an arc minute. On
+2 November 2026 at 12:00 UT, the USNO gives 221.778235°, a difference of 0.13′:
+
+```rpl
+20261102 12.00 ⓁAriesGHA
+@ Expecting 221.77610 2707 °
+```
+
+
+## SunGP
+
+The geographical position of the Sun: its Greenwich hour angle, its declination, and
+its semidiameter, from the approximate formulas of the US Naval Observatory.
+
+Stack: date as YYYYMMDD, UT time as HH.MMSS ▶ `GHA` `δ` `SD`.
+
+The USNO states about 1′ within two centuries of 2000, that is about a nautical mile of
+position. On the dates below, the USNO gives 4.110467°, -14.837829° and 0.268635° for
+the first, and 97.030789°, 23.437309° and 0.262316° for the second:
+
+```rpl
+20261102 12.00 ⓁSunGP 3 →LIST
+@ Expecting { 4.11254 12203 7 ° -14.83488 22968 ° 16.12055 67085 arcmin }
+```
+
+```rpl
+20260621 18.30 ⓁSunGP 3 →LIST
+@ Expecting { 97.03027 65818 ° 23.43491 40059 ° 15.73993 05698 arcmin }
+```
+
+
+## Sextant
+
+The observed altitude from a sextant altitude. It applies the index correction, the
+dip of the horizon, the refraction, the semidiameter and the parallax.
+
+![Sextant altitude](img/SextantAltitude.bmp)
+
+Stack: `Hs` `IC` `HE` `SD` `HP` ▶ `Ho`, with the sextant altitude, the index
+correction, the height of eye, the semidiameter and the horizontal parallax.
+Plain numbers are degrees for `Hs`, arc minutes for `IC`, `SD` and `HP`, and metres for
+`HE`.
+
+`SD` is positive for the lower limb, negative for the upper limb, and zero for a star.
+`HP` is about 0.15′ for the Sun and 60′ for the Moon. With a bubble sextant, or an
+artificial horizon, `HE` is 0.
+
+The dip is 1.76′√h, h in metres, as in Bowditch. The refraction follows the formula of
+G. G. Bennett (1982) for standard air: it is not reliable below about 5°, and
+atmospheric conditions change it.
+
+The Sun's lower limb at 45°30′, with an index correction of +2′, from 10 m; this
+result is computed, not from a published example:
+
+```rpl
+'45_°+30_arcmin' 2_arcmin 10_m 16_arcmin 0.15_arcmin ⓁSextant
+@ Expecting 45.69266 54988 °
+```
+
+
+## SightRed
+
+Sight reduction: the computed altitude and the true azimuth of a body seen from an
+assumed position, from the formulas of Bowditch, appendix B.
+
+![Position triangle](img/PositionTriangle.bmp)
+
+Stack: `φ` `λ` `GHA` `δ` ▶ `Hc` `Zn`, where `φ` and `λ` are the assumed position,
+East positive, and `GHA` and `δ` the Greenwich hour angle and declination of the body.
+
+The Sun from Montréal; the USNO gives 3.138076° and 114.941856°:
+
+```rpl
+45.5 -73.6 4.110467 -14.837829 ⓁSightRed 2 →LIST
+@ Expecting { 3.13807 56645 4 ° 114.94185 6868 ° }
+```
+
+Canopus from Sydney; the USNO gives 7.827592° and 151.033424°:
+
+```rpl
+-33.86 151.21 81.164278 -52.71505 ⓁSightRed 2 →LIST
+@ Expecting { 7.82759 19399 8 ° 151.03342 4621 ° }
+```
+
+Bowditch, §403, example 1, gives an azimuth of 097.7°:
+
+```rpl
+33.4 0 '316_°+41.2_arcmin' '20_°+13.8_arcmin' ⓁSightRed 2 →LIST
+@ Expecting { 49.49282 8747 ° 97.71043 67843 ° }
+```
+
+
+## MeridLat
+
+The latitude from a meridian altitude, when the body bears due North or South.
+
+Stack: `Ho` `δ`, then the text `"S"` or `"N"` for the direction of the body ▶ `φ`.
+
+The result is computed; a body to the south with a declination of 10°N, at 64.6°:
+
+```rpl
+64.6 10 "S" ⓁMeridLat
+@ Expecting 35.4 °
+```
+
+
+## LOPFix
+
+The position from two or more lines of position, by least squares on their intercepts
+and azimuths from an assumed position.
+
+![Line of position](img/LineOfPosition.bmp)
+
+Stack: `φ` `λ` `lines` ▶ `φ` `λ`. Each element of `lines` is `{ Zn a }`, the true
+azimuth and the intercept, positive toward the body. Plain numbers are degrees and
+nautical miles. Parallel lines stop with an error.
+
+The lines are treated as straight: with intercepts above about 30 NM, reduce the sights
+again from the result, and repeat.
+
+Three stars seen from a true position of 45.5°N, 73.6°W, using the hour angles of the
+USNO, from an assumed position at 45.7°N, 73.2°W. A second pass gives back the true
+position to within a metre; this example shows the first:
+
+```rpl
+45.7 -73.2 { { 93.400 -16.097 } { 26.561 -18.257 } { 296.550 9.657 } } ⓁLOPFix 2 →LIST
+@ Expecting { 45.49979 40144 ° -73.60135 20881 ° }
+```
+
+
+See also: [UTC→GPS](#utc→gps) for times, and [WMM](#wmm) for the magnetic declination.
 

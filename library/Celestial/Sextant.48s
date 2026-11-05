@@ -1,0 +1,38 @@
+«
+@@ ============================================================
+@@ Sextant — observed altitude from a sextant altitude: index correction, dip of
+@@ the horizon, refraction, semidiameter and parallax.
+@@ 
+@@ Input : Hs IC h SD HP — sextant altitude; index correction; height of eye;
+@@         semidiameter, positive for the lower limb, negative for the upper limb,
+@@         zero for a star; horizontal parallax. Plain numbers are degrees for Hs,
+@@         arc minutes for IC, SD and HP, metres for h; units are accepted.
+@@ Output: Ho — observed altitude.
+@@ Dip 1.76′√h, as in Bowditch appendix B with h in metres. Refraction by the
+@@ formula of G. G. Bennett (1982), for standard air. With a bubble sextant, h is 0.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  3 PICK DROP
+  → hps ice hgt sdm hpr
+  «
+    hps →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END
+    ice →Num IF DUP TypeName "unit" == THEN 1_arcmin CONVERT UVAL END
+    hgt IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END →Num
+    sdm →Num IF DUP TypeName "unit" == THEN 1_arcmin CONVERT UVAL END
+    hpr →Num IF DUP TypeName "unit" == THEN 1_arcmin CONVERT UVAL END
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    Ⓒπ →Num 180 /
+    → hsx icx hmx sdx hpx amode aunits rdn
+    «
+      IF hmx 0 < THEN "Height of eye must not be negative" DOERR END
+      'hsx+(icx-1.76*√hmx)/60' EVAL
+      → hap
+      «
+        'hap+(sdx+hpx*COS(hap*rdn)-1/TAN((hap+7.31/(hap+4.4))*rdn))/60' EVAL 1_° *
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+  »
+»

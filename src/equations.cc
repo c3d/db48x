@@ -2205,6 +2205,33 @@ static const cstring basic_equations[] =
     "}",
 
     // ------------------------------------------------------------------------
+    "Celestial Navigation", nullptr,
+    // ------------------------------------------------------------------------
+    // Position from the altitudes of celestial bodies. Longitudes positive East,
+    // azimuths from true North. 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°).
+    "Sight Reduction",  "{ "
+    "  '(LHA_°)=(GHA_°)+(λA_°)' "
+    "  '(Hc_°)=ASIN(SIN(φA_°)·SIN(δb_°)+COS(φA_°)·COS(δb_°)·COS(LHA_°))' "
+    "  'xZ=SIN(δb_°)·COS(φA_°)-COS(δb_°)·SIN(φA_°)·COS(LHA_°)' "
+    "  '(Zn_°)=180_°+(COS(δb_°)·SIN(LHA_°))∠(-xZ)' "
+    "  '(aHo_nmi)=(1_nmi)·((Ho_°)-(Hc_°))/(1_arcmin)' "
+    "}",
+    "Altitude Corrections",  "{ "
+    "  '(Dip_arcmin)=(1.76_arcmin)·√((HE_m)/(1_m))' "
+    "  '(Ha_°)=(Hs_°)+(IC_arcmin)-(Dip_arcmin)' "
+    "  '(Rfr_arcmin)=(1_arcmin)/TAN((Ha_°)+(7.31_°)/((Ha_°)/(1_°)+4.4))' "
+    "  '(PA_arcmin)=(HP_arcmin)·COS(Ha_°)' "
+    "  '(Ho_°)=(Ha_°)-(Rfr_arcmin)+(SD_arcmin)+(PA_arcmin)' "
+    "}",
+    "Meridian Altitude",  "{ "
+    "  '(ZD_°)=90_°-(Ho_°)' "
+    "  '(φM_°)=(δb_°)+Sdir·(ZD_°)' "
+    "}",
+    "Amplitude",  "{ "
+    "  '(Amp_°)=ASIN(SIN(δb_°)/COS(φA_°))' "
+    "}",
+
+    // ------------------------------------------------------------------------
     "Aeronautics", nullptr,
     "Aeronautics/Flight Management", nullptr,
     // ------------------------------------------------------------------------

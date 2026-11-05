@@ -5376,6 +5376,102 @@ TC=265_° GS=15_knot WD=5_° WS=3_knot
 ```
 
 
+## Celestial Navigation
+
+The `Celestial Navigation` section finds a position from the altitudes of celestial
+bodies. A sextant altitude is first corrected to an observed altitude, then compared
+with the altitude computed from an assumed position. The difference, the intercept,
+places a line of position.
+
+**Conventions.** Latitudes are positive North, longitudes positive East. Azimuths are
+measured clockwise from true North. Angles can be entered in any angular unit.
+
+The Function Library has matching functions, and gives the position of the Sun.
+
+The 23 variables in the Celestial Navigation section are:
+
+* `φA`, `λA`: Latitude and longitude of the assumed position
+* `GHA`: Greenwich hour angle of the body
+* `δb`: Declination of the body
+* `LHA`: Local hour angle of the body
+* `Hc`: Computed altitude
+* `Zn`: True azimuth of the body
+* `xZ`: North component of the azimuth, an intermediate step
+* `Ho`: Observed altitude
+* `aHo`: Intercept, `Ho-Hc`: the distance of the line of position from the assumed position, positive toward the body (dim.: length, in SI: m)
+* `Hs`: Sextant altitude
+* `IC`: Index correction of the sextant
+* `HE`: Height of eye (dim.: length, in SI: m)
+* `Dip`: Dip of the horizon
+* `Ha`: Apparent altitude
+* `Rfr`: Refraction, for standard air
+* `SD`: Semidiameter of the body: positive for the lower limb, negative for the upper limb, zero for a star
+* `HP`: Horizontal parallax of the body
+* `PA`: Parallax in altitude
+* `ZD`: Zenith distance
+* `Sdir`: `1` when the body bears South, `-1` when it bears North
+* `φM`: Latitude from the meridian altitude
+* `Amp`: Amplitude: the angle from East or West of a body on the celestial horizon
+
+**References.**
+  [1] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2024), vol. 2, appendix B, and chapter 4, §403;
+  [2] US Naval Observatory, *Celestial Navigation Data*, https://aa.usno.navy.mil/data/celnav ;
+  [3] G. G. Bennett, *The Calculation of Astronomical Refraction in Marine Navigation*, Journal of Navigation 35 (1982).
+
+#### Sight Reduction
+
+![Position triangle](img/PositionTriangle.bmp)
+
+![Line of position](img/LineOfPosition.bmp)
+
+* Main results: the computed altitude `Hc` and the true azimuth `Zn` of a body from the assumed position `(φA;λA)`, and the intercept `aHo` when an observed altitude `Ho` is known.
+* Step: the local hour angle `LHA`, and `xZ`, the North component of the azimuth.
+
+* To calculate: `[Hc;Zn;aHo]` for the Sun on 2 November 2026 at 12:00 UT from Montréal, with an observed altitude of 3.2°. [2] gives 3.138076° and 114.941856°:
+```rpl
+φA=45.5_° λA=-73.6_° GHA=4.110467_° δb=-14.837829_° Ho=3.2_°
+@ Expecting [ LHA=-69.48953 3 ° Hc=3.13807 56645 4 ° xZ=-0.42106 60014 47 Zn=114.94185 6868 ° aHo=3.71546 01273 6 nmi ]
+'ROOT(ⒺSight Reduction;[LHA;Hc;xZ;Zn;aHo];[1_°;1_°;0;1_°;1_nmi])'
+```
+
+#### Altitude Corrections
+
+![Sextant altitude](img/SextantAltitude.bmp)
+
+* Main result: the observed altitude `Ho` from the sextant altitude `Hs`.
+* Steps: the dip `Dip`, 1.76′√h with h in metres [1]; the apparent altitude `Ha`; the refraction `Rfr` [3], not reliable below about 5°; the parallax in altitude `PA`.
+
+* To calculate: `Ho` for the lower limb of the Sun at 45°30′, with an index correction of +2′, from 10 m. These values are computed, not from a published example:
+```rpl
+HE=10_m Hs=45.5_° IC=2_arcmin HP=0.15_arcmin SD=16_arcmin
+@ Expecting [ Dip=5.56560 86819 arcmin Ha=45.44057 31886 ° Rfr=0.97970 86884 83 arcmin PA=0.10524 72998 86 arcmin Ho=45.69266 54988 ° ]
+'ROOT(ⒺAltitude Corrections;[Dip;Ha;Rfr;PA;Ho];[1_arcmin;1_°;1_arcmin;1_arcmin;1_°])'
+```
+
+#### Meridian Altitude
+
+* Main result: the latitude `φM` when the body is on the meridian.
+* Step: the zenith distance `ZD`.
+
+* To calculate: `φM` for a body bearing South at 64.6°, with a declination of 10°N. These values are computed, not from a published example:
+```rpl
+Ho=64.6_° δb=10_° Sdir=1
+@ Expecting [ ZD=25.4 ° φM=35.4 ° ]
+'ROOT(ⒺMeridian Altitude;[ZD;φM];[1_°;1_°])'
+```
+
+#### Amplitude
+
+* Main result: the amplitude `Amp`, the angle between East or West and a body on the celestial horizon. It compares a compass with the rising or setting Sun. It is the formula of [1, chapter 4] with an altitude of zero.
+
+* To calculate: `Amp` for a declination of 20°, at 45° of latitude. These values are computed, not from a published example:
+```rpl
+δb=20_° φA=45_°
+@ Expecting [ Amp=28.92664 92998 ° ]
+'ROOT(ⒺAmplitude;[Amp];[1_°])'
+```
+
+
 ## Aeronautics
 
 The `Aeronautics` section gathers the calculations of aircraft operation. Its

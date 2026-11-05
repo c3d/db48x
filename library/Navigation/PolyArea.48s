@@ -1,0 +1,45 @@
+«
+@@ ============================================================
+@@ PolyArea — area of a polygon on the WGS-84 ellipsoid, from the spherical
+@@ excess on the sphere of the same area, with authalic latitudes.
+@@ 
+@@ Input : a list of at least three corners, each { φ λ } or { "name" φ λ }.
+@@         Plain numbers are degrees. The polygon closes by itself.
+@@ Output: the area of the polygon.
+@@ Edges are great circles of the authalic sphere rather than geodesics.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  → pts
+  «
+    IF pts SIZE 3 < THEN "A polygon needs at least three corners" DOERR END
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    Ⓒe12♁GPS →Num Ⓒa♁GPS →Num UVAL Ⓒπ →Num 180 / Ⓒe12♁GPS →Num √
+    → amode aunits ee2 axa rdn ecc
+    «
+      '(1-ee2)*(1/(1-ee2)+ATANH(ecc)/ecc)' EVAL 0
+      → qpl ttl
+      «
+        1 pts SIZE FOR kk
+          pts kk GET DUP SIZE 1 - GET IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num
+          pts kk GET DUP SIZE 0 - GET IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num
+          pts kk pts SIZE MOD 1 + GET DUP SIZE 1 - GET IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num
+          pts kk pts SIZE MOD 1 + GET DUP SIZE 0 - GET IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num
+          → la1 lo1 la2 lo2
+          «
+            'ASIN((1-ee2)*(SIN(la1*rdn)/(1-ee2*SIN(la1*rdn)²)+ATANH(ecc*SIN(la1*rdn))/ecc)/qpl)' EVAL
+            'ASIN((1-ee2)*(SIN(la2*rdn)/(1-ee2*SIN(la2*rdn)²)+ATANH(ecc*SIN(la2*rdn))/ecc)/qpl)' EVAL
+            lo2 lo1 - 180 + 360 MOD 180 - rdn *
+            → bt1 bt2 dlm
+            «
+              'ttl+2*((TAN(dlm/2)*(TAN(bt1/2)+TAN(bt2/2)))∠(1+TAN(bt1/2)*TAN(bt2/2)))' EVAL 'ttl' STO
+            »
+          »
+        NEXT
+        'ABS(ttl)*axa²*qpl/2' EVAL 1_m^2 *
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+  »
+»

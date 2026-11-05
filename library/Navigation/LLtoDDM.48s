@@ -1,0 +1,46 @@
+«
+@@ ============================================================
+@@ LLtoDDM — latitude and longitude as a text in degrees and decimal minutes, to 0.001′.
+@@ 
+@@ Input : φ λ — plain numbers are degrees; angles with a unit are accepted.
+@@ Output: text with hemispheres, such as "45°30′00.00″N 73°36′00.00″W".
+@@ ============================================================
+
+  → lat lon
+  «
+    lat « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL
+      → vlu
+      «
+        vlu ABS 60000 * 0.5 + FLOOR R→I
+        → ttl
+        «
+          ttl 60000 / FLOOR R→I
+          ttl 60000 MOD 1000 / FLOOR R→I
+          ttl 1000 MOD
+          → dgs mnt tms
+          «
+            dgs →Str "°" + mnt →Str mnt 10 < "0" "" IFTE SWAP + + "." + tms →Str tms 100 < "0" "" IFTE SWAP + tms 10 < "0" "" IFTE SWAP + + "′" +
+          »
+          vlu 0 < "S" "N" IFTE +
+        »
+      »
+    " " +
+    lon « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL
+      → vlu
+      «
+        vlu ABS 60000 * 0.5 + FLOOR R→I
+        → ttl
+        «
+          ttl 60000 / FLOOR R→I
+          ttl 60000 MOD 1000 / FLOOR R→I
+          ttl 1000 MOD
+          → dgs mnt tms
+          «
+            dgs →Str "°" + mnt →Str mnt 10 < "0" "" IFTE SWAP + + "." + tms →Str tms 100 < "0" "" IFTE SWAP + tms 10 < "0" "" IFTE SWAP + + "′" +
+          »
+          vlu 0 < "W" "E" IFTE +
+        »
+      »
+    +
+  »
+»

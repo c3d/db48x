@@ -1,0 +1,53 @@
+«
+@@ ============================================================
+@@ LOPFix — position from two or more lines of position, by least squares on
+@@ their intercepts and azimuths from an assumed position.
+@@ 
+@@ Input : φ λ lines — assumed latitude and longitude, and a list of { Zn a }:
+@@         true azimuth and intercept, positive toward the body. Plain numbers are
+@@         degrees and nautical miles; units are accepted.
+@@ Output: φ λ — the position. For intercepts above about 30 NM, repeat from there.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  → lns
+  «
+    IF lns SIZE 2 < THEN "A fix needs at least two lines" DOERR END
+    2 →LIST « →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END » MAP LIST→ DROP
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    Ⓒπ →Num 180 / 0 0 0 0 0
+    → lat lon amode aunits rdn caa cab cbb cdd cee
+    «
+      1 lns SIZE FOR kk
+        lns kk GET 1 GET →Num IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END rdn *
+        lns kk GET 2 GET IF DUP TypeName "unit" == THEN 1_nmi CONVERT UVAL END →Num
+        → zaz itc
+        «
+          'caa+COS(zaz)²' EVAL 'caa' STO
+          'cab+COS(zaz)*SIN(zaz)' EVAL 'cab' STO
+          'cbb+SIN(zaz)²' EVAL 'cbb' STO
+          'cdd+itc*COS(zaz)' EVAL 'cdd' STO
+          'cee+itc*SIN(zaz)' EVAL 'cee' STO
+        »
+      NEXT
+      'caa*cbb-cab²' EVAL
+      → dtr
+      «
+        IF dtr ABS 1E-9 < THEN
+          0 0 1
+        ELSE
+          'lat+(cbb*cdd-cab*cee)/dtr/60' EVAL 1_° *
+          'lon+(caa*cee-cab*cdd)/(dtr*COS(lat*rdn))/60' EVAL 1_° *
+          0
+        END
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+    → phf lmf bad
+    «
+      IF bad THEN "The lines are parallel" DOERR END
+      phf lmf
+    »
+  »
+»

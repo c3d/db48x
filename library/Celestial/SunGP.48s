@@ -1,0 +1,41 @@
+«
+@@ ============================================================
+@@ SunGP — geographical position of the Sun: Greenwich hour angle, declination
+@@ and semidiameter, from the approximate formulas of the US Naval Observatory.
+@@ 
+@@ Input : date time — date as YYYYMMDD, UT time as HH.MMSS.
+@@ Output: GHA Dec SD.
+@@ The USNO states about 1′ within two centuries of 2000, about one nautical
+@@ mile of position.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  → dat tme
+  «
+    @ Dates as decimals: on a DM32, integer dates are rejected (issue #1873)
+    dat DUP TypeName "unit" == « UVAL » « » IFTE EVAL →Num 20000101. DDays
+    DUP TypeName "unit" == « UVAL » « » IFTE EVAL
+    tme HMS→ 24 / + 0.5 - →Num
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    Ⓒπ →Num 180 /
+    → ddd amode aunits rdn
+    «
+      '(357.529+0.98560028*ddd)*rdn' EVAL '280.459+0.98564736*ddd' EVAL
+      '(23.439-0.00000036*ddd)*rdn' EVAL
+      → gan qml obl
+      «
+        '(qml+1.915*SIN(gan)+0.020*SIN(2*gan))*rdn' EVAL
+        '1.00014-0.01671*COS(gan)-0.00014*COS(2*gan)' EVAL
+        → lng dst
+        «
+          '(15*(18.697374558+24.06570982441908*ddd))-((COS(obl)*SIN(lng))∠(COS(lng)))/rdn' EVAL
+          360 MOD 1_° *
+          'ASIN(SIN(obl)*SIN(lng))/rdn' EVAL 1_° *
+          '0.2666/dst' EVAL 1_° * 1_arcmin CONVERT
+        »
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+  »
+»

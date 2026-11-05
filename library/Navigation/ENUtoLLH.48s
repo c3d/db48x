@@ -1,0 +1,33 @@
+«
+@@ ============================================================
+@@ ENUtoLLH — latitude, longitude and height of a point given in the local
+@@ East, North, Up frame of an origin on the WGS-84 ellipsoid.
+@@ 
+@@ Input : φ0 λ0 h0 E N U — origin, then the point. Plain numbers are degrees
+@@         and metres; angles and lengths with a unit are accepted.
+@@ Output: φ λ h.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  3 →LIST « IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END →Num » MAP LIST→ DROP
+  → la0 lo0 hg0 eas nrt upw
+  «
+    la0 lo0 hg0 ⓁLLH→XYZ 3 →LIST « 1_m CONVERT UVAL » MAP LIST→ DROP
+    la0 « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL lo0 « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END →Num » EVAL
+    Ⓒπ →Num 180 /
+    'AngleMode' RCL 'SetAngleUnits' RCL
+    RAD NoAngleUnits
+    → xa ya za ld0 lg0 rdn amode aunits
+    «
+      'ld0*rdn' EVAL 'lg0*rdn' EVAL
+      → phi lam
+      «
+        'xa-SIN(lam)*eas-SIN(phi)*COS(lam)*nrt+COS(phi)*COS(lam)*upw' EVAL
+        'ya+COS(lam)*eas-SIN(phi)*SIN(lam)*nrt+COS(phi)*SIN(lam)*upw' EVAL
+        'za+COS(phi)*nrt+SIN(phi)*upw' EVAL
+      »
+      amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    »
+    ⓁXYZ→LLH
+  »
+»
