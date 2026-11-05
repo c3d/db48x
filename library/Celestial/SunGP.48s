@@ -12,7 +12,8 @@
 
   → dat tme
   «
-    dat DUP TypeName "unit" == « UVAL » « » IFTE EVAL 20000101 DDays
+    @ Dates as decimals: on a DM32, integer dates are rejected (issue #1873)
+    dat DUP TypeName "unit" == « UVAL » « » IFTE EVAL →Num 20000101. DDays
     DUP TypeName "unit" == « UVAL » « » IFTE EVAL
     tme HMS→ 24 / + 0.5 - →Num
     'AngleMode' RCL 'SetAngleUnits' RCL

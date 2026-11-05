@@ -15,12 +15,13 @@
     → dnm
     «
       IF dnm 20170101 < THEN "UTCtoGPS needs a date from 2017 on" DOERR END
-      dnm 19800106 DDays DUP TypeName "unit" == « UVAL » « » IFTE EVAL
+      @ Dates as decimals: on a DM32, integer dates are rejected (issue #1873)
+      dnm →Num 19800106. DDays DUP TypeName "unit" == « UVAL » « » IFTE EVAL
       86400 * tme HMS→ 3600 * + 18 +
       → scd
       «
         scd 604800 / FLOOR R→I
-        scd 604800 MOD 1_s *
+        scd 604800 MOD DUP FP 0 = « R→I » IFT 1_s *
       »
     »
   »
