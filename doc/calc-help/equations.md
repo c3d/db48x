@@ -6813,6 +6813,8 @@ The 103 variables in the Design section are:
 * `ΛLE`: Sweep angle of the leading edge
 * `Λm`, `Λn`: Sweep of the chord lines at the fractions `xcm` and `xcn` of the
   chord
+* `xcm`, `xcn`: Positions of these two chord lines, in fraction of the chord
+  from the leading edge: 0 for the leading edge, 0.25 for the quarter chord
 * `Mnrm`: Mach number normal to the wing
 * `xfl`: Hinge position of the flap, in fraction of the chord
 * `ηf`: Deflection of the flap
