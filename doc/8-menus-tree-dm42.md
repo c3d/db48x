@@ -595,7 +595,7 @@ Access: 🟦 E (LN); [RealMenu](#realmenu) 🟦 F6
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | [Polynomial→](#frompolynomial) | [→Polynomial](#topolynomial) |   |
 | [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) | ◀ |
-| [CstName](#constantname) | [CstValue](#constantvalue) | CstRng | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | ▶ |
+| [CstName](#constantname) | [CstValue](#constantvalue) | [CstRng](#constantrange) | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | ▶ |
 
 ### PlotMenu
 
@@ -707,7 +707,7 @@ Access: [MathMenu](#mathmenu-reference) F6
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Size](#size) |   |   |   |   |   |
+| [Size](#size) | [CstRng](#constantrange) |   |   |   |   |
 | [→Range](#range) | [→∆Range](#range-1) | [→%Range](#range-2) | [→σRange](#range-3) | [∪](#rangeunion) | [∩](#rangeintersect) |
 | `…` | `±` | `±%` | `±σ` | [Range→](#fromrange) | `ρ` |
 

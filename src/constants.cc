@@ -192,9 +192,10 @@ algebraic_p constant::range() const
         }
         if (value && uncertainty)
         {
-            if (range::adjust_input(ID_drange, value, uncertainty))
-                if (range_p range = range::make(ID_drange, value, uncertainty))
-                    value = range;
+            // The uncertainty of a constant is a standard uncertainty
+            // (CODATA: "one-standard-deviation uncertainty"), not a bound
+            if (range_p range = range::make(ID_uncertain, value, uncertainty))
+                value = range;
             if (uexpr && value)
                 value = unit::make(value, uexpr);
         }
@@ -828,8 +829,8 @@ static const cstring basic_constants[] =
                 "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
     // *Electron magnetic moment / Bohr magneton - Measurement [0]
     "μeμB",     "[ -1.00115965218046 "
-                "  0.00000000000011 "
-                "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
+                "  0.00000000000018 "
+                "  'ROUND(ABS(ⓈμeμB/ⒸμeμB);-2)' ]",
     // *Proton magnetic moment - Measurement [0]
     "μp",       "[ 1.41060679545E-26_J/T "
                 "  0.00000000060E-26_J/T "
@@ -1086,8 +1087,8 @@ static const cstring basic_constants[] =
                 "  1836. ]",
     // *mnmp ratio - Neutron/proton mass ratio - Measurement [0]
     "mnmp",     "[ 1.00137841946 "
-                "  0.00000000051 "
-                "  'ROUND(UBASE(Ⓢmn/Ⓒmn+Ⓢmp/Ⓒmp);-2)' "
+                "  0.00000000040 "
+                "  'ROUND(Ⓢmnmp/Ⓒmnmp;-2)' "
                 "  1.001 ]",
     // *Electron relative atomic mass - Measurement [0]
     "Are",       "[ 5.485799090441E-4 "

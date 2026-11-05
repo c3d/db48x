@@ -129,6 +129,33 @@ Return the value for a given constant
 This also works for library items, library equations, standard and relative
 uncertainties.
 
+## ConstantRange
+
+Return a constant as an uncertain number, its value with its standard
+uncertainty. This is what the right-shifted key of a constant does in the
+constants menus.
+
+**1)**
+```rpl
+Ⓒμ₀ ConstantRange
+@ Expecting 1.25663 70612 7⁳⁻⁶±σ2.⁳⁻¹⁶ H/m
+```
+
+**2)** It can also be written in an algebraic expression, and the result can be used
+in further computations with uncertain numbers:
+
+```rpl
+'ConstantRange(ⒸG)·2'
+EVAL
+@ Expecting 1.33486⁳⁻¹⁰±σ3.⁳⁻¹⁵ m↑3/(s↑2·kg)
+```
+
+The argument is the constant itself, `Ⓒμ₀`, not its name. An exact constant
+gives a zero uncertainty, for example `299 792 458±σ0 m/s` for `Ⓒc`. The
+uncertainty is a standard deviation, as in CODATA, so the result combines with
+other `±σ` values. `Cycle` converts it to other range types only when it has no
+unit; for a value with a unit, use `Cycling` or remove the unit first.
+
 # Precision control
 
 Scientific calculations lead to the numerical evaluation of expressions whose
