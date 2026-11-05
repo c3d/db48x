@@ -11,6 +11,9 @@ Library.
   the flight plan, and the check of the airspeed indicator.
 * [Aircraft Performance](#aircraft-performancelibrary): the drag polar
   from measurements, the speeds of best climb, and the takeoff roll.
+* [Aircraft Design](#aircraft-designlibrary): the area, aspect ratio and
+  mean aerodynamic chord of a wing made of several panels, the lift and
+  moments of a NACA airfoil, and the V-n diagram.
 
 ## Flight ManagementLibrary
 
@@ -305,3 +308,162 @@ liftoff, at sea level:
 
 See also: the Takeoff Ground Roll and Wind on Runway Distances equations of
 the Equation Library.
+
+## Aircraft DesignLibrary
+
+The design of the aircraft, where the equation solver is not enough: a wing
+made of a variable number of panels, an airfoil given by its digits, and a
+diagram drawn on the screen.
+
+* [WingPanels](#wingpanels): the area, aspect ratio and mean aerodynamic
+  chord of a wing made of several straight tapered panels;
+* [NACA4](#naca4): the zero lift angle, the lift and the moments of a NACA
+  4-digit airfoil;
+* [VnPlot](#vnplot): the maneuver and gust envelope of an airplane.
+
+## WingPanels
+
+The area, the aspect ratio and the mean aerodynamic chord of a wing made of
+several straight tapered panels, such as a wing with a constant chord inboard
+and a tapered outer part, or a wing with a crank in its leading edge.
+
+![Wing panels](img/WingPanels.bmp)
+
+Stack: a list of stations of the half wing, from the root to the tip, one
+`{ y c xLE }` list each ▶ `Sw` `AR` `MAC` `yMAC` `xMAC`, tagged: the spanwise
+position, the chord and the position of the leading edge, positive aft, 0 when
+omitted. Between two stations, the chord and the leading edge vary linearly.
+Lengths may carry units; the results are then in the unit of the span of the
+last station.
+
+`Sw` is the area of the whole wing, `AR` its aspect ratio, `MAC` the mean
+aerodynamic chord, `yMAC` the spanwise position of its centroid and `xMAC` the
+position of its leading edge, from exact integrals over each panel. With one
+panel, the results are those of the Trapezoidal Wing equation. A first station
+away from the center line leaves out the part of the wing inside the fuselage.
+
+A glider wing of 19 m, with a constant chord of 1.5 m out to 3 m from the
+center line, then tapered to 1.2 m at the tip. The source finds 26.55 m², an
+aspect ratio of 13.6 and a mean aerodynamic chord of 1.405 m (J. G.
+Leishman, *Introduction to Aerospace Flight Vehicles*, Embry-Riddle
+Aeronautical University, *Worked Examples: Airfoils & Wings*):
+
+```rpl
+{ { 0_m 1.5_m } { 3_m 1.5_m } { 9.5_m 1.2_m } } ⓁWingPanels
+DROP DROP
+@ Expecting MAC:1.40451 97740 1 m
+```
+
+The same wing without units: the aspect ratio.
+
+```rpl
+{ { 0 1.5 } { 3 1.5 } { 9.5 1.2 } } ⓁWingPanels
+DROP DROP DROP
+@ Expecting AR:13.59698 68173
+```
+
+One panel, a glider wing of 15 m with chords of 1 m and 0.5 m, its leading
+edge swept by 5°, so 0.656 m aft at the tip: the leading edge of the mean
+aerodynamic chord is 0.292 m aft, as with the Trapezoidal Wing equation.
+
+```rpl
+{ { 0_m 1_m 0_m } { 7.5_m 0.5_m 0.656168_m } } ⓁWingPanels
+@ Expecting xMAC:0.29163 02222 22 m
+```
+
+See also: the Trapezoidal Wing and Elliptical Wing equations of the Equation
+Library.
+
+## NACA4
+
+The zero lift angle, the lift and the moments of a NACA 4-digit airfoil, by
+thin airfoil theory.
+
+![NACA camber line](img/NACACamber.bmp)
+
+Stack: the digits of the airfoil as a number, and the angle of attack ▶ `α0`
+`Cl` `Cm4` `CmLE`, tagged: the zero lift angle, the lift coefficient, and the
+moment coefficients about the quarter chord and the leading edge. A NACA 0012 is
+entered as 12. The angle is a value with an angle unit, or a plain number of
+degrees.
+
+The first digit is the maximum camber, in % of the chord, and the second its
+position, in tenths of the chord. The last two digits, the thickness, play no
+part in this theory: a NACA 2412 gives the same results as a NACA 2415. The
+integrals over the camber line are computed in closed form.
+
+A NACA 2415 at 5°. The source finds a lift coefficient of 0.776, moments of
+−0.0531 and −0.247 (J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+Embry-Riddle Aeronautical University, *Classic Airfoil Theory*):
+
+```rpl
+2415 5_° ⓁNACA4
+@ Expecting CmLE:-0.24714 60774 82
+```
+
+Its zero lift angle:
+
+```rpl
+2415 5_° ⓁNACA4
+DROP DROP DROP
+@ Expecting α0:-2.07724 04049 °
+```
+
+The moment about the quarter chord of a NACA 4412, with twice the camber at the
+same position, is twice as large:
+
+```rpl
+4412 5_° ⓁNACA4
+DROP
+@ Expecting Cm4:-0.10623 90269 2
+```
+
+A symmetrical NACA 0012 at 5 degrees: the lift coefficient is 2π times the angle
+in radians.
+
+```rpl
+12 5 ⓁNACA4
+DROP DROP
+@ Expecting Cl:0.54831 13556 16
+```
+
+See also: the Thin Airfoil equation of the Equation Library.
+
+## VnPlot
+
+The maneuver and gust envelope of an airplane, drawn on the screen: the V-n diagram
+of 14 CFR Part 23 before amendment 23-64 of 2017.
+
+![Maneuver envelope](img/ManeuverEnvelope.bmp)
+
+Stack: `Wt` `Sw` `CLmax` `CLmxn` `nlim` `kneg` `kVC` `kVD` `cgeo` `CLα` ▶ `Vst` `VA`
+`VC` `VD` `nGC` `nGD`, tagged: the mass, the wing area, the maximum and most
+negative lift coefficients, the limit load factor, the ratio of the negative one
+to it, the factors of the design speeds, the mean geometric chord and the lift
+slope of the wing, per radian. `Wt` is a mass, or a weight such as `2450_lbf`.
+Values with units are converted; plain numbers are in SI units. The results are the stall speed, the maneuvering speed, the design
+cruising and dive speeds, in knots, equivalent airspeed, and the load factors in an
+upward gust of 50 ft/s at `VC` and of 25 ft/s at `VD`.
+
+The diagram stays on the screen until the next key: thick lines for the maneuvers,
+thin lines for the gusts. An airframe must withstand the larger of the two. The
+factors are those of the Maneuver Envelope equation of the Equation Library, whose
+sheet gives their values for each category.
+
+A light airplane of 2 450 lb in the normal category, with a wing of 174 ft². It
+gives 50.98, 99.39, 123.83 and 173.36 kt, and gust load factors of 3.651 and 2.856,
+computed from the rules, as with the Maneuver Envelope and Gust Load Factor
+equations:
+
+```rpl
+2450_lb 174_ft^2 1.6 -1.2 3.8 0.4 33 1.4 4.83333_ft 4.48 ⓁVnPlot
+```
+
+The same airplane in the aerobatic category:
+
+```rpl
+2450_lb 174_ft^2 1.6 -1.2 6 0.5 36 1.55 4.83333_ft 4.48 ⓁVnPlot
+```
+
+See also: the Maneuver Envelope and Gust Load Factor equations of the Equation
+Library.

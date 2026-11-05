@@ -5385,7 +5385,9 @@ runway, time, speed and distance, fuel, weight and balance, altitudes,
 airspeeds, climb and descent, and the decision points of a flight. Its second
 part, [Performance](#performance), gives the performance of the aircraft from
 its drag polar: lift and drag, stall, turns, glide, climb, range and
-endurance, takeoff and landing.
+endurance, takeoff and landing. Its third part, [Design](#design), gives
+the geometry of the wing, its lift slope and its induced drag, the stability
+in pitch, the propeller and the first sizing of the airplane.
 
 **Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
 lb, ft, inHg); every equation also accepts SI units.
@@ -6766,4 +6768,847 @@ in proportion to it, and both with the square of the speed.
 s0=1600_ft Wt=2400_lb Wt0=2400_lb xW=1 Vact=80_knot Vref=70_knot
 @ Expecting [ fW=1 fV=1.30612 24489 8 sCor=2 089.79591 837 ft ]
 'ROOT(ⒺWeight & Speed Corrections;[fW;fV;sCor];[1;1;1_ft])'
+```
+
+### Design
+
+The aircraft as it is designed: the geometry of its wing, the lift and the
+induced drag that follow from it, its stability in pitch, its propeller and
+its first sizing, in five submenus:
+[Wing Geometry](#wing geometry),
+[Airfoil & Wing](#airfoil & wing),
+[Stability](#stability),
+[Propeller](#propeller) and
+[Sizing](#sizing).
+
+**Lengths.** The lengths are in ft in the equations, as the wingspan `bw` and
+the wing area `Sw` of [Performance](#performance); the examples of the source
+in metres are entered in m, and DB48x converts.
+
+**Lift slopes and angles.** The lift slopes `Clαs` and `CLα` are per radian:
+2π in theory. The angles are in degrees; an equation that multiplies a slope by
+an angle divides the angle by `(1_r)`.
+
+**Rotation.** The rotation `nrot` is in rpm, a unit of angle per time; the
+propeller equations divide it by `(1_turn)`.
+
+**Upper and lower case.** DB48x does not tell an upper case letter from a lower
+case one in a variable name: `CL` and `Cl` would be the same variable, and so
+would `CLα` and `Clα`. The lift slope of the airfoil is therefore `Clαs`, for
+*section*, and its lift coefficient `Cls`.
+
+The 103 variables in the Design section are:
+
+* `λt`: Taper ratio, tip chord over root chord
+* `Croot`: Root chord; for an elliptical wing, the chord at the center line
+  (dim.: length)
+* `Ctip`: Tip chord (dim.: length)
+* `cgeo`: Mean geometric chord, wing area over wingspan (dim.: length)
+* `MAC`: Mean aerodynamic chord, as in [CG in % MAC](#cg in % mac)
+  (dim.: length)
+* `yMAC`: Spanwise station of the mean aerodynamic chord, from the center
+  line (dim.: length)
+* `xMAC`: Distance of the leading edge of the mean aerodynamic chord behind
+  the leading edge at the root (dim.: length)
+* `ΛLE`: Sweep angle of the leading edge
+* `Λm`, `Λn`: Sweep of the chord lines at the fractions `xcm` and `xcn` of the
+  chord
+* `xcm`, `xcn`: Positions of these two chord lines, in fraction of the chord
+  from the leading edge: 0 for the leading edge, 0.25 for the quarter chord
+* `Mnrm`: Mach number normal to the wing
+* `xfl`: Hinge position of the flap, in fraction of the chord
+* `ηf`: Deflection of the flap
+* `θf`: Hinge angle of thin airfoil theory
+* `ΔCl`, `ΔCm4`: Changes of lift and moment due to the flap
+* `τf`: Flap efficiency, the change of the zero lift angle per degree of flap
+* `Clα0`, `ClαM`: Lift slopes of the airfoil at low speed and at the Mach number
+* `Cp0`, `CpM`: Pressure coefficients at low speed and at the Mach number
+* `βpg`: Compressibility factor, √(1−Mach²)
+* `hwl`: Height of the winglet (dim.: length)
+* `ηwl`: Winglet height over half the span
+* `φwl`: Cant of the winglet from the vertical
+* `Kwl`: Factor of the linear estimate of the winglets
+* `ARef`, `ARlin`: Effective aspect ratio, and its linear estimate
+* `ωph`: Angular frequency of the phugoid (dim.: angular speed)
+* `Tphg`: Period of the phugoid (dim.: time)
+* `ζph`: Damping ratio of the phugoid
+* `Clαs`: Lift slope of the airfoil, per radian: 2π in thin airfoil theory,
+  about 6 for real airfoils
+* `Cls`: Lift coefficient of the airfoil
+* `Cm4`, `CmLE`: Moment coefficients of the airfoil about the quarter chord and
+  the leading edge
+* `xcps`: Center of pressure of the airfoil, in fraction of the chord
+* `CLα`: Lift slope of the wing, per radian
+* `δsp`: Span efficiency penalty of the lift distribution: 0 for an
+  elliptical distribution, 0.05 to 0.15 for most wings
+* `αw`: Angle of attack of the wing
+* `α0`: Angle of attack at zero lift, negative for a cambered airfoil
+* `αi`: Induced angle of attack
+* `CDi`: Induced drag coefficient
+* `Dk2`: Growth of the profile drag of the wing with the square of the lift
+  coefficient
+* `SHT`, `SVT`: Areas of the horizontal and vertical tails (dim.: area)
+* `lH`, `lV`: Lever arms of the horizontal and vertical tails
+  (dim.: length)
+* `VHT`, `VVT`: Horizontal and vertical tail volume coefficients
+* `KT`: Tail factor, the share of the tail in the lift slope of the
+  airplane
+* `dεdα`: Downwash gradient at the tail, about 0.1 to 0.5
+* `CLαw`, `CLαt`: Lift slopes of the wing and of the horizontal tail,
+  per radian
+* `xacw`: Aerodynamic center of the wing, about 0.25 of the MAC
+* `xnp`: Neutral point, in fraction of the MAC
+* `xcg`: Center of gravity, in fraction of the MAC
+* `SMarg`: Static margin, in fraction of the MAC, typically 0.05 to 0.15
+* `Cmα`: Pitch stiffness, slope of the pitching moment coefficient, per
+  radian
+* `Cm0`: Pitching moment coefficient at zero lift
+* `αtr`: Trim angle of attack, from zero lift
+* `Cmac`: Pitching moment coefficient of the wing about its aerodynamic
+  center
+* `CLw`, `CLt`: Lift coefficients of the wing and of the horizontal tail
+* `ηt`: Tail efficiency, the dynamic pressure at the tail over that of the
+  free stream
+* `nrot`: Rotation of the propeller (dim.: angular speed)
+* `Dprop`: Diameter of the propeller (dim.: length)
+* `Jadv`: Advance ratio, the distance flown per turn in diameters
+* `CTp`, `CPp`, `CQp`: Thrust, power and torque coefficients of the propeller
+* `CSp`: Speed-power coefficient of the propeller
+* `Qsh`: Torque on the shaft (dim.: force·length)
+* `Vtip`: Rotational speed of the blade tip (dim.: speed)
+* `Vhel`: Helical speed of the blade tip (dim.: speed)
+* `Mhel`: Helical Mach number of the blade tip
+* `asnd`: Speed of sound (dim.: speed)
+* `Adisk`: Area of the propeller disk (dim.: area)
+* `vind`: Induced velocity at the disk (dim.: speed)
+* `ηi`: Ideal efficiency, the upper limit of `ηp`
+* `Vwake`: Speed of the wake far behind the disk (dim.: speed)
+* `WoS`: Wing loading, weight over wing area (dim.: pressure)
+* `TWr`: Thrust to weight ratio of a flight case
+* `TWsl`: The same ratio brought back to the takeoff weight and thrust
+* `βW`, `βT`: Weight and thrust of the flight case over those at takeoff
+* `PWr`: Shaft power per unit of mass (dim.: power/mass)
+* `dVdt`: Acceleration along the flight path (dim.: acceleration)
+* `RavW`: Average resistance on the runway over the weight
+* `kneg`: Negative load factor over the limit load factor
+* `nneg`: Negative limit load factor
+* `kVC`, `kVD`: Factors of the design cruising and dive speeds
+* `VCmin`, `VDmin`: Lowest design cruising and dive speeds (dim.: speed)
+* `CLmxn`: Most negative lift coefficient
+* `Vsn`: Speed where the negative stall reaches `nneg` (dim.: speed)
+* `μgst`: Airplane mass ratio in a gust
+* `Kgust`: Gust alleviation factor
+* `Ude`: Derived gust velocity (dim.: speed)
+* `EAS`: Equivalent airspeed (dim.: speed)
+* `ngst`: Load factor in an upward gust
+
+The entries also use `Sw`, `bw`, `AR`, `CL`, `eO`, `Kind`, `CD0`, `qd`, `nLF`,
+`Vst`, `CLmax`, `nlim`, `fLO`, `sLO`, `fTD`, `sLD`, `Thr`, `Psh`, `ηp`, `LD` and
+`ρa`, with the same meaning as in Performance, and `Wt`, `VS`, `PMAC`, `TAS` and
+`Mach` as in
+Flight Management.
+
+* References:
+  [1] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, chapters *Wing Shapes &
+  Nomenclature*, *Finite Wing Characteristics*, *Lifting Line Theory* and
+  *Airfoil Characteristics*, *Classic Airfoil Theory*,
+  *Worked Examples: Airfoils & Wings*, *Aircraft Stability & Control*,
+  *Propellers*, *Worked Examples: Propulsion*, *Principles of Aerospace Design*,
+  *Maneuvers & Gusts* and *Takeoff & Landing Performance* ;
+  [2] 14 CFR 23.333, 23.335, 23.337 and 23.341, before amendment 23-64 of 2017 ;
+  [3] K. G. Pratt and W. G. Walker, *A revised gust-load formula and a
+  re-evaluation of V-G data taken on civil transport airplanes from 1933 to 1950*,
+  NACA Report 1206, 1954 ;
+  [4] E. C. Polhamus, *A simple method of estimating the subsonic lift and damping
+  in roll of sweptback wings*, NACA Technical Note 1862, 1949.
+
+#### Wing Geometry
+
+The area, aspect ratio and mean chords of a trapezoidal or an elliptical wing.
+
+Entries: [Trapezoidal Wing](#trapezoidal wing), [Elliptical Wing](#elliptical wing) and [Sweep Conversion & Normal Mach](#sweep conversion & normal mach).
+
+#### Trapezoidal Wing
+
+A wing whose chord decreases linearly from the root to the tip.
+
+![Trapezoidal wing](img/TrapezoidalWing.bmp)
+
+* Main results: the taper ratio `λt`, the wing area `Sw`, the aspect ratio
+  `AR`, the mean geometric chord `cgeo`, the mean aerodynamic chord `MAC`, its
+  spanwise station `yMAC` and the position `xMAC` of its leading edge, from the
+  wingspan `bw`, the chords `Croot` and `Ctip`, and the sweep `ΛLE` of the
+  leading edge.
+* `yMAC` is both the centroid of the area of the half wing and the station
+  where the chord equals `MAC`. It is not the station where the chord equals
+  `cgeo`, which lies at mid span for a taper ratio of 0.5.
+* The weight and balance of the aircraft is given in percent of `MAC`, from
+  the leading edge of the mean aerodynamic chord: it lies `xMAC` behind the
+  leading edge at the root.
+
+* To calculate: `[λt;Sw;AR;cgeo;MAC;yMAC;xMAC]` (Taper ratio; Area; Aspect ratio; Geometric and aerodynamic mean chords; Station and position of the MAC) for a glider wing of 15 m, with chords of 1 m and 0.5 m, its leading edge swept by 5°. The source gives 11.25 m², 20 and 0.778 m, without the sweep [1]:
+```rpl
+bw=15_m Croot=1_m Ctip=0.5_m ΛLE=5_°
+@ Expecting [ λt=0.5 Sw=11.25 m↑2 AR=20. cgeo=0.75 m MAC=0.77777 77777 78 m yMAC=3.33333 33333 3 m xMAC=0.29162 88784 2 m ]
+'ROOT(ⒺTrapezoidal Wing;[λt;Sw;AR;cgeo;MAC;yMAC;xMAC];[0.5;1_m^2;10;1_m;1_m;1_m;1_m])'
+```
+
+* To calculate: `[λt;Sw;AR;cgeo;MAC;yMAC;xMAC]` for a flying wing of 235 ft, with chords of 35 ft and 12.25 ft. The source gives 5 552 ft² and 9.95 [1]:
+```rpl
+bw=235_ft Croot=35_ft Ctip=12.25_ft ΛLE=0_°
+@ Expecting [ λt=0.35 Sw=5 551.875 ft↑2 AR=9.94708 99470 9 cgeo=23.625 ft MAC=25.45061 7284 ft yMAC=49.32098 76543 ft xMAC=0. ft ]
+'ROOT(ⒺTrapezoidal Wing;[λt;Sw;AR;cgeo;MAC;yMAC;xMAC];[0.5;1_ft^2;10;1_ft;1_ft;1_ft;1_ft])'
+```
+
+* To calculate: `[λt;bw;Sw;cgeo;MAC;yMAC;xMAC]` (Taper ratio; Wingspan; Area; Mean chords; Station and position of the MAC) the other way: the wing of aspect ratio 12 whose chord decreases from 1 m to 0.84 m. The source gives 11.04 m and 10.16 m² [1]:
+```rpl
+AR=12 Croot=1_m Ctip=0.84_m ΛLE=0_°
+@ Expecting [ λt=0.84 bw=11.04 m Sw=10.1568 m↑2 cgeo=0.92 m MAC=0.92231 88405 8 m yMAC=2.68 m xMAC=0. m ]
+'ROOT(ⒺTrapezoidal Wing;[λt;bw;Sw;cgeo;MAC;yMAC;xMAC];[0.5;10_m;10_m^2;1_m;1_m;1_m;1_m])'
+```
+
+#### Elliptical Wing
+
+A wing whose chord follows an ellipse, the planform of the Spitfire: with an
+untwisted wing, it gives the elliptical lift distribution and the lowest
+induced drag.
+
+![Elliptical wing](img/EllipticalWing.bmp)
+
+* Main results: the wing area `Sw`, the aspect ratio `AR`, the mean
+  aerodynamic chord `MAC` and the centroid `yMAC` of the half wing, from the
+  wingspan `bw` and the chord `Croot` at the center line.
+* Unlike a trapezoidal wing, the centroid `yMAC`, at 0.424 of the half span,
+  is not the station where the chord equals `MAC`, at 0.529 of the half span.
+
+* To calculate: `[Sw;AR;MAC;yMAC]` (Area; Aspect ratio; Mean aerodynamic chord; Centroid) for the Spitfire: a span of 445 in, a chord of 100 in at the center line. The source gives 242.71 ft² and 5.67 [1]:
+```rpl
+Croot=100_in bw=445_in
+@ Expecting [ Sw=242.70984 9105 ft↑2 AR=5.66591 59740 7 MAC=7.07355 30263 1 ft yMAC=7.86932 77417 7 ft ]
+'ROOT(ⒺElliptical Wing;[Sw;AR;MAC;yMAC];[1_ft^2;5;1_ft;1_ft])'
+```
+
+* To calculate: `[Sw;AR;MAC;yMAC]` for an elliptical wing of 30 ft with a chord of 6 ft at the center line. The source gives 141.37 ft², 6.366 and 5.093 ft [1]:
+```rpl
+Croot=6_ft bw=30_ft
+@ Expecting [ Sw=141.37166 9412 ft↑2 AR=6.36619 77236 8 MAC=5.09295 81789 4 ft yMAC=6.36619 77236 8 ft ]
+'ROOT(ⒺElliptical Wing;[Sw;AR;MAC;yMAC];[1_ft^2;5;1_ft;1_ft])'
+```
+
+#### Sweep Conversion & Normal Mach
+
+The sweep angle of a tapered wing differs from one chord line to another, and the
+flow over a swept wing sees only the component of the Mach number normal to the
+wing.
+
+![Sweep conversion](img/SweepConversion.bmp)
+
+* Main results: the sweep `Λn` of the chord line at the fraction `xcn` of the
+  chord, from the sweep `Λm` of the chord line at the fraction `xcm`, the aspect
+  ratio `AR` and the taper ratio `λt`; the normal Mach number `Mnrm`.
+* The fractions go from 0 at the leading edge to 1 at the trailing edge; the quarter
+  chord is 0.25.
+* This is the geometry of a trapezoidal wing, and the examples are computed.
+
+* To calculate: `[Λn;Mnrm]` (Sweep; Normal Mach number) for the leading edge of an airliner wing of aspect ratio 9.5, taper ratio 0.24 and quarter chord sweep 25°, at Mach 0.78:
+```rpl
+AR=9.5 λt=0.24 Λm=25_° xcm=0.25 xcn=0 Mach=0.78
+@ Expecting [ Λn=27.96042 58769 ° Mnrm=0.70692 00738 89 ]
+'ROOT(ⒺSweep Conversion & Normal Mach;[Λn;Mnrm];[20_°;0.7])'
+```
+
+* To calculate: `[Λn;Mnrm]` for the mid chord of the same wing:
+```rpl
+AR=9.5 λt=0.24 Λm=25_° xcm=0.25 xcn=0.5 Mach=0.78
+@ Expecting [ Λn=21.88984 3627 ° Mnrm=0.70692 00738 89 ]
+'ROOT(ⒺSweep Conversion & Normal Mach;[Λn;Mnrm];[20_°;0.7])'
+```
+
+#### Airfoil & Wing
+
+The lift and the moment of an airfoil, the lift slope of a wing of finite span,
+and its induced drag.
+
+Entries: [Thin Airfoil](#thin airfoil), [Plain Flap](#plain flap), [Prandtl Glauert Correction](#prandtl glauert correction), [Finite Wing Lift Slope](#finite wing lift slope), [Swept Wing Lift Slope](#swept wing lift slope), [Induced Drag & Span Efficiency](#induced drag & span efficiency) and [Winglets](#winglets).
+
+#### Thin Airfoil
+
+The results of thin airfoil theory: the lift grows linearly with the angle of
+attack from the zero lift angle, and the moment about the quarter chord does
+not depend on it.
+
+* Main results: the lift coefficient `Cls` of the airfoil, from its lift slope
+  `Clαs`, the angle of attack `αw` and the zero lift angle `α0`; the moment
+  coefficient `Cm4` about the quarter chord, from the moment coefficient `CmLE`
+  about the leading edge; the center of pressure `xcps`, in fraction of the chord.
+* A symmetrical airfoil has `α0` and `Cm4` of zero, and its center of pressure
+  stays at the quarter chord.
+* The theory gives a slope of 2π per radian; real airfoils have about 6. It
+  holds below the stall.
+
+* To calculate: `[Cls]` (Lift coefficient) for a cambered airfoil of 6.1 per radian, at 5° with a zero lift angle of −1.2°. The source gives 0.660 [1]:
+```rpl
+Clαs=6.1 αw=5_° α0=-1.2_°
+@ Expecting [ Cls=0.66008 35231 04 ]
+'ROOT(ⒺThin Airfoil;[Cls];[0.5])'
+```
+
+* To calculate: `[Cls]` for an airfoil of 0.105 per degree, at 10° with a zero lift angle of −2°. The source gives 1.26 [1]:
+```rpl
+Clαs=6.01606 αw=10_° α0=-2_°
+@ Expecting [ Cls=1.26000 06599 7 ]
+'ROOT(ⒺThin Airfoil;[Cls];[1])'
+```
+
+* To calculate: `[α0;CmLE;xcps]` (Zero lift angle; Moment about the leading edge; Center of pressure) for a NACA 2415 at 5°, with a lift coefficient of 0.776 and a quarter chord moment of −0.0531. The source gives −0.247 for the moment [1]:
+```rpl
+Cls=0.776106 Cm4=-0.0531195 Clαs=6.28318530718 αw=5_°
+@ Expecting [ α0=-2.07723 80696 7 ° CmLE=-0.24714 6 xcps=0.31844 36146 61 ]
+'ROOT(ⒺThin Airfoil;[α0;CmLE;xcps];[-2_°;-0.2;0.3])'
+```
+
+#### Plain Flap
+
+A deflected flap acts as added camber: thin airfoil theory gives the changes of
+lift and moment.
+
+![Plain flap](img/PlainFlap.bmp)
+
+* Main results: the hinge angle `θf`, the change of lift `ΔCl`, the change of moment
+  about the quarter chord `ΔCm4` and the flap efficiency `τf`, from the hinge
+  position `xfl`, in fraction of the chord, and the deflection `ηf`.
+* The theory overestimates the effect of a real flap, on which the flow separates.
+* The examples are computed from the formulas of the source.
+
+* To calculate: `[θf;ΔCl;ΔCm4;τf]` (Hinge angle; Lift change; Moment change; Efficiency) for a flap of 25 % of the chord deflected by 10°:
+```rpl
+xfl=0.75 ηf=10_°
+@ Expecting [ θf=120. ° ΔCl=0.66784 07977 83 ΔCm4=-0.11336 24602 65 τf=0.60899 77810 44 ]
+'ROOT(ⒺPlain Flap;[θf;ΔCl;ΔCm4;τf];[100_°;0.5;-0.1;0.5])'
+```
+
+* To calculate: `[θf;ΔCl;ΔCm4;τf]` for a flap of 20 % of the chord deflected by 20°:
+```rpl
+xfl=0.8 ηf=20_°
+@ Expecting [ θf=126.86989 7646 ° ΔCl=1.20587 95483 2 ΔCm4=-0.22340 21442 55 τf=0.54981 51442 48 ]
+'ROOT(ⒺPlain Flap;[θf;ΔCl;ΔCm4;τf];[100_°;0.5;-0.1;0.5])'
+```
+
+#### Prandtl Glauert Correction
+
+Compressibility raises the lift slope of an airfoil and its pressure coefficient
+as the Mach number grows.
+
+* Main results: the lift slope `ClαM` and the pressure coefficient `CpM` at the
+  Mach number `Mach`, from their values `Clα0` and `Cp0` at low speed.
+* It holds up to the critical Mach number only. For a finite wing, the Swept Wing
+  Lift Slope entry applies the full transformation, which also changes the aspect
+  ratio and the sweep.
+* The examples are computed: the correction is an exact rule of linearized theory.
+
+* To calculate: `[ClαM;CpM]` (Lift slope; Pressure coefficient) at Mach 0.6, from 2π and −0.5:
+```rpl
+Clα0=6.28318530718 Cp0=-0.5 Mach=0.6
+@ Expecting [ ClαM=7.85398 16339 8 CpM=-0.625 ]
+'ROOT(ⒺPrandtl Glauert Correction;[ClαM;CpM];[7;-0.6])'
+```
+
+#### Finite Wing Lift Slope
+
+A wing of finite span lifts less than its airfoil: the vortices of its tips
+deflect the air downward, and lower the angle of attack that the wing really
+sees by the induced angle.
+
+![Lift slope](img/LiftSlope.bmp)
+
+* Main results: the lift slope `CLα` of the wing, its lift coefficient `CL`
+  and the induced angle `αi`, from the lift slope `Clαs` of the airfoil, the
+  aspect ratio `AR`, the span efficiency penalty `δsp`, the angle of attack
+  `αw` and the angle of zero lift `α0`.
+* The slopes are per radian. A slope of 0.1 per degree is 5.72958 per radian.
+* The lifting line theory holds for the straight wings of moderate to large
+  aspect ratio.
+
+* To calculate: `[CLα]` (Lift slope of the wing) for an airfoil of 0.10 per degree, on a wing of aspect ratio 7.2 with a penalty of 0.1. The source gives 4.48 per radian [1]:
+```rpl
+Clαs=5.72957795131 AR=7.2 δsp=0.1
+@ Expecting [ CLα=4.48101 74683 2 ]
+'ROOT(ⒺFinite Wing Lift Slope;[CLα];[1])'
+```
+
+* To calculate: `[CLα;CL;αi]` (Lift slope; Lift coefficient; Induced angle) for a wing of 10 m with an area of 8 m², an elliptical lift distribution, at 5° with a zero lift angle of −0.5°. The source gives 5.42 and 0.520 [1]:
+```rpl
+Clαs=6.28318530718 AR=12.5 δsp=0 αw=5_° α0=-0.5_°
+@ Expecting [ CLα=5.41653 90579 1 CL=0.51995 04234 29 αi=0.75862 06896 55 ° ]
+'ROOT(ⒺFinite Wing Lift Slope;[CLα;CL;αi];[1;0.5;1_°])'
+```
+
+#### Swept Wing Lift Slope
+
+The formula of Helmbold and Polhamus for the lift slope of a swept wing of any
+aspect ratio, with compressibility.
+
+* Main results: the compressibility factor `βpg` and the lift slope `CLα` of the
+  wing, from the lift slope `Clαs` of the airfoil, the aspect ratio `AR`, the sweep
+  `Λm` of the quarter chord and the Mach number `Mach`.
+* The sweep and the compressibility work in opposite directions: sweep lowers the
+  slope, and the Mach number raises it.
+* It holds below the critical Mach number, and gives the same value for a forward
+  sweep, a limit that the source points out.
+* NACA Technical Note 1862 announces a ratio of 0.698 between the two slopes of the
+  first two examples, whose formula gives 0.6935: the 0.6 % gap is unexplained.
+
+* To calculate: `[βpg;CLα]` (Compressibility factor; Lift slope) for a straight wing of aspect ratio 3, at low speed:
+```rpl
+Clαs=6.28318530718 AR=3 Λm=0_° Mach=0
+@ Expecting [ βpg=1 CLα=3.36265 87279 7 ]
+'ROOT(ⒺSwept Wing Lift Slope;[βpg;CLα];[1;3])'
+```
+
+* To calculate: `[βpg;CLα]` for the same wing swept by 60° [4]:
+```rpl
+Clαs=6.28318530718 AR=3 Λm=60_° Mach=0
+@ Expecting [ βpg=1 CLα=2.33206 85039 2 ]
+'ROOT(ⒺSwept Wing Lift Slope;[βpg;CLα];[1;3])'
+```
+
+* To calculate: `[βpg;CLα]` for an airliner wing of aspect ratio 9.5, swept by 25°, at Mach 0.7:
+```rpl
+Clαs=6.28318530718 AR=9.5 Λm=25_° Mach=0.7
+@ Expecting [ βpg=0.71414 28428 54 CLα=5.80993 96000 2 ]
+'ROOT(ⒺSwept Wing Lift Slope;[βpg;CLα];[1;5])'
+```
+
+#### Induced Drag & Span Efficiency
+
+The drag induced by the lift, and the Oswald factor that goes into the drag
+polar of the Performance section.
+
+![Induced drag](img/InducedAngle.bmp)
+
+* Main results: the induced drag coefficient `CDi` of the wing, from its
+  lift coefficient `CL`, its aspect ratio `AR` and the penalty `δsp`; the
+  Oswald factor `eO` and the induced drag factor `Kind` of the drag polar.
+* With `Dk2=0`, the Oswald factor is `1/(1+δsp)`: the induced drag of the wing
+  alone. The growth `Dk2` of the profile drag with the square of the lift
+  coefficient lowers it further.
+* The Oswald factor of a whole airplane, 0.7 to 0.85, is lower than that of
+  its wing.
+
+* To calculate: `[CDi]` (Induced drag coefficient) for the wing of the second example of the Finite Wing Lift Slope entry. The source gives 0.00689 [1]:
+```rpl
+CL=0.51995 AR=12.5 δsp=0
+@ Expecting [ CDi=6.88435 53524 6⁳⁻³ ]
+'ROOT(ⒺInduced Drag & Span Efficiency;[CDi];[0.01])'
+```
+
+* To calculate: `[eO;Dk2]` (Oswald factor; Growth of the profile drag) for the flying wing of the Trapezoidal Wing entry, whose drag polar has an induced drag factor of 0.040. The source gives 0.80 [1]:
+```rpl
+Kind=0.040 AR=9.94709 δsp=0
+@ Expecting [ eO=0.80000 75554 35 Dk2=7.99969 77825 9⁳⁻³ ]
+'ROOT(ⒺInduced Drag & Span Efficiency;[eO;Dk2];[0.8;0.01])'
+```
+
+* To calculate: `[eO;Kind]` (Oswald factor; Induced drag factor) for a wing of aspect ratio 7.2, with a penalty of 0.1 and a growth of the profile drag of 0.004:
+```rpl
+AR=7.2 δsp=0.1 Dk2=0.004
+@ Expecting [ eO=0.83999 88160 42 Kind=0.05263 06770 56 ]
+'ROOT(ⒺInduced Drag & Span Efficiency;[eO;Kind];[0.8;0.05])'
+```
+
+#### Winglets
+
+A winglet acts on the induced drag as a larger aspect ratio.
+
+![Winglet](img/Winglet.bmp)
+
+* Main results: the winglet height ratio `ηwl`, the effective aspect ratio `ARef`,
+  and the simple linear estimate `ARlin`, from the winglet height `hwl`, the span
+  `bw`, the aspect ratio `AR`, the cant `φwl` from the vertical, and the factor
+  `Kwl`, which is the sine of the cant in that estimate, or about 1 for the winglets
+  of Whitcomb.
+* In the Drag Polar entry, `ARef` replaces `AR`; the induced drag is multiplied by
+  `AR/ARef`.
+
+* To calculate: `[ηwl;ARef;ARlin]` (Height ratio; Effective aspect ratio; Linear estimate) for a wing of 60 ft and aspect ratio 9.5, with winglets of 2 ft canted by 25°. The source gives ratios of 1.032 and 1.028, and 9.80 [1]:
+```rpl
+bw=60_ft hwl=2_ft φwl=25_° AR=9.5 Kwl=0.422618
+@ Expecting [ ηwl=0.06666 66666 67 ARef=9.80138 89562 1 ARlin=9.76765 80666 7 ]
+'ROOT(ⒺWinglets;[ηwl;ARef;ARlin];[0.1;10;10])'
+```
+
+#### Stability
+
+The static longitudinal stability of the airplane: the size of its tails, its
+neutral point and static margin, and its trim.
+
+Entries: [Tail Volume Coefficients](#tail volume coefficients), [Neutral Point & Static Margin](#neutral point & static margin), [Pitch Stiffness & Trim](#pitch stiffness & trim) and [Phugoid](#phugoid).
+
+#### Tail Volume Coefficients
+
+The tail volume coefficients compare the area of a tail times its lever arm
+with the area of the wing times its mean aerodynamic chord, or its wingspan
+for the vertical tail. They size the tails of a new design from those of
+similar airplanes.
+
+* Main results: the horizontal and vertical tail volume coefficients `VHT`
+  and `VVT`, from the tail areas `SHT` and `SVT`, their lever arms `lH` and
+  `lV`, and the area `Sw`, mean aerodynamic chord `MAC` and wingspan `bw` of
+  the wing; or the tail areas for given coefficients.
+* Typical values: `VHT` 0.4 to 1.1, `VVT` 0.03 to 0.09.
+* For sizing, the lever arms are measured between the aerodynamic centers of
+  the wing and of the tail; in a balance of moments, from the center of
+  gravity.
+
+* To calculate: `[SHT;SVT]` (Horizontal and vertical tail areas) for a turboprop of 46 ft, with a wing of 300 ft², 70 ft of span and a mean aerodynamic chord of 5.2 ft, tail lever arms of 53 % of its length, and coefficients of 0.80 and 0.03. The source gives 51.2 ft² and 25.8 ft² [1]:
+```rpl
+Sw=300_ft^2 MAC=5.2_ft bw=70_ft lH=24.38_ft lV=24.38_ft VHT=0.80 VVT=0.03
+@ Expecting [ SHT=51.18949 95898 ft↑2 SVT=25.84085 31583 ft↑2 ]
+'ROOT(ⒺTail Volume Coefficients;[SHT;SVT];[50_ft^2;25_ft^2])'
+```
+
+#### Neutral Point & Static Margin
+
+The neutral point is the center of gravity at which the airplane would be
+neutrally stable in pitch. The airplane is stable when its center of gravity
+is ahead of it; the distance between them, in fractions of the mean
+aerodynamic chord, is the static margin.
+
+![Static margin](img/StaticMargin.bmp)
+
+* Main results: the tail efficiency factor `KT`, the neutral point `xnp`,
+  the center of gravity `xcg` and the static margin `SMarg`, from the lift
+  slopes `CLαw` and `CLαt` of the wing and of the tail, the downwash gradient
+  `dεdα`, the areas `Sw` and `SHT`, the lever arm `lH`, the mean aerodynamic
+  chord `MAC`, the aerodynamic center `xacw` of the wing and the CG in % MAC
+  `PMAC` of the weight and balance.
+* Positions are fractions of `MAC` from its leading edge: `xcg` is
+  `PMAC/100`.
+* Solved the other way, a minimum static margin gives the aft limit of the
+  center of gravity.
+
+* To calculate: `[KT;xnp;xcg;SMarg]` (Tail factor; Neutral point; Center of gravity; Static margin) for a wing of 0.08 per degree and a tail of 0.06 per degree, a downwash gradient of 0.1, a tail of 20 % of the wing area and a lever arm of 2.5 mean chords, the wing aerodynamic center at 25 % and the CG at 36 % of the MAC. The source gives 0.547 and 0.19 [1]:
+```rpl
+CLαw=4.58366236105 CLαt=3.43774677078 dεdα=0.1 Sw=100_ft^2 SHT=20_ft^2 MAC=4_ft lH=10_ft xacw=0.25 PMAC=36
+@ Expecting [ KT=0.135 xnp=0.54735 68281 93 xcg=0.36 SMarg=0.18735 68281 93 ]
+'ROOT(ⒺNeutral Point & Static Margin;[KT;xnp;xcg;SMarg];[0.1;0.5;0.3;0.2])'
+```
+
+* To calculate: `[KT;xnp;xcg;PMAC]` (Tail factor; Neutral point; Center of gravity; CG in % MAC) for the aft limit of the center of gravity of the same airplane, with a static margin of 5 %:
+```rpl
+CLαw=4.58366236105 CLαt=3.43774677078 dεdα=0.1 Sw=100_ft^2 SHT=20_ft^2 MAC=4_ft lH=10_ft xacw=0.25 SMarg=0.05
+@ Expecting [ KT=0.135 xnp=0.54735 68281 93 xcg=0.49735 68281 93 PMAC=49.73568 28193 ]
+'ROOT(ⒺNeutral Point & Static Margin;[KT;xnp;xcg;PMAC];[0.1;0.5;0.3;30])'
+```
+
+#### Pitch Stiffness & Trim
+
+The pitching moment of a stable airplane decreases as its angle of attack
+increases, and it flies trimmed at the angle where the moment is zero.
+
+* Main results: the pitch stiffness `Cmα` and the trim angle `αtr`,
+  counted from zero lift; the lift coefficient `CLt` the horizontal tail
+  must give to balance the moment of the wing.
+* `Cmα` is per radian, as `CLαw`; it is negative for a stable airplane.
+* In the balance of moments, `VHT` is computed with the lever arm from the
+  center of gravity.
+* The examples are computed, not taken from the source.
+
+* To calculate: `[Cmα;αtr;CLt]` (Pitch stiffness; Trim angle; Tail lift coefficient) for the airplane of the Neutral Point & Static Margin entry, with a moment coefficient of 0.05 at zero lift, a wing moment of −0.05 about its aerodynamic center, a wing lift coefficient of 0.5, a tail volume coefficient of 0.5 and a tail efficiency of 0.9:
+```rpl
+CLαw=4.58366236105 KT=0.135 SMarg=0.187357 Cm0=0.05 Cmac=-0.05 CLw=0.5 xcg=0.36 xacw=0.25 VHT=0.5 ηt=0.9
+@ Expecting [ Cmα=-0.97471 66948 91 αtr=2.93909 91153 3 ° CLt=1.11111 11111 1⁳⁻² ]
+'ROOT(ⒺPitch Stiffness & Trim;[Cmα;αtr;CLt];[-1;3_°;0.01])'
+```
+
+#### Phugoid
+
+The slow oscillation of speed and height of an airplane, at nearly constant angle
+of attack: Lanchester's approximation.
+
+* Main results: the angular frequency `ωph`, the period `Tphg` and the damping ratio
+  `ζph`, from the true airspeed `TAS` and the lift to drag ratio `LD`.
+* The period depends on the speed only: about 0.233 s per knot. The damping is small
+  for an efficient airplane.
+* The example is computed.
+
+* To calculate: `[ωph;Tphg;ζph]` (Angular frequency; Period; Damping ratio) at 120 kt with a lift to drag ratio of 11.39:
+```rpl
+TAS=120_knot LD=11.39
+@ Expecting [ ωph=0.22465 49259 95 r/s Tphg=27.96816 17456 s ζph=6.20813 67970 7⁳⁻² ]
+'ROOT(ⒺPhugoid;[ωph;Tphg;ζph];[0.2_r/s;30_s;0.06])'
+```
+
+#### Propeller
+
+The coefficients of a propeller, the speed of its blade tips, and the momentum
+theory of the actuator disk.
+
+Entries: [Propeller Coefficients](#propeller coefficients), [Helical Tip Mach](#helical tip mach) and [Actuator Disk](#actuator disk).
+
+#### Propeller Coefficients
+
+The dimensionless coefficients that describe a propeller in the charts of its
+maker: the advance ratio is the distance flown per turn, in propeller
+diameters.
+
+* Main results: the advance ratio `Jadv`, the thrust `Thr`, the shaft power
+  `Psh`, the torque `Qsh`, the propeller efficiency `ηp` and the speed-power
+  coefficient `CSp`, from the true airspeed `TAS`, the rotation `nrot`, the
+  diameter `Dprop`, the air density `ρa` and the thrust and power coefficients
+  `CTp` and `CPp`; `CQp` is the torque coefficient, `CPp/(2π)`.
+* `CSp` does not depend on the diameter: it is the coefficient to use to choose
+  a propeller, when the diameter is not known yet.
+* Coefficients read from charts are not exact: `Jadv·CTp/CPp` can differ from
+  the efficiency read on the chart.
+
+* To calculate: `[TAS;Thr;Psh;CQp;Qsh;ηp;CSp]` (True airspeed; Thrust; Shaft power; Torque coefficient; Torque; Efficiency; Speed-power coefficient) for a propeller of 7 ft at 2 000 rpm, at 8 000 ft, with an advance ratio of 1.25 and coefficients read on a chart at a pitch of 30°. The source gives 234.4 lbf and 137.5 hp. It prints 292.7 ft/s, but 1.25·233.33 is 291.67 ft/s, or 172.8 kt, and it reads an efficiency of 0.87 on its chart [1]:
+```rpl
+Dprop=7_ft nrot=2000_rpm ρa=0.001869_slug/ft^3 Jadv=1.25 CTp=0.047 CPp=0.065
+@ Expecting [ TAS=172.80777 5378 knot Thr=234.34560 3333 lbf Psh=137.49484 1414 hp CQp=1.03450 71301⁳⁻² Qsh=361.06923 0401 lbf·ft ηp=0.90384 61538 46 CSp=2.15937 13833 9 ]
+'ROOT(ⒺPropeller Coefficients;[TAS;Thr;Psh;CQp;Qsh;ηp;CSp];[100_knot;100_lbf;100_hp;0.01;100_lbf*ft;0.8;1])'
+```
+
+* To calculate: `[Dprop;CPp;CSp]` (Diameter; Power coefficient; Speed-power coefficient) for a drone at 45 mph, with 800 W at 7 000 rpm and an advance ratio of 0.60. The source gives 0.287 m and 0.821, from a speed rounded to 20.12 m/s [1]:
+```rpl
+TAS=45_mph nrot=7000_rpm ρa=1.225_kg/m^3 Psh=800_W Jadv=0.6
+@ Expecting [ Dprop=0.28738 28571 43 m CPp=0.20980 18137 72 CSp=0.81995 38373 66 ]
+'ROOT(ⒺPropeller Coefficients;[Dprop;CPp;CSp];[0.3_m;0.05;0.8])'
+```
+
+#### Helical Tip Mach
+
+The tip of a blade moves along a helix, at a speed that combines the rotation
+and the flight speed. Noise and losses grow quickly when its Mach number nears
+one, which limits the rotation of a propeller.
+
+![Helical tip speed](img/HelicalTip.bmp)
+
+* Main results: the rotational tip speed `Vtip`, the helical tip speed `Vhel`
+  and the helical tip Mach number `Mhel`, from the rotation `nrot`, the
+  diameter `Dprop`, the true airspeed `TAS` and the speed of sound `asnd`.
+* Solved the other way, a maximum `Mhel` gives the maximum rotation.
+
+* To calculate: `[Vtip;Vhel;Mhel]` (Rotational tip speed; Helical tip speed; Mach number) for the propeller of the Propeller Coefficients entry, at 291.67 ft/s. The source gives 788.9 ft/s and 0.73 [1]:
+```rpl
+nrot=2000_rpm Dprop=7_ft asnd=1085.3_ft/s TAS=291.667_ft/s
+@ Expecting [ Vtip=733.03828 5838 ft/s Vhel=788.93267 6084 ft/s Mhel=0.72692 58970 64 ]
+'ROOT(ⒺHelical Tip Mach;[Vtip;Vhel;Mhel];[700_ft/s;800_ft/s;0.7])'
+```
+
+* To calculate: `[Vhel;Vtip;nrot]` (Helical tip speed; Rotational tip speed; Rotation) for the maximum rotation of a propeller of 6.5 ft at 220 ft/s, with a limit of Mach 0.85. The source gives 918 ft/s, 891.3 ft/s and 2 618 rpm [1]:
+```rpl
+TAS=220_ft/s asnd=1080_ft/s Dprop=6.5_ft Mhel=0.85
+@ Expecting [ Vhel=918. ft/s Vtip=891.24856 2411 ft/s nrot=2 618.70672 427 rpm ]
+'ROOT(ⒺHelical Tip Mach;[Vhel;Vtip;nrot];[900_ft/s;800_ft/s;2000_rpm])'
+```
+
+#### Actuator Disk
+
+The momentum theory replaces the propeller by a disk that accelerates the air
+through it. Half of the gain of speed is reached at the disk, and the other half
+in the wake.
+
+![Actuator disk](img/ActuatorDisk.bmp)
+
+* Main results: the area of the disk `Adisk`, the induced velocity `vind`, the
+  ideal efficiency `ηi` and the speed of the wake `Vwake`, from the thrust
+  `Thr`, the true airspeed `TAS`, the air density `ρa` and the diameter `Dprop`.
+* `ηi` is an upper limit: a real propeller also loses energy to the drag and
+  the rotation of its blades, and its efficiency `ηp` is lower.
+* The larger the disk, the smaller `vind` and the higher `ηi`, for the same
+  thrust.
+* The examples are computed, not taken from the source.
+
+* To calculate: `[Adisk;vind;ηi;Vwake]` (Disk area; Induced velocity; Ideal efficiency; Wake speed) for the propeller of the Propeller Coefficients entry, with a thrust of 234.4 lbf at 291.67 ft/s:
+```rpl
+Thr=234.4_lbf TAS=291.667_ft/s ρa=0.001869_slug/ft^3 Dprop=7_ft
+@ Expecting [ Adisk=38.48451 00065 ft↑2 vind=5.48347 56482 8 ft/s ηi=0.98154 64685 48 Vwake=302.63395 1297 ft/s ]
+'ROOT(ⒺActuator Disk;[Adisk;vind;ηi;Vwake];[30_ft^2;5_ft/s;0.9;300_ft/s])'
+```
+
+* To calculate: `[Adisk;vind;ηi;Vwake]` for the same thrust at rest, where the ideal efficiency is zero:
+```rpl
+Thr=234.4_lbf TAS=0_knot ρa=0.001869_slug/ft^3 Dprop=7_ft
+@ Expecting [ Adisk=38.48451 00065 ft↑2 vind=40.36604 26236 ft/s ηi=0. Vwake=80.73208 52472 ft/s ]
+'ROOT(ⒺActuator Disk;[Adisk;vind;ηi;Vwake];[30_ft^2;30_ft/s;0.5;60_ft/s])'
+```
+
+#### Sizing
+
+The first sizing of an airplane: its wing loading and its thrust or power
+loading, the constraints that each flight case puts on them, and the load
+factors in maneuver and in gusts.
+
+![Constraint diagram](img/ConstraintDiagram.bmp)
+
+Entries: [Wing Loading](#wing loading), [Stall Constraint](#stall constraint), [Thrust & Power Loading](#thrust & power loading), [Takeoff Constraint](#takeoff constraint), [Landing Constraint](#landing constraint), [Maneuver Envelope](#maneuver envelope) and [Gust Load Factor](#gust load factor).
+
+#### Wing Loading
+
+The wing loading is the weight carried by each unit of wing area.
+
+* Main result: the wing loading `WoS`, from the mass `Wt` and the wing area `Sw`.
+* Typical values: light airplanes 10 to 20 lbf/ft², airliners 80 to 150, gliders
+  4 to 8.
+
+* To calculate: `[WoS]` (Wing loading) for a Cessna 172 of 2 076 lb with a wing of 174 ft²:
+```rpl
+Wt=2076_lb Sw=174_ft^2
+@ Expecting [ WoS=11.93103 44828 lbf/ft↑2 ]
+'ROOT(ⒺWing Loading;[WoS];[10_lbf/ft^2])'
+```
+
+#### Stall Constraint
+
+A given stall speed limits the wing loading.
+
+* Main results: the stall speed `Vst` for a wing loading `WoS`, or the highest
+  wing loading for a stall speed, from the air density `ρa` and the maximum lift
+  coefficient `CLmax`.
+
+* To calculate: `[Vst]` (Stall speed) for a wing loading of 76.84 lbf/ft², with a maximum lift coefficient of 3.2, at 5 000 ft. The source gives 90.7 kt [1]:
+```rpl
+WoS=76.84_lbf/ft^2 ρa=0.002048_slug/ft^3 CLmax=3.2
+@ Expecting [ Vst=90.72880 51951 knot ]
+'ROOT(ⒺStall Constraint;[Vst];[90_knot])'
+```
+
+* To calculate: `[WoS]` (Wing loading) the other way, for the rounded speed of 90.7 kt:
+```rpl
+Vst=90.7_knot ρa=0.002048_slug/ft^3 CLmax=3.2
+@ Expecting [ WoS=76.79121 63789 lbf/ft↑2 ]
+'ROOT(ⒺStall Constraint;[WoS];[70_lbf/ft^2])'
+```
+
+#### Thrust & Power Loading
+
+The thrust that a flight case demands for each unit of weight, as a function of
+the wing loading: the master equation of sizing, one curve per flight case.
+
+* Main results: the dynamic pressure `qd`, the thrust to weight ratio `TWr`, the
+  shaft power per unit of mass `PWr` and the thrust to weight ratio at takeoff
+  `TWsl`, from the wing loading `WoS`, the true airspeed `TAS`, the air density
+  `ρa`, the drag polar `CD0` and `Kind`, the load factor `nLF`, the rate of climb
+  `VS`, the acceleration `dVdt` and the propeller efficiency `ηp`.
+* In cruise, `nLF=1`, `VS` and `dVdt` are zero, and `TWr` is one over the lift
+  to drag ratio. For a level turn, `nLF` is one over the cosine of the bank angle.
+* The airplane must satisfy all of its flight cases at the same wing loading.
+* `βW` is the weight of the flight case over the takeoff weight, and `βT` its
+  thrust over the takeoff thrust.
+
+* To calculate: `[qd;TWr;PWr]` (Dynamic pressure; Thrust to weight ratio; Power per mass) for the Cessna 172 of the Wing Loading entry in cruise at 120 kt, in air of 0.00216 slug/ft³. The source gives 183.7 lbf and 79.6 hp, or 0.0885 and 0.0383 hp/lb for its 2 076 lb [1]:
+```rpl
+WoS=11.93103_lbf/ft^2 TAS=120_knot ρa=0.00216_slug/ft^3 CD0=0.02 Kind=0.05276055498 nLF=1 VS=0_ft/min dVdt=0_ft/s^2 ηp=0.85
+@ Expecting [ qd=2 121.23984 487 Pa TWr=8.84738 86979 8⁳⁻² PWr=0.03832 99504 28 hp/lb ]
+'ROOT(ⒺThrust & Power Loading;[qd;TWr;PWr];[1000_Pa;0.1;0.05_hp/lb])'
+```
+
+* To calculate: `[qd;TWr;PWr]` for the same airplane in a level turn at 60° of bank, with a load factor of 2:
+```rpl
+WoS=11.93103_lbf/ft^2 TAS=120_knot ρa=0.00216_slug/ft^3 CD0=0.02 Kind=0.05276055498 nLF=2 VS=0_ft/min dVdt=0_ft/s^2 ηp=0.85
+@ Expecting [ qd=2 121.23984 487 Pa TWr=0.13109 99538 79 PWr=0.05679 70381 41 hp/lb ]
+'ROOT(ⒺThrust & Power Loading;[qd;TWr;PWr];[1000_Pa;0.1;0.05_hp/lb])'
+```
+
+* To calculate: `[qd;TWr;PWr;TWsl]` for the same airplane climbing at 500 ft/min, at 95 % of its takeoff weight and 80 % of its takeoff thrust:
+```rpl
+WoS=11.93103_lbf/ft^2 TAS=120_knot ρa=0.00216_slug/ft^3 CD0=0.02 Kind=0.05276055498 nLF=1 VS=500_ft/min dVdt=0_ft/s^2 ηp=0.85 βW=0.95 βT=0.8
+@ Expecting [ qd=2 121.23984 487 Pa TWr=0.12961 85954 03 PWr=5.61552 62370 5⁳⁻² hp/lb TWsl=0.15392 20820 41 ]
+'ROOT(ⒺThrust & Power Loading;[qd;TWr;PWr;TWsl];[1000_Pa;0.1;0.05_hp/lb;0.2])'
+```
+
+#### Takeoff Constraint
+
+The thrust to weight ratio for a takeoff ground roll: the Takeoff Ground Roll
+equation of the Performance section, the other way.
+
+* Main result: the thrust to weight ratio `TWr`, from the wing loading `WoS`, the
+  air density `ρa`, the maximum lift coefficient `CLmax`, the ground roll `sLO`,
+  the liftoff speed factor `fLO` and the average resistance over the weight
+  `RavW`.
+
+* To calculate: `[TWr]` (Thrust to weight ratio) for an airplane of 6 600 lb with a wing of 160 ft², a roll of 3 273 ft and a resistance of 221.6 lbf. Its thrust is 1 200 lbf, or 0.1818 [1]:
+```rpl
+WoS=41.25_lbf/ft^2 ρa=0.002378_slug/ft^3 CLmax=1.6 fLO=1.2 sLO=3273.38_ft RavW=0.03358273
+@ Expecting [ TWr=0.18181 83159 97 ]
+'ROOT(ⒺTakeoff Constraint;[TWr];[0.2])'
+```
+
+#### Landing Constraint
+
+The highest wing loading for a landing ground roll: the Landing Ground Roll
+equation of the Performance section, the other way.
+
+* Main result: the wing loading `WoS`, from the ground roll `sLD`, the air density
+  `ρa`, the maximum lift coefficient `CLmax`, the touchdown speed factor `fTD` and
+  the average resistance over the weight `RavW`.
+
+* To calculate: `[WoS]` (Wing loading) for an airplane of 5 200 lb with a wing of 160 ft², a roll of 814 ft and a resistance of 2 183 lbf. Its wing loading is 32.5 lbf/ft² [1]:
+```rpl
+sLD=814.474_ft ρa=0.002378_slug/ft^3 CLmax=2.1 fTD=1.3 RavW=0.41971731
+@ Expecting [ WoS=32.50006 72184 lbf/ft↑2 ]
+'ROOT(ⒺLanding Constraint;[WoS];[30_lbf/ft^2])'
+```
+
+#### Maneuver Envelope
+
+The V-n diagram of 14 CFR Part 23 before amendment 23-64 of 2017: the load factors
+that the airframe must withstand, as a function of the speed.
+
+![Maneuver envelope](img/ManeuverEnvelope.bmp)
+
+* Main results: the wing loading `WoS`, the negative limit load factor `nneg`, the
+  lowest design cruising and dive speeds `VCmin` and `VDmin`, and the speed `Vsn`
+  where the negative stall reaches `nneg`, from the mass `Wt`, the wing area `Sw`,
+  the air density `ρa`, the limit load factor `nlim`, the factors `kneg`, `kVC` and
+  `kVD`, and the most negative lift coefficient `CLmxn`.
+* `kneg` is 0.4 in the normal, utility and commuter categories, 0.5 in the
+  aerobatic one.
+* `kVC` is 33, in knots for a wing loading in lbf/ft², and 36 in the aerobatic
+  category. Above 20 lbf/ft², it decreases linearly to 28.6 at 100 lbf/ft².
+* `kVD` is 1.40 in the normal category, 1.50 in the utility one, 1.55 in the
+  aerobatic one.
+* The speeds are equivalent airspeeds: give the sea level density. The Limit Load
+  Factor and the Maneuvering Speed & Weight entries of the Performance section give
+  `nlim` and the maneuvering speed.
+* The example is computed from the rules.
+
+* To calculate: `[WoS;nneg;VCmin;VDmin;Vsn]` (Wing loading; Negative load factor; Cruising and dive speeds; Negative stall speed at that factor) for a light airplane of 2 450 lb in the normal category, with a wing of 174 ft² and a most negative lift coefficient of −1.2:
+```rpl
+Wt=2450_lb Sw=174_ft^2 ρa=1.225_kg/m^3 nlim=3.8 kneg=0.4 kVC=33 kVD=1.4 CLmxn=-1.2
+@ Expecting [ WoS=14.08045 97701 lbf/ft↑2 nneg=-1.52 VCmin=123.82899 7774 knot VDmin=173.36059 6883 knot Vsn=72.58156 13389 knot ]
+'ROOT(ⒺManeuver Envelope;[WoS;nneg;VCmin;VDmin;Vsn];[10_lbf/ft^2;-1;100_knot;150_knot;70_knot])'
+```
+
+#### Gust Load Factor
+
+The load factor in a vertical gust, by the formula of Pratt and Walker: a gust
+changes the angle of attack, and the alleviation factor accounts for the time that
+the airplane takes to enter it.
+
+* Main results: the mass ratio `μgst`, the gust alleviation factor `Kgust` and the
+  load factor `ngst` in an upward gust, from the wing loading `WoS`, the air density
+  `ρa`, the mean geometric chord `cgeo`, the lift slope `CLα` of the wing, per
+  radian, the derived gust velocity `Ude` and the equivalent airspeed `EAS`.
+* In a downward gust, the load factor is `2-ngst`.
+* Up to 20 000 ft, the rules take `Ude` of 50 ft/s at the cruising speed and 25 ft/s
+  at the dive speed, decreasing linearly to 25 and 12.5 ft/s at 50 000 ft.
+* 14 CFR 23.341, before amendment 23-64 of 2017, rounds the constant of the formula
+  to 498 in its units, for 498.54: its result is slightly higher. The examples are
+  computed.
+
+* To calculate: `[μgst;Kgust;ngst]` (Mass ratio; Alleviation factor; Load factor) for the airplane of the Maneuver Envelope entry, with a mean chord of 4.83 ft and a lift slope of 4.48 per radian, in a gust of 50 ft/s at its cruising speed. The rounded constant gives 3.654:
+```rpl
+WoS=14.08046_lbf/ft^2 ρa=1.225_kg/m^3 cgeo=4.83333_ft CLα=4.48 Ude=50_ft/s EAS=123.829_knot
+@ Expecting [ μgst=17.00619 44568 Kgust=0.67091 00985 81 ngst=3.65106 82977 3 ]
+'ROOT(ⒺGust Load Factor;[μgst;Kgust;ngst];[10;0.5;3])'
+```
+
+* To calculate: `[μgst;Kgust;ngst]` in a gust of 25 ft/s at its dive speed. The rounded constant gives 2.858:
+```rpl
+WoS=14.08046_lbf/ft^2 ρa=1.225_kg/m^3 cgeo=4.83333_ft CLα=4.48 Ude=25_ft/s EAS=173.361_knot
+@ Expecting [ μgst=17.00619 44568 Kgust=0.67091 00985 81 ngst=2.85575 20902 3 ]
+'ROOT(ⒺGust Load Factor;[μgst;Kgust;ngst];[10;0.5;3])'
 ```

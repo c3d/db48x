@@ -1,0 +1,82 @@
+«
+@@ ============================================================
+@@ WingPanels — area, aspect ratio and mean aerodynamic chord of a
+@@ wing made of several straight tapered panels.
+@@
+@@ Input:  a list of stations of the half wing, from the root to the
+@@         tip, one { y c xLE } list each: the spanwise position y,
+@@         the chord c, and the position xLE of the leading edge,
+@@         positive aft (0 if omitted). Between two stations, the
+@@         chord and the leading edge vary linearly.
+@@         Lengths may carry units; the results are then in the unit
+@@         of the span of the last station.
+@@ Output: Sw, the area of the whole wing; AR, the aspect ratio;
+@@         MAC, the mean aerodynamic chord; yMAC, the spanwise
+@@         position of its centroid; xMAC, the position of its leading
+@@         edge; tagged.
+@@ Method: exact integrals of c, c², c·y and c·xLE over each panel:
+@@ Sw = 2∫c dy, MAC = ∫c² dy/∫c dy, yMAC = ∫c·y dy/∫c dy,
+@@ xMAC = ∫c·xLE dy/∫c dy; the span is twice the y of the last
+@@ station. A first station away from the center line leaves out
+@@ the part of the wing inside the fuselage.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → stl
+  «
+    IF stl TypeName "list" ≠ THEN
+      "WingPanels needs a list of stations { y c xLE }" DoError
+    END
+    stl SIZE
+    → nst
+    «
+      IF nst 2 < THEN "WingPanels needs two stations or more" DoError END
+      stl nst GET 1 GET
+      IF DUP TypeName "unit" == THEN DUP UVAL / ELSE DROP 1 END
+      → uu
+      «
+        1 nst FOR ii
+          stl ii GET 1 GET IF DUP TypeName "unit" == THEN uu CONVERT UVAL END
+        NEXT nst →LIST
+        1 nst FOR ii
+          stl ii GET 2 GET IF DUP TypeName "unit" == THEN uu CONVERT UVAL END
+        NEXT nst →LIST
+        1 nst FOR ii
+          stl ii GET
+          IF DUP SIZE 3 ≥ THEN
+            3 GET IF DUP TypeName "unit" == THEN uu CONVERT UVAL END
+          ELSE DROP 0 END
+        NEXT nst →LIST
+        0 0 0 0
+        → ys cs xs sa s2 sy sx
+        «
+          1 nst 1 - FOR ii
+            ys ii GET ys ii 1 + GET cs ii GET cs ii 1 + GET
+            xs ii GET xs ii 1 + GET
+            → ya yb ca cb xa xb
+            «
+              IF yb ya ≤ THEN "WingPanels: y must increase from the root to the tip" DoError END
+              yb ya -
+              → ll
+              «
+                sa ll ca cb + * 2 / + 'sa' STO
+                s2 ll ca SQ ca cb * + cb SQ + * 3 / + 's2' STO
+                sy ll 6 / 2 ca * ya * ca yb * + cb ya * + 2 cb * yb * + * + 'sy' STO
+                sx ll 6 / 2 ca * xa * ca xb * + cb xa * + 2 cb * xb * + * + 'sx' STO
+              »
+            »
+          NEXT
+          ys nst GET
+          → bh
+          «
+            2 sa * uu SQ * "Sw" →TAG
+            2 bh * SQ 2 sa * / "AR" →TAG
+            s2 sa / uu * "MAC" →TAG
+            sy sa / uu * "yMAC" →TAG
+            sx sa / uu * "xMAC" →TAG
+          »
+        »
+      »
+    »
+  »
+»

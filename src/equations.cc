@@ -2459,6 +2459,154 @@ static const cstring basic_equations[] =
     "  '(sCor_ft)=(s0_ft)·fW·fV' "
     "}",
 
+    "Aeronautics/Design", nullptr,
+    // ------------------------------------------------------------------------
+    // The aircraft as it is designed: wing geometry and aerodynamics.
+    // Lift slopes are per radian (2π in theory): an angle in degrees is
+    // divided by (1_r). DB48x does not tell CL from Cl, nor CLα from Clα
+    // (a to z are compared in capitals): the airfoil slope is Clαs.
+    "Aeronautics/Design/Wing Geometry", nullptr,
+    "Trapezoidal Wing",  "{ "
+    "  'λt=(Ctip_ft)/(Croot_ft)' "
+    "  '(Sw_ft²)=((Croot_ft)+(Ctip_ft))·(bw_ft)/2' "
+    "  'AR=(bw_ft)²/(Sw_ft²)' "
+    // The same aspect ratio without the area: lets the solver find bw from AR
+    "  'AR=2·(bw_ft)/((Croot_ft)+(Ctip_ft))' "
+    "  '(cgeo_ft)=(Sw_ft²)/(bw_ft)' "
+    "  '(MAC_ft)=2/3·((Croot_ft)²+(Croot_ft)·(Ctip_ft)+(Ctip_ft)²)/((Croot_ft)+(Ctip_ft))' "
+    "  '(yMAC_ft)=(bw_ft)/6·((Croot_ft)+2·(Ctip_ft))/((Croot_ft)+(Ctip_ft))' "
+    "  '(xMAC_ft)=(yMAC_ft)·TAN(ΛLE_°)' "
+    "}",
+    "Elliptical Wing",  "{ "
+    "  '(Sw_ft²)=Ⓒπ·(Croot_ft)·(bw_ft)/4' "
+    "  'AR=(bw_ft)²/(Sw_ft²)' "
+    "  '(MAC_ft)=8·(Croot_ft)/(3·Ⓒπ)' "
+    "  '(yMAC_ft)=2·(bw_ft)/(3·Ⓒπ)' "
+    "}",
+    // Straight chord lines of a trapezoidal wing; x are fractions of the chord
+    "Sweep Conversion & Normal Mach",  "{ "
+    "  'TAN(Λn_°)=TAN(Λm_°)-4/AR·(xcn-xcm)·(1-λt)/(1+λt)' "
+    "  'Mnrm=Mach·COS(Λm_°)' "
+    "}",
+    "Aeronautics/Design/Airfoil & Wing", nullptr,
+    // Cls and xcps, not Cl and xcp, which DB48x would take for CL and XCP
+    "Thin Airfoil",  "{ "
+    "  'Cls=Clαs·((αw_°)-(α0_°))/(1_r)' "
+    "  'Cm4=CmLE+Cls/4' "
+    "  'xcps=1/4-Cm4/Cls' "
+    "}",
+    // xfl, not xf, which DB48x would take for XF
+    "Plain Flap",  "{ "
+    "  'COS(θf_°)=1-2·xfl' "
+    "  'ΔCl·(1_r)²=2·(ηf_°)·(Ⓒπ·(1_r)-(θf_°)+SIN(θf_°)·(1_r))' "
+    "  'ΔCm4·(1_r)=(ηf_°)/4·(SIN(2·(θf_°))-2·SIN(θf_°))' "
+    "  'τf·Ⓒπ·(1_r)=Ⓒπ·(1_r)-(θf_°)+SIN(θf_°)·(1_r)' "
+    "}",
+    "Prandtl Glauert Correction",  "{ "
+    "  'ClαM=Clα0/√(1-(Mach)²)' "
+    "  'CpM=Cp0/√(1-(Mach)²)' "
+    "}",
+    // Lifting line theory; δsp is 0 for the elliptic lift distribution
+    "Finite Wing Lift Slope",  "{ "
+    "  'CLα=Clαs/(1+(1+δsp)·Clαs/(Ⓒπ·AR))' "
+    "  'CL=CLα·((αw_°)-(α0_°))/(1_r)' "
+    "  '(αi_°)=(1_r)·CL/(Ⓒπ·AR)' "
+    "}",
+    // Helmbold and Polhamus (NACA TN 1862), with the Prandtl-Glauert transformation
+    "Swept Wing Lift Slope",  "{ "
+    "  'βpg=√(1-(Mach)²)' "
+    "  'CLα=Clαs·AR/(√((AR)²·((βpg)²+(TAN(Λm_°))²)+4·(βpg)²/((βpg)²+(TAN(Λm_°))²))+Clαs/Ⓒπ)' "
+    "}",
+    "Induced Drag & Span Efficiency",  "{ "
+    "  'CDi=(1+δsp)·(CL)²/(Ⓒπ·AR)' "
+    "  'Kind=1/(Ⓒπ·AR·eO)' "
+    "  'eO=1/(Ⓒπ·AR·Dk2+1+δsp)' "
+    "}",
+    "Winglets",  "{ "
+    "  'ηwl=(hwl_ft)/((bw_ft)/2)' "
+    "  'ARef=AR·(1+2·ηwl·SIN(φwl_°)+(ηwl)²)/(1+ηwl·SIN(φwl_°))' "
+    "  'ARlin=AR·(1+Kwl·ηwl)' "
+    "}",
+    "Aeronautics/Design/Stability", nullptr,
+    // Static longitudinal stability of the wing and the horizontal tail.
+    // Positions are fractions of the MAC from its leading edge; PMAC is the
+    // CG in % MAC of Flight Management. SHT, SVT and SMarg, not SH, SV and
+    // SM, which DB48x would take for sh (Weibull) and sm (Waves).
+    "Tail Volume Coefficients",  "{ "
+    "  'VHT=(SHT_ft²)·(lH_ft)/((Sw_ft²)·(MAC_ft))' "
+    "  'VVT=(SVT_ft²)·(lV_ft)/((Sw_ft²)·(bw_ft))' "
+    "}",
+    "Neutral Point & Static Margin",  "{ "
+    "  'KT=(1-dεdα)·CLαt/CLαw·(SHT_ft²)/(Sw_ft²)' "
+    "  'xnp=xacw+KT/(1+KT)·(lH_ft)/(MAC_ft)' "
+    "  'xcg=PMAC/100' "
+    "  'SMarg=xnp-xcg' "
+    "}",
+    // Cmα and CLαw per radian; αtr from the zero lift attitude
+    "Pitch Stiffness & Trim",  "{ "
+    "  'Cmα=-CLαw·(1+KT)·SMarg' "
+    "  '(αtr_°)=-(1_r)·Cm0/Cmα' "
+    "  'Cmac+CLw·(xcg-xacw)=ηt·VHT·CLt' "
+    "}",
+    // Lanchester's approximation
+    "Phugoid",  "{ "
+    "  '(ωph_(r/s))=√2·Ⓒg/(TAS_knot)·(1_r)' "
+    "  '(Tphg_s)·(ωph_(r/s))=2·Ⓒπ·(1_r)' "
+    "  'ζph=1/(√2·LD)' "
+    "}",
+    "Aeronautics/Design/Propeller", nullptr,
+    // The rotation nrot is in rpm, a unit of angle per time: the coefficients
+    // want revolutions per second without an angle, hence (nrot_rpm)/(1_turn).
+    "Propeller Coefficients",  "{ "
+    "  'Jadv·(nrot_rpm)/(1_turn)·(Dprop_ft)=(TAS_knot)' "
+    "  '(Thr_lbf)=CTp·(ρa_(kg/m^3))·((nrot_rpm)/(1_turn))²·(Dprop_ft)^4' "
+    "  '(Psh_hp)=CPp·(ρa_(kg/m^3))·((nrot_rpm)/(1_turn))³·(Dprop_ft)^5' "
+    "  'CPp=2·Ⓒπ·CQp' "
+    "  '(Qsh_(lbf*ft))=CQp·(ρa_(kg/m^3))·((nrot_rpm)/(1_turn))²·(Dprop_ft)^5' "
+    "  'ηp=Jadv·CTp/CPp' "
+    "  'CSp=Jadv/CPp^0.2' "
+    "}",
+    "Helical Tip Mach",  "{ "
+    "  '(Vtip_(ft/s))=Ⓒπ·(nrot_rpm)/(1_turn)·(Dprop_ft)' "
+    "  '(Vhel_(ft/s))=√((Vtip_(ft/s))²+(TAS_knot)²)' "
+    "  'Mhel·(asnd_(ft/s))=(Vhel_(ft/s))' "
+    "}",
+    // Momentum theory: the speed through the disk is TAS+vind, in the wake
+    // TAS+2·vind; ηi is the upper limit of the propeller efficiency
+    "Actuator Disk",  "{ "
+    "  '(Adisk_ft²)=Ⓒπ·(Dprop_ft)²/4' "
+    "  '(Thr_lbf)=2·(ρa_(kg/m^3))·(Adisk_ft²)·((TAS_knot)+(vind_(ft/s)))·(vind_(ft/s))' "
+    "  'ηi·((TAS_knot)+(vind_(ft/s)))=(TAS_knot)' "
+    "  '(Vwake_(ft/s))=(TAS_knot)+2·(vind_(ft/s))' "
+    "}",
+    "Aeronautics/Design/Sizing", nullptr,
+    // Each constraint on the wing loading WoS is its own entry: the solver
+    // takes the first eligible equation, and would use a value left by another
+    "Wing Loading",  "'(WoS_(lbf/ft^2))·(Sw_ft²)=(Wt_lb)·Ⓒg'",
+    "Stall Constraint",  "'(WoS_(lbf/ft^2))=(ρa_(kg/m^3))·(Vst_knot)²·CLmax/2'",
+    "Thrust & Power Loading",  "{ "
+    "  '(qd_Pa)=(ρa_(kg/m^3))·(TAS_knot)²/2' "
+    "  'TWr·(WoS_Pa)=(qd_Pa)·CD0+Kind·(nLF)²·(WoS_Pa)²/(qd_Pa)+(WoS_Pa)·(VS_ft/min)/(TAS_knot)+(WoS_Pa)·(dVdt_ft/s²)/Ⓒg' "
+    "  '(PWr_hp/lb)·ηp=TWr·Ⓒg·(TAS_knot)' "
+    "  'TWsl·βT=βW·TWr' "
+    "}",
+    // Inverses of Takeoff Ground Roll and Landing Ground Roll; RavW is Rav/W
+    "Takeoff Constraint",  "'(TWr-RavW)·(ρa_(kg/m^3))·Ⓒg·CLmax·(sLO_ft)=(fLO)²·(WoS_Pa)'",
+    "Landing Constraint",  "'(WoS_Pa)·(fTD)²=(sLD_ft)·(ρa_(kg/m^3))·Ⓒg·CLmax·RavW'",
+    // 14 CFR 23.333 to 23.341, before amendment 23-64 (2017)
+    "Maneuver Envelope",  "{ "
+    "  '(WoS_(lbf/ft^2))·(Sw_ft²)=(Wt_lb)·Ⓒg' "
+    "  'nneg=-kneg·nlim' "
+    "  '(VCmin_knot)=kVC·√((WoS_(lbf/ft^2))/(1_(lbf/ft^2)))·(1_knot)' "
+    "  '(VDmin_knot)=kVD·(VCmin_knot)' "
+    "  '(Vsn_knot)=√(2·(Wt_lb)·Ⓒg·nneg/((ρa_(kg/m^3))·(Sw_ft²)·CLmxn))' "
+    "}",
+    "Gust Load Factor",  "{ "
+    "  'μgst·(ρa_(kg/m^3))·(cgeo_ft)·CLα·Ⓒg=2·(WoS_Pa)' "
+    "  'Kgust=0.88·μgst/(5.3+μgst)' "
+    "  '(ngst-1)·2·(WoS_Pa)=Kgust·(1.225_(kg/m^3))·(Ude_(ft/s))·(EAS_knot)·CLα' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)

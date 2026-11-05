@@ -1,0 +1,79 @@
+«
+@@ ============================================================
+@@ NACA4 — zero lift angle, lift and moment of a NACA 4-digit
+@@ airfoil, by thin airfoil theory.
+@@
+@@ Input:  the digits of the airfoil as a number, such as 2415, or
+@@         12 for a NACA 0012, and the angle of attack: a value with
+@@         an angle unit, or a plain number of degrees.
+@@ Output: α0, the zero lift angle, in degrees; Cl, the lift
+@@         coefficient; Cm4 and CmLE, the moment coefficients about
+@@         the quarter chord and the leading edge; tagged.
+@@ Method: the first digit gives the maximum camber m in % of the
+@@ chord, the second its position p in tenths. The camber line of
+@@ two parabolas joined at p has a slope that is integrated in closed
+@@ form with x = (1 − cos θ)/2. The thickness, the last two digits,
+@@ plays no part in this theory.
+@@ Angle mode and angle units setting are restored before returning.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → nac aoa
+  «
+    IF nac 0 < nac 9999 > OR THEN
+      "NACA4 needs the 4 digits of an airfoil, such as 2415" DoError
+    END
+    nac 1000 / IP →Num 100 /
+    nac 100 / IP 10 MOD →Num 10 /
+    → mc pc
+    «
+      IF mc 0 > pc 0 = AND THEN
+        "NACA4: a cambered airfoil needs its second digit" DoError
+      END
+      'AngleMode' RCL 'SetAngleUnits' RCL
+      RAD NoAngleUnits
+      Ⓒπ →Num
+      aoa IF DUP TypeName "unit" == THEN 1_r CONVERT UVAL →Num ELSE →Num 180 / Ⓒπ →Num * END
+      → amode aunits pic alr
+      «
+        IF mc 0 > THEN
+          1 2 pc * - ACOS
+          2 mc * pc SQ /
+          2 mc * 1 pc - SQ /
+          pc 0.5 -
+          → tht k1p k2p qp
+          «
+            qp tht * tht SIN 2 / +
+            qp tht SIN * tht 2 / 2 tht * SIN 4 / + 2 / +
+            qp 2 tht * SIN * 2 / tht SIN 2 / 3 tht * SIN 6 / + 2 / +
+            → i0c i1c i2c
+            «
+              k1p i0c * k2p qp pic * i0c - * +
+              k1p i1c * k2p pic 4 / i1c - * +
+              k1p k2p - i2c *
+            »
+          »
+        ELSE
+          0 0 0
+        END
+        → j0c j1c j2c
+        «
+          j0c j1c - pic /
+          j2c j1c - 2 /
+          → azr cm4c
+          «
+            2 pic * alr azr - *
+            → clc
+            «
+              azr 180 * pic / 1_° * "α0" →TAG
+              clc "Cl" →TAG
+              cm4c "Cm4" →TAG
+              cm4c clc 4 / - "CmLE" →TAG
+            »
+          »
+        »
+        amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+      »
+    »
+  »
+»

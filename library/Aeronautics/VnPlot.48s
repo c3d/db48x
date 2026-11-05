@@ -1,0 +1,131 @@
+«
+@@ ============================================================
+@@ VnPlot — the maneuver and gust envelope of an airplane: the V-n
+@@ diagram of 14 CFR Part 23 before amendment 23-64 (2017).
+@@
+@@ Input:  Wt Sw — the mass, or a weight such as 2450_lbf, and the wing area;
+@@         CLmax CLmxn — the maximum and most negative lift coefficients;
+@@         nlim kneg — the limit load factor, and nneg over it;
+@@         kVC kVD — the factors of the design speeds;
+@@         cgeo CLa — the mean geometric chord and the lift slope of the
+@@         wing, per radian, for the gusts.
+@@         Values with units are converted; plain numbers are in SI units.
+@@ Output: Vst, VA, VC, VD, in knots, equivalent airspeed; nGC and nGD,
+@@         the load factors in an upward gust of 50 ft/s at VC and 25 ft/s
+@@         at VD; tagged. The diagram stays on the screen until the next
+@@         key: solid for the maneuvers, thin for the gusts.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  → wtm swa clp cln nli kng kvc kvd cgm cla
+  «
+    IF cln 0 ≥ THEN "VnPlot: the most negative lift coefficient must be negative" DoError END
+    wtm
+    IF DUP TypeName "unit" == THEN
+      IF DUP 1_kg / UBASE TypeName "unit" ≠ THEN
+        1_kg CONVERT UVAL →Num 9.80665 *
+      ELSE
+        IF DUP 1_N / UBASE TypeName "unit" ≠ THEN
+          1_N CONVERT UVAL →Num
+        ELSE
+          "VnPlot: Wt must be a mass or a weight" DoError
+        END
+      END
+    ELSE
+      →Num 9.80665 *
+    END
+    swa IF DUP TypeName "unit" == THEN 1_m^2 CONVERT UVAL END →Num
+    cgm IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END →Num
+    → wnw sqm cgb
+    «
+      wnw sqm /
+      → wsp
+      «
+        @ All speeds in knots, equivalent airspeed
+        2 wsp * 1.225 clp * / √ 0.51444444444 /
+        kvc wsp 47.88025898 / √ *
+        2 wsp * 1.225 cln ABS * / √ 0.51444444444 /
+        kng nli * NEG
+        2 wsp * 1.225 cgb * cla * 9.80665 * /
+        → vss vcc vs0 nng mug
+        «
+          vss nli √ *
+          vcc kvd *
+          vs0 nng ABS √ *
+          0.88 mug * 5.3 mug + /
+          → vaa vdd vnn kgu
+          «
+            kgu 1.225 * 15.24 * vcc * 0.51444444444 * cla * 2 wsp * / 1 +
+            kgu 1.225 * 7.62 * vdd * 0.51444444444 * cla * 2 wsp * / 1 +
+            → ngc ngd
+            «
+              @ Scales: V from 0 to 1.08·VD, n with a margin of 0.4
+              nli ngc MAX 0.4 +
+              nng 2 ngc - MIN 0.4 -
+              → nmx nmn
+              «
+                352 vdd 1.08 * /
+                214 nmx nmn - /
+                → sxv syv
+                «
+                  14 nmx syv * +
+                  → ynz
+                  «
+                    ClearLCD
+                    @ Axes
+                    0 sxv * 34 + IP R→B ynz nmx syv * - IP R→B 2 →List 0 sxv * 34 + IP R→B ynz nmn syv * - IP R→B 2 →List DrawLine
+                    0 sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List vdd 1.08 * sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List DrawLine
+                    "V" vdd 1.08 * sxv * 34 + -14 + IP R→B ynz 0 syv * - -18 + IP R→B 0 true false 1 1 7 →List DrawText
+                    @ Gust lines, thin
+                    0 sxv * 34 + IP R→B ynz 1 syv * - IP R→B 2 →List vcc sxv * 34 + IP R→B ynz ngc syv * - IP R→B 2 →List DrawLine
+                    vcc sxv * 34 + IP R→B ynz ngc syv * - IP R→B 2 →List vdd sxv * 34 + IP R→B ynz ngd syv * - IP R→B 2 →List DrawLine
+                    0 sxv * 34 + IP R→B ynz 1 syv * - IP R→B 2 →List vcc sxv * 34 + IP R→B ynz 2 ngc - syv * - IP R→B 2 →List DrawLine
+                    vcc sxv * 34 + IP R→B ynz 2 ngc - syv * - IP R→B 2 →List vdd sxv * 34 + IP R→B ynz 2 ngd - syv * - IP R→B 2 →List DrawLine
+                    vdd sxv * 34 + IP R→B ynz ngd syv * - IP R→B 2 →List vdd sxv * 34 + IP R→B ynz 2 ngd - syv * - IP R→B 2 →List DrawLine
+                    @ Maneuvers
+                    2 LineWidth
+                    vss sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List vss sxv * 34 + IP R→B ynz 1 syv * - IP R→B 2 →List DrawLine
+                    1 19 FOR ii
+                      1 nli 1 - ii 1 - * 19 / + 1 nli 1 - ii * 19 / +
+                      → naa nbb
+                      «
+                        vss naa √ * sxv * 34 + IP R→B ynz naa syv * - IP R→B 2 →List vss nbb √ * sxv * 34 + IP R→B ynz nbb syv * - IP R→B 2 →List DrawLine
+                      »
+                    NEXT
+                    vaa sxv * 34 + IP R→B ynz nli syv * - IP R→B 2 →List vdd sxv * 34 + IP R→B ynz nli syv * - IP R→B 2 →List DrawLine
+                    vdd sxv * 34 + IP R→B ynz nli syv * - IP R→B 2 →List vdd sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List DrawLine
+                    vdd sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List vcc sxv * 34 + IP R→B ynz nng syv * - IP R→B 2 →List DrawLine
+                    vcc sxv * 34 + IP R→B ynz nng syv * - IP R→B 2 →List vnn sxv * 34 + IP R→B ynz nng syv * - IP R→B 2 →List DrawLine
+                    vs0 sxv * 34 + IP R→B ynz 0 syv * - IP R→B 2 →List vs0 sxv * 34 + IP R→B ynz -1 syv * - IP R→B 2 →List DrawLine
+                    1 9 FOR ii
+                      1 nng ABS 1 - ii 1 - * 9 / + 1 nng ABS 1 - ii * 9 / +
+                      → naa nbb
+                      «
+                        vs0 naa √ * sxv * 34 + IP R→B ynz naa NEG syv * - IP R→B 2 →List vs0 nbb √ * sxv * 34 + IP R→B ynz nbb NEG syv * - IP R→B 2 →List DrawLine
+                      »
+                    NEXT
+                    'LineWidth' Purge
+                    @ Labels
+                    "Vst" vss sxv * 34 + -8 + IP R→B ynz 0 syv * - 4 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "VA" vaa sxv * 34 + -8 + IP R→B ynz nli syv * - -20 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "VC" vcc sxv * 34 + -8 + IP R→B ynz 0 syv * - 4 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "VD" vdd sxv * 34 + -8 + IP R→B ynz 0 syv * - 4 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "nlim" 0 sxv * 34 + 4 + IP R→B ynz nli syv * - -18 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "nneg" 0 sxv * 34 + 4 + IP R→B ynz nng syv * - -20 + IP R→B 0 true false 1 1 7 →List DrawText
+                    "thin: gusts" vaa sxv * 34 + 6 + IP R→B ynz 1 syv * - -8 + IP R→B 0 true false 1 1 7 →List DrawText
+                    vss 1_knot * "Vst" →TAG
+                    vaa 1_knot * "VA" →TAG
+                    vcc 1_knot * "VC" →TAG
+                    vdd 1_knot * "VD" →TAG
+                    ngc "nGC" →TAG
+                    ngd "nGD" →TAG
+                  »
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»
