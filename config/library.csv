@@ -670,36 +670,36 @@
 
 "Navigation/Geodesy"
 
-	"VincentyInv",	"="
-	"VincentyDir",	"="
-	"LLH→XYZ",	"=/library/LLHtoXYZ.48s"
-	"XYZ→LLH",	"=/library/XYZtoLLH.48s"
-	"RadialFix",	"="
-	"GCPoint",	"="
+	"VincentyInv",	"=/library/Navigation/VincentyInv.48s"
+	"VincentyDir",	"=/library/Navigation/VincentyDir.48s"
+	"LLH→XYZ",	"=/library/Navigation/LLHtoXYZ.48s"
+	"XYZ→LLH",	"=/library/Navigation/XYZtoLLH.48s"
+	"RadialFix",	"=/library/Navigation/RadialFix.48s"
+	"GCPoint",	"=/library/Navigation/GCPoint.48s"
 
 "Navigation/Route"
 
-	"WPAdd",		"="
-	"WPIns",		"="
-	"WPDel",		"="
-	"WPLegs",	"="
-	"WPNext",	"="
-	"WPDirect",	"="
+	"WPAdd",		"=/library/Navigation/WPAdd.48s"
+	"WPIns",		"=/library/Navigation/WPIns.48s"
+	"WPDel",		"=/library/Navigation/WPDel.48s"
+	"WPLegs",	"=/library/Navigation/WPLegs.48s"
+	"WPNext",	"=/library/Navigation/WPNext.48s"
+	"WPDirect",	"=/library/Navigation/WPDirect.48s"
 
 "Aeronautics"
 
 "Aeronautics/Flight Management"
 
-	"WBLoad",	"="
-	"WBEnv",		"="
-	"FPlan",		"="
-	"TAS3GS",	"="
+	"WBLoad",	"=/library/Aeronautics/WBLoad.48s"
+	"WBEnv",		"=/library/Aeronautics/WBEnv.48s"
+	"FPlan",		"=/library/Aeronautics/FPlan.48s"
+	"TAS3GS",	"=/library/Aeronautics/TAS3GS.48s"
 
 "Aeronautics/Aircraft Performance"
 
-	"PolarFit",	"="
-	"ClimbVxVy",	"="
-	"TORoll",	"="
+	"PolarFit",	"=/library/Aeronautics/PolarFit.48s"
+	"ClimbVxVy",	"=/library/Aeronautics/ClimbVxVy.48s"
+	"TORoll",	"=/library/Aeronautics/TORoll.48s"
 
 "Chemistry"
 
