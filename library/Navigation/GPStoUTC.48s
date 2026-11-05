@@ -20,7 +20,8 @@
       → dys rmn
       «
         IF scd 1167264000 < THEN "GPStoUTC needs a date from 2017 on" DOERR END
-        19800106. dys Date+
+        @ A decimal date, which a DM32 can display (issue #1873)
+        19800106. dys Date+ UVAL →Num 1_date *
         rmn 3600 / →HMS
       »
     »
