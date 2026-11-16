@@ -9928,6 +9928,9 @@ void tests::symbolic_numerical_integration()
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
         .test(KEY2, ID_ln, ID_subtract).expect("0");
+    step("Integration with a negative slope (constant minus linear)")
+        .test(CLEAR, "0 5 '1/(2000-3*X)' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.00250 94221 4");
     step("Integration through menu")
         .test(CLEAR, 2, ENTER).expect("2")
         .test(3, ENTER).expect("3")
@@ -11016,6 +11019,15 @@ void tests::symbolic_integration()
     step("Primitive of ratio of linear functions")
         .test(CLEAR, "'(A*X+B)/(C*X+D)' 'X'", ID_Primitive)
         .expect("'B÷C·ln (abs(C·X+D))+A÷C²·(C·X+D-D·ln (abs(C·X+D)))'");
+    step("Primitive with a negative slope (constant minus linear)")
+        .test(CLEAR, "'1/(200-3*X)' 'X'", ID_Primitive)
+        .expect("'ln (abs(200-3·X))÷-3'");
+    step("Primitive of exponential with a negative slope")
+        .test(CLEAR, "'exp(1-X)' 'X'", ID_Primitive)
+        .expect("'exp(1-X)÷-1'");
+    step("Primitive of sine with a negative slope")
+        .test(CLEAR, "'sin(5-2*X)' 'X'", ID_Primitive)
+        .expect("'(-cos(5-2·X))÷-2'");
     step("Primitive of power by a numerical constant")
         .test(CLEAR, "'X^(2.5+3.2)' 'X'", ID_Primitive)
         .expect("'X↑6.7÷6.7'");
@@ -11035,11 +11047,11 @@ void tests::symbolic_integration()
         .error("Unknown primitive");
     step("Primitive of negation, inverse and sign")
         .test(CLEAR, "'-(inv(A*X+B) - sign(3-2*X))' 'X'", ID_Primitive)
-        .expect("'-(ln (abs(A·X+B))÷A-abs(3-2·X)÷2)'");
+        .expect("'-(ln (abs(A·X+B))÷A-abs(3-2·X)÷-2)'");
     step("Primitive of sine, cosine, tangent")
         .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'",
               LENGTHY(10000), ID_Primitive)
-        .expect("'(-cos(A·X+3))÷A+sin(X·B-5)÷B+(-ln (cos(Z-C·X)))÷C'");
+        .expect("'(-cos(A·X+3))÷A+sin(X·B-5)÷B+(-ln (cos(Z-C·X)))÷(-C)'");
     step("Primitive of hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'sinh(A*X-3)+cosh(B*X+5*A)+tanh(C*(X-A))' 'X'",
               LENGTHY(20000), ID_Primitive)
@@ -11051,7 +11063,7 @@ void tests::symbolic_integration()
     step("Primitive of secant, cosecant, cotangent")
         .test(CLEAR, "'sec(A*X+3)+csc(X*B-5)+cot(Z-C*X)' 'X'",
               LENGTHY(10000), ID_Primitive)
-        .expect("'ln (abs(sec(A·X+3)+tan(A·X+3)))÷A+ln (abs (tan((X·B-5)÷2)))÷B+ln (abs (sin(Z-C·X)))÷C'");
+        .expect("'ln (abs(sec(A·X+3)+tan(A·X+3)))÷A+ln (abs (tan((X·B-5)÷2)))÷B+ln (abs (sin(Z-C·X)))÷(-C)'");
     step("Primitive of arc-secant, arc-cosecant, arc-cotangent")
         .test(CLEAR, "'asec(A*X+B)+acsc(X*B+A*(X+1))+acot(C*(X-6))' 'X'",
               LENGTHY(20000), ID_Primitive)
@@ -11059,7 +11071,7 @@ void tests::symbolic_integration()
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
+        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷-2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
         .test(CLEAR, "'ln(A*X+B)+exp(X*C-D)' 'X'",
