@@ -2789,7 +2789,7 @@ bool expression::is_linear(symbol_r sym, algebraic_g &a, algebraic_g &b) const
                     switch(type)
                     {
                     case ID_add:        b = t + b; break;
-                    case ID_subtract:   b = t - b; break;
+                    case ID_subtract:   b = t - b; a = -a; break;
                     case ID_multiply:   b = t * b; a = t * a; break;
                     default:
                     case ID_divide:     return false;
