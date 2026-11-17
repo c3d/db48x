@@ -2280,19 +2280,19 @@ static const cstring basic_constants[] =
 
     // *Dry air volumetric density - Measurement [M1] [M2]
     "ρvAir",     "[ 1.2929_kg/m³ "
-                "  0.0001_kg/m³ "
+                "  0.000058_kg/m³ "
                 "  'ROUND(ⓈρvAir/ⒸρvAir;-2)' ]",
     // *Dry air refractive index - Measurement [M2]
     "nAir",     "[ 1.000293 "
-                "  0.000001 "
+                "  0.00000058 "
                 "  'ROUND(ⓈnAir/ⒸnAir;-2)' ]",
     // *Dry air specific heat cp - Measurement [M1] [M2]
     "cpAir",    "[ 1006._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcpAir/ⒸcpAir;-2)' ]",
     // *Dry air specific heat cv - Calculation from measurement [M1] [M2]
     "cvAir",    "[ 717._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcvAir/ⒸcvAir;-2)' ]",
     // *Dry air adiabatic index - Calculation: γ=cp/cv [M1] [M2]
     "γAir",     "[ 'ROUND(ⒸcpAir/ⒸcvAir;XPON(UVAL(ⓇγAir*ⒸcpAir/ⒸcvAir))-XPON(UVAL(ⒸcpAir/ⒸcvAir))-2)' "
@@ -2304,38 +2304,38 @@ static const cstring basic_constants[] =
     "RAir",     "[ 'ROUND(CONVERT(ⒸcpAir-ⒸcvAir;1_J/(kg*K));XPON(UVAL(ⓇRAir*(ⒸcpAir-ⒸcvAir)))-XPON(UVAL(ⒸcpAir-ⒸcvAir))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇRAir*ⒸRAir);-2);1_J/(kg*K))' "
                 "  'ROUND((ⓈcpAir+ⓈcvAir)/ABS(ⒸcpAir-ⒸcvAir);-2)' ]",
-    // *Dry air electric permittivity - Measurement [M1] [M2]
-    "εAir",     "[ 8.8542E-12_F/m "
-                "  0.0005E-12_F/m "
+    // *Dry air electric permittivity at 20 °C and 1 atm - Measurement [M29]
+    "εAir",     "[ 8.858937E-12_F/m "
+                "  0.0000027E-12_F/m "
                 "  'ROUND(ⓈεAir/ⒸεAir;-2)' "
-                "  8.854E-12_F/m ]",
+                "  8.859E-12_F/m ]",
     // *Dry air magnetic permeability - Measurement [M1] [M2]
     "μAir",     "[ 1.2566E-6_H/m "
-                "  0.0001E-6_H/m "
+                "  0.000058E-6_H/m "
                 "  'ROUND(ⓈμAir/ⒸμAir;-2)' "
                 "  1.257E-6_H/m ]",
     // *Dry air resistivity - Measurement [M1] [M2]
     "ρAir",     "[ 1.5E15_Ω·m "
-                "  0.5E15_Ω·m "
+                "  0.29E15_Ω·m "
                 "  'ROUND(ⓈρAir/ⒸρAir;-2)' ]",
     // *Dry air dielectric rigidity - Measurement [M1] [M2]
     "EdAir",    "[ 3.0E6_V/m "
-                "  0.2E6_V/m "
+                "  0.12E6_V/m "
                 "  'ROUND(ⓈEdAir/ⒸEdAir;-2)' ]",
 
     "Materials/N2",     nullptr,
 
     // *Dinitrogen N2 volumetric density - Measurement [M2] [M3]
     "ρvN2",      "[ 1.2506_kg/m³ "
-                "  0.0001_kg/m³ "
+                "  0.000058_kg/m³ "
                 "  'ROUND(ⓈρvN2/ⒸρvN2;-2)' ]",
     // *Dinitrogen N2 specific heat cp - Measurement [M2] [M3]
     "cpN2",     "[ 1039._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcpN2/ⒸcpN2;-2)' ]",
     // *Dinitrogen N2 specific heat cv - Measurement [M2] [M3]
     "cvN2",     "[ 742._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcvN2/ⒸcvN2;-2)' ]",
     // *Dinitrogen N2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
     "γN2",      "[ 'ROUND(ⒸcpN2/ⒸcvN2;XPON(UVAL(ⓇγN2*ⒸcpN2/ⒸcvN2))-XPON(UVAL(ⒸcpN2/ⒸcvN2))-2)' "
@@ -2347,37 +2347,37 @@ static const cstring basic_constants[] =
                 "  'ROUND((ⓈcpN2+ⓈcvN2)/ABS(ⒸcpN2-ⒸcvN2);-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Dinitrogen N2 electric permittivity - Measurement [M2]
-    "εN2",      "[ 8.859E-12_F/m "        // εr ≈ 1.000580 at STP
-                "  0.001E-12_F/m "
+    // *Dinitrogen N2 electric permittivity at 20 °C and 1 atm - Measurement [M29]
+    "εN2",      "[ 8.859040E-12_F/m "
+                "  0.0000044E-12_F/m "
                 "  'ROUND(ⓈεN2/ⒸεN2;-2)' ]",
     // *Dinitrogen N2 magnetic permeability - Measurement [M2]
     "μN2",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
-                "  0.0001E-6_H/m "
+                "  0.000058E-6_H/m "
                 "  'ROUND(ⓈμN2/ⒸμN2;-2)' "
                 "  1.257E-6_H/m ]",
     // *Dinitrogen N2 resistivity - Measurement [M2]
     "ρN2",      "[ 1.0E15_Ω·m "           // dry N2 at STP; excellent insulator
-                "  0.5E15_Ω·m "
+                "  0.29E15_Ω·m "
                 "  'ROUND(ⓈρN2/ⒸρN2;-2)' ]",
     // *Dinitrogen N2 dielectric rigidity - Measurement [M2]
     "EdN2",     "[ 3.5E6_V/m "            // slightly higher than dry air
-                "  0.3E6_V/m "
+                "  0.17E6_V/m "
                 "  'ROUND(ⓈEdN2/ⒸEdN2;-2)' ]",
 
     "Materials/O2",     nullptr,
 
     // *Dioxygen O2 volumetric density - Measurement [M2] [M3]
     "ρvO2",      "[ 1.4290_kg/m³ "
-                "  0.0001_kg/m³ "
+                "  0.000058_kg/m³ "
                 "  'ROUND(ⓈρvO2/ⒸρvO2;-2)' ]",
     // *Dioxygen O2 specific heat cp - Measurement [M2] [M3]
     "cpO2",     "[ 919._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcpO2/ⒸcpO2;-2)' ]",
     // *Dioxygen O2 specific heat cv - Measurement [M2] [M3]
     "cvO2",     "[ 659._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcvO2/ⒸcvO2;-2)' ]",
     // *Dioxygen O2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
     "γO2",      "[ 'ROUND(ⒸcpO2/ⒸcvO2;XPON(UVAL(ⓇγO2*ⒸcpO2/ⒸcvO2))-XPON(UVAL(ⒸcpO2/ⒸcvO2))-2)' "
@@ -2389,37 +2389,37 @@ static const cstring basic_constants[] =
                 "  'ROUND((ⓈcpO2+ⓈcvO2)/ABS(ⒸcpO2-ⒸcvO2);-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Dioxygen O2 electric permittivity - Measurement [M2]
-    "εO2",      "[ 8.859E-12_F/m "        // εr ≈ 1.000530 at STP
-                "  0.001E-12_F/m "
+    // *Dioxygen O2 electric permittivity at 20 °C and 1 atm - Measurement [M29]
+    "εO2",      "[ 8.858568E-12_F/m "
+                "  0.0000018E-12_F/m "
                 "  'ROUND(ⓈεO2/ⒸεO2;-2)' ]",
     // *Dioxygen O2 magnetic permeability - Measurement [M2]
     "μO2",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000019 (paramagnetic)
-                "  0.0001E-6_H/m "
+                "  0.000058E-6_H/m "
                 "  'ROUND(ⓈμO2/ⒸμO2;-2)' "
                 "  1.257E-6_H/m ]",
     // *Dioxygen O2 resistivity - Measurement [M2]
     "ρO2",      "[ 1.0E15_Ω·m "           // dry O2 at STP
-                "  0.5E15_Ω·m "
+                "  0.29E15_Ω·m "
                 "  'ROUND(ⓈρO2/ⒸρO2;-2)' ]",
     // *Dioxygen O2 dielectric rigidity - Measurement [M2]
     "EdO2",     "[ 2.9E6_V/m "            // slightly lower than N2
-                "  0.3E6_V/m "
+                "  0.17E6_V/m "
                 "  'ROUND(ⓈEdO2/ⒸEdO2;-2)' ]",
 
     "Materials/Argon",     nullptr,
 
     // *Argon volumetric density - Measurement [M2]
     "ρvAr",      "[ 1.7839_kg/m³ "
-                "  0.0001_kg/m³ "
+                "  0.000058_kg/m³ "
                 "  'ROUND(ⓈρvAr/ⒸρvAr;-2)' ]",
     // *Argon specific heat cp - Exact calculation [M2]
     "cpAr",     "[ 520.3_J/(kg*K) "
-                "  0.1_J/(kg*K) "
+                "  0.058_J/(kg*K) "
                 "  'ROUND(ⓈcpAr/ⒸcpAr;-2)' ]",
     // *Argon specific heat cv - Exact calculation [M2]
     "cvAr",     "[ 312.2_J/(kg*K) "
-                "  0.1_J/(kg*K) "
+                "  0.058_J/(kg*K) "
                 "  'ROUND(ⓈcvAr/ⒸcvAr;-2)' ]",
     // *Argon adiabatic index - Exact definition: 5/3 for monatomic ideal gas [M2]
     "γAr",      "[ '5/3' "
@@ -2431,37 +2431,37 @@ static const cstring basic_constants[] =
                 "  'ROUND((ⓈcpAr+ⓈcvAr)/ABS(ⒸcpAr-ⒸcvAr);-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Argon electric permittivity - Measurement [M2]
-    "εAr",      "[ 8.855E-12_F/m "        // εr ≈ 1.000516 at STP
-                "  0.001E-12_F/m "
+    // *Argon electric permittivity at 20 °C and 1 atm - Measurement [M29]
+    "εAr",      "[ 8.858767E-12_F/m "
+                "  0.0000035E-12_F/m "
                 "  'ROUND(ⓈεAr/ⒸεAr;-2)' ]",
     // *Argon magnetic permeability - Measurement [M2]
     "μAr",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
-                "  0.0001E-6_H/m "
+                "  0.000058E-6_H/m "
                 "  'ROUND(ⓈμAr/ⒸμAr;-2)' "
                 "  1.257E-6_H/m ]",
     // *Argon resistivity - Measurement [M2]
     "ρAr",      "[ 1.0E15_Ω·m "           // noble gas; excellent insulator
-                "  0.5E15_Ω·m "
+                "  0.29E15_Ω·m "
                 "  'ROUND(ⓈρAr/ⒸρAr;-2)' ]",
     // *Argon dielectric rigidity - Measurement [M2]
     "EdAr",     "[ 2.0E6_V/m "            // lower than air (no polar molecules)
-                "  0.2E6_V/m "
+                "  0.12E6_V/m "
                 "  'ROUND(ⓈEdAr/ⒸEdAr;-2)' ]",
 
     "Materials/CO2",     nullptr,
 
     // *Carbon dioxide CO2 volumetric density - Measurement [M2] [M3]
     "ρvCO2",     "[ 1.9768_kg/m³ "
-                "  0.0001_kg/m³ "
+                "  0.000058_kg/m³ "
                 "  'ROUND(ⓈρvCO2/ⒸρvCO2;-2)' ]",
     // *Carbon dioxide CO2 specific heat cp - Measurement [M2] [M3]
     "cpCO2",    "[ 819._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcpCO2/ⒸcpCO2;-2)' ]",
     // *Carbon dioxide CO2 specific heat cv - Measurement [M2] [M3]
     "cvCO2",    "[ 630._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcvCO2/ⒸcvCO2;-2)' ]",
     // *Carbon dioxide CO2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
     "γCO2",     "[ 'ROUND(ⒸcpCO2/ⒸcvCO2;XPON(UVAL(ⓇγCO2*ⒸcpCO2/ⒸcvCO2))-XPON(UVAL(ⒸcpCO2/ⒸcvCO2))-2)' "
@@ -2473,22 +2473,22 @@ static const cstring basic_constants[] =
                 "  'ROUND((ⓈcpCO2+ⓈcvCO2)/ABS(ⒸcpCO2-ⒸcvCO2);-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Carbon dioxide CO2 electric permittivity - Measurement [M2] [M3]
-    "εCO2",     "[ 8.920E-12_F/m "        // εr ≈ 1.000921 at STP
-                "  0.001E-12_F/m "
+    // *Carbon dioxide CO2 electric permittivity at 20 °C and 1 atm - Measurement [M29]
+    "εCO2",     "[ 8.862351E-12_F/m "
+                "  0.0000089E-12_F/m "
                 "  'ROUND(ⓈεCO2/ⒸεCO2;-2)' ]",
     // *Carbon dioxide CO2 magnetic permeability - Measurement [M2]
     "μCO2",     "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
-                "  0.0001E-6_H/m "
+                "  0.000058E-6_H/m "
                 "  'ROUND(ⓈμCO2/ⒸμCO2;-2)' "
                 "  1.257E-6_H/m ]",
     // *Carbon dioxide CO2 resistivity - Measurement [M2]
     "ρCO2",     "[ 1.0E13_Ω·m "           // lower than N2/Ar; polar molecule
-                "  0.5E13_Ω·m "
+                "  0.29E13_Ω·m "
                 "  'ROUND(ⓈρCO2/ⒸρCO2;-2)' ]",
     // *Carbon dioxide CO2 dielectric rigidity - Measurement [M2]
     "EdCO2",    "[ 2.9E6_V/m "            // similar to air
-                "  0.3E6_V/m "
+                "  0.17E6_V/m "
                 "  'ROUND(ⓈEdCO2/ⒸEdCO2;-2)' ]",
 
     // ========================================================================
@@ -2502,21 +2502,25 @@ static const cstring basic_constants[] =
 
     // *Liquid water volumetric density - Measurement [M4] [M2]
     "ρvH2O",     "[ 998.2_kg/m³ "
-                "  0.1_kg/m³ "
+                "  0.058_kg/m³ "
                 "  'ROUND(ⓈρvH2O/ⒸρvH2O;-2)' ]",
     // *Liquid water refractive index - Measurement [M4]
     "nH2O",     "[ 1.3330 "
-                "  0.0005 "
+                "  0.00029 "
                 "  'ROUND(ⓈnH2O/ⒸnH2O;-2)' "
                 "  1.333 ]",
     // *Liquid water specific heat cp - Measurement [M4] [M2]
     "cpH2O",    "[ 4182._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcpH2O/ⒸcpH2O;-2)' ]",
     // *Liquid water resistivity - Measurement [M4] [M2]
     "ρH2O",     "[ 1.8E5_Ω·m "            // ultra-pure water at 25°C; 18 MΩ·cm
-                "  0.2E5_Ω·m "
+                "  0.12E5_Ω·m "
                 "  'ROUND(ⓈρH2O/ⒸρH2O;-2)' ]",
+    // *Water ionization constant pKw at 25°C, 0.1 MPa - Calculation from [M27]
+    "pKwH2O",    "[ 13.994 "
+                "  0.03 "
+                "  'ROUND(ⓈpKwH2O/ⒸpKwH2O;-2)' ]",
 
     // ========================================================================
     //   C. SOLIDS (at T = 293.15 K = 20°C, P = 101.325 kPa)
@@ -2532,19 +2536,26 @@ static const cstring basic_constants[] =
     //   C1. Materials for optical fibers and waveguides
     // ------------------------------------------------------------------------
 
+    "Materials/Acetic Acid",     nullptr,
+
+    // *Acetic acid pKa at 25°C, zero ionic strength - Measurement [M28]
+    "pKaAcetic", "[ 4.756 "
+                "  0.002 "
+                "  'ROUND(ⓈpKaAcetic/ⒸpKaAcetic;-2)' ]",
+
     "Materials/Silicon",     nullptr,
 
     // *Crystalline silicon volumetric density - Measurement [M10] [M11]
     "ρvSi",      "[ 2330._kg/m³ "
-                "  1._kg/m³ "
+                "  0.58_kg/m³ "
                 "  'ROUND(ⓈρvSi/ⒸρvSi;-2)' ]",
-    // *Crystalline silicon refractive index - Measurement [M11]
-    "nSi",      "[ 3.4179 "
-                "  0.0002 "
+    // *Crystalline silicon refractive index at 1550 nm - Measurement [M30]
+    "nSi",      "[ 3.4757 "
+                "  0.00012 "
                 "  'ROUND(ⓈnSi/ⒸnSi;-2)' ]",
     // *Crystalline silicon specific heat - Measurement [M10]
     "cpSi",     "[ 711._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcpSi/ⒸcpSi;-2)' ]",
     // *Dielectric constant of silicon - Definition convention [HP50g manual]
     "εsi",      "[ 11.9 "
@@ -2552,22 +2563,22 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Crystalline silicon resistivity - Measurement [M10] [M11]
     "ρSi",      "[ 2.3E3_Ω·m "            // intrinsic Si at 300 K; range 10²–10⁴ Ω·m
-                "  0.5E3_Ω·m "
+                "  0.29E3_Ω·m "
                 "  'ROUND(ⓈρSi/ⒸρSi;-2)' ]",
 
     "Materials/SiO2",     nullptr,
 
     // *Fused silica volumetric density - Measurement [M7]
     "ρvSiO2",    "[ 2201._kg/m³ "
-                "  2._kg/m³ "
+                "  1.2_kg/m³ "
                 "  'ROUND(ⓈρvSiO2/ⒸρvSiO2;-2)' ]",
     // *Fused silica refractive index - Measurement [M5]
-    "nSiO2",    "[ 1.45701 "
-                "  0.00005 "
+    "nSiO2",    "[ 1.45840 "
+                "  0.000029 "
                 "  'ROUND(ⓈnSiO2/ⒸnSiO2;-2)' ]",
     // *Fused silica specific heat - Measurement [M7]
     "cpSiO2",   "[ 703._J/(kg*K) "
-                "  5._J/(kg*K) "
+                "  2.9_J/(kg*K) "
                 "  'ROUND(ⓈcpSiO2/ⒸcpSiO2;-2)' ]",
     // *Dielectric constant of SiO2 - Definition convention [HP50g manual]
     "εox",      "[ 3.9 "
@@ -2575,57 +2586,57 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Fused silica resistivity - Measurement [M7]
     "ρSiO2",    "[ 1.0E18_Ω·m "           // fused silica; excellent insulator
-                "  0.5E18_Ω·m "
+                "  0.29E18_Ω·m "
                 "  'ROUND(ⓈρSiO2/ⒸρSiO2;-2)' ]",
     // *Fused silica dielectric rigidity - Measurement [M7]
     "EdSiO2",   "[ 5.0E8_V/m "            // fused silica bulk breakdown
-                "  0.5E8_V/m "
+                "  0.29E8_V/m "
                 "  'ROUND(ⓈEdSiO2/ⒸEdSiO2;-2)' ]",
 
     "Materials/GeO2",     nullptr,
 
     // *Germanate glass volumetric density - Measurement [M8] [M9]
     "ρvGeO2",    "[ 3650._kg/m³ "
-                "  10._kg/m³ "
+                "  5.8_kg/m³ "
                 "  'ROUND(ⓈρvGeO2/ⒸρvGeO2;-2)' ]",
     // *Germanate glass refractive index - Measurement [M8]
     "nGeO2",    "[ 1.607 "
-                "  0.002 "
+                "  0.0012 "
                 "  'ROUND(ⓈnGeO2/ⒸnGeO2;-2)' ]",
     // *Germanate glass specific heat - Measurement [M9]
     "cpGeO2",   "[ 440._J/(kg*K) "
-                "  10._J/(kg*K) "
+                "  5.8_J/(kg*K) "
                 "  'ROUND(ⓈcpGeO2/ⒸcpGeO2;-2)' ]",
     // *Germanate glass resistivity - Measurement [M9]
     "ρGeO2",    "[ 1.0E12_Ω·m "           // pure GeO2 glass; lower than SiO2
-                "  0.5E12_Ω·m "
+                "  0.29E12_Ω·m "
                 "  'ROUND(ⓈρGeO2/ⒸρGeO2;-2)' ]",
     // *Germanate glass dielectric rigidity - Measurement [M9]
     "EdGeO2",   "[ 4.0E8_V/m "            // estimated from glass family
-                "  0.5E8_V/m "
+                "  0.29E8_V/m "
                 "  'ROUND(ⓈEdGeO2/ⒸEdGeO2;-2)' ]",
 
     "Materials/Si3N4",     nullptr,
 
     // *Silicon nitride volumetric density - Measurement [M18] [M19]
     "ρvSi3N4",   "[ 3170._kg/m³ "
-                "  10._kg/m³ "
+                "  5.8_kg/m³ "
                 "  'ROUND(ⓈρvSi3N4/ⒸρvSi3N4;-2)' ]",
     // *LPCVD Si3N4 refractive index - Measurement [M18]
     "nSi3N4",   "[ 2.016 "
-                "  0.005 "
+                "  0.0029 "
                 "  'ROUND(ⓈnSi3N4/ⒸnSi3N4;-2)' ]",
     // *Silicon nitride specific heat - Measurement [M19]
     "cpSi3N4",  "[ 691._J/(kg*K) "
-                "  10._J/(kg*K) "
+                "  5.8_J/(kg*K) "
                 "  'ROUND(ⓈcpSi3N4/ⒸcpSi3N4;-2)' ]",
     // *Silicon nitride resistivity - Measurement [M19]
     "ρSi3N4",   "[ 1.0E14_Ω·m "           // LPCVD Si3N4; good insulator
-                "  0.5E14_Ω·m "
+                "  0.29E14_Ω·m "
                 "  'ROUND(ⓈρSi3N4/ⒸρSi3N4;-2)' ]",
     // *Silicon nitride dielectric rigidity - Measurement [M19]
     "EdSi3N4",  "[ 1.0E9_V/m "            // thin-film breakdown field
-                "  0.2E9_V/m "
+                "  0.12E9_V/m "
                 "  'ROUND(ⓈEdSi3N4/ⒸEdSi3N4;-2)' ]",
 
     // ------------------------------------------------------------------------
@@ -2636,23 +2647,23 @@ static const cstring basic_constants[] =
 
     // *Schott BK7 glass volumetric density - Measurement [M15]
     "ρvBK7",     "[ 2510._kg/m³ "
-                "  5._kg/m³ "
+                "  2.9_kg/m³ "
                 "  'ROUND(ⓈρvBK7/ⒸρvBK7;-2)' ]",
     // *Schott BK7 glass refractive index - Measurement [M15]
     "nBK7",     "[ 1.51680 "
-                "  0.00002 "
+                "  0.000012 "
                 "  'ROUND(ⓈnBK7/ⒸnBK7;-2)' ]",
     // *Schott BK7 glass specific heat - Measurement [M15]
     "cpBK7",    "[ 858._J/(kg*K) "
-                "  10._J/(kg*K) "
+                "  5.8_J/(kg*K) "
                 "  'ROUND(ⓈcpBK7/ⒸcpBK7;-2)' ]",
     // *Schott BK7 glass resistivity - Measurement [M15]
     "ρBK7",     "[ 1.0E13_Ω·m "           // borosilicate glass at 20°C
-                "  0.5E13_Ω·m "
+                "  0.29E13_Ω·m "
                 "  'ROUND(ⓈρBK7/ⒸρBK7;-2)' ]",
     // *Schott BK7 glass dielectric rigidity - Measurement [M15]
     "EdBK7",    "[ 2.5E7_V/m "            // bulk optical glass breakdown
-                "  0.5E7_V/m "
+                "  0.29E7_V/m "
                 "  'ROUND(ⓈEdBK7/ⒸEdBK7;-2)' ]",
 
     // ------------------------------------------------------------------------
@@ -2663,69 +2674,69 @@ static const cstring basic_constants[] =
 
     // *Sapphire volumetric density - Measurement [M16]
     "ρvAl2O3",   "[ 3980._kg/m³ "
-                "  5._kg/m³ "
+                "  2.9_kg/m³ "
                 "  'ROUND(ⓈρvAl2O3/ⒸρvAl2O3;-2)' ]",
     // *Sapphire ordinary refractive index - Measurement [M16]
-    "nAl2O3",   "[ 1.7659 "
-                "  0.0002 "
+    "nAl2O3",   "[ 1.76808 "
+                "  0.00012 "
                 "  'ROUND(ⓈnAl2O3/ⒸnAl2O3;-2)' ]",
     // *Sapphire specific heat - Measurement [M16] [M2]
     "cpAl2O3",  "[ 765._J/(kg*K) "
-                "  5._J/(kg*K) "
+                "  2.9_J/(kg*K) "
                 "  'ROUND(ⓈcpAl2O3/ⒸcpAl2O3;-2)' ]",
     // *Sapphire resistivity - Measurement [M16]
     "ρAl2O3",   "[ 1.0E14_Ω·m "           // single-crystal sapphire at 20°C
-                "  0.5E14_Ω·m "
+                "  0.29E14_Ω·m "
                 "  'ROUND(ⓈρAl2O3/ⒸρAl2O3;-2)' ]",
     // *Sapphire dielectric rigidity - Measurement [M16]
     "EdAl2O3",  "[ 4.0E8_V/m "            // bulk sapphire breakdown field
-                "  0.5E8_V/m "
+                "  0.29E8_V/m "
                 "  'ROUND(ⓈEdAl2O3/ⒸEdAl2O3;-2)' ]",
 
     "Materials/CaF2",     nullptr,
 
     // *Calcium fluoride volumetric density - Measurement [M17] [M15]
     "ρvCaF2",    "[ 3180._kg/m³ "
-                "  5._kg/m³ "
+                "  2.9_kg/m³ "
                 "  'ROUND(ⓈρvCaF2/ⒸρvCaF2;-2)' ]",
     // *Calcium fluoride refractive index - Measurement [M17]
     "nCaF2",    "[ 1.43381 "
-                "  0.00005 "
+                "  0.000029 "
                 "  'ROUND(ⓈnCaF2/ⒸnCaF2;-2)' ]",
     // *Calcium fluoride specific heat - Measurement [M15]
     "cpCaF2",   "[ 854._J/(kg*K) "
-                "  5._J/(kg*K) "
+                "  2.9_J/(kg*K) "
                 "  'ROUND(ⓈcpCaF2/ⒸcpCaF2;-2)' ]",
     // *Calcium fluoride resistivity - Measurement [M17]
     "ρCaF2",    "[ 1.0E15_Ω·m "           // single-crystal CaF2 at 20°C
-                "  0.5E15_Ω·m "
+                "  0.29E15_Ω·m "
                 "  'ROUND(ⓈρCaF2/ⒸρCaF2;-2)' ]",
     // *Calcium fluoride dielectric rigidity - Measurement [M17]
     "EdCaF2",   "[ 1.0E9_V/m "            // CaF2 crystal bulk breakdown
-                "  0.2E9_V/m "
+                "  0.12E9_V/m "
                 "  'ROUND(ⓈEdCaF2/ⒸEdCaF2;-2)' ]",
 
     "Materials/C Diamond",     nullptr,
 
     // *Diamond volumetric density - Measurement [M13] [M14]
     "ρvC",       "[ 3515._kg/m³ "
-                "  1._kg/m³ "
+                "  0.58_kg/m³ "
                 "  'ROUND(ⓈρvC/ⒸρvC;-2)' ]",
     // *Diamond refractive index - Measurement [M14]
-    "nC",       "[ 2.4180 "
-                "  0.0002 "
+    "nC",       "[ 2.41726 "
+                "  0.00012 "
                 "  'ROUND(ⓈnC/ⒸnC;-2)' ]",
     // *Diamond specific heat - Measurement [M13]
     "cpC",      "[ 502._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcpC/ⒸcpC;-2)' ]",
     // *Diamond resistivity - Measurement [M13] [M14]
     "ρC",       "[ 1.0E13_Ω·m "           // type IIa natural diamond; ~10¹¹–10¹⁴ Ω·m
-                "  0.5E13_Ω·m "
+                "  0.29E13_Ω·m "
                 "  'ROUND(ⓈρC/ⒸρC;-2)' ]",
     // *Diamond dielectric rigidity - Measurement [M13] [M14]
     "EdC",      "[ 1.0E9_V/m "            // type IIa diamond; highest of any solid
-                "  0.2E9_V/m "
+                "  0.12E9_V/m "
                 "  'ROUND(ⓈEdC/ⒸEdC;-2)' ]",
 
     // ------------------------------------------------------------------------
@@ -2739,34 +2750,152 @@ static const cstring basic_constants[] =
 
     // *Aluminium volumetric density - Measurement [M12] [M2]
     "ρvAl",      "[ 2700._kg/m³ "
-                "  1._kg/m³ "
+                "  0.58_kg/m³ "
                 "  'ROUND(ⓈρvAl/ⒸρvAl;-2)' ]",
     // *Aluminium specific heat - Measurement [M12] [M2]
     "cpAl",     "[ 902._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcpAl/ⒸcpAl;-2)' ]",
+    // *Aluminium thermal conductivity at 300 K - Measurement [M12]
+    "kAl",       "[ 237._W/(m*K) "
+                "  2.3_W/(m*K) "
+                "  'ROUND(ⓈkAl/ⒸkAl;-2)' ]",
+    // *Aluminium electrical resistivity at 300 K - Measurement [M22]
+    "ρAl",       "[ 2.733E-8_Ω·m "
+                "  0.016E-8_Ω·m "
+                "  'ROUND(ⓈρAl/ⒸρAl;-2)' ]",
+    // *Aluminium temperature coefficient of resistivity at 300 K - Calculation from [M22]
+    "αρAl",      "[ 0.004213_K⁻¹ "
+                "  0.000074_K⁻¹ "
+                "  'ROUND(ⓈαρAl/ⒸαρAl;-2)' ]",
+    // *Aluminium mean linear expansion 20-100°C - Measurement [M26]
+    "αLAl",      "[ 23.8E-6_K⁻¹ "
+                "  0.14E-6_K⁻¹ "
+                "  'ROUND(ⓈαLAl/ⒸαLAl;-2)' ]",
 
     "Materials/Cu Metal",     nullptr,
 
     // *Copper volumetric density - Measurement [M12] [M2]
     "ρvCu",      "[ 8960._kg/m³ "
-                "  5._kg/m³ "
+                "  2.9_kg/m³ "
                 "  'ROUND(ⓈρvCu/ⒸρvCu;-2)' ]",
     // *Copper specific heat - Measurement [M12] [M2]
     "cpCu",     "[ 385._J/(kg*K) "
-                "  1._J/(kg*K) "
+                "  0.58_J/(kg*K) "
                 "  'ROUND(ⓈcpCu/ⒸcpCu;-2)' ]",
+    // *Copper Young modulus (polycrystal, annealed) - Measurement [M20]
+    "ECu",       "[ 123.5_GPa "
+                "  0.7_GPa "
+                "  'ROUND(ⓈECu/ⒸECu;-2)' ]",
+    // *Copper Poisson ratio (polycrystal, annealed) - Measurement [M20]
+    "νCu",       "[ 0.350 "
+                "  0.009 "
+                "  'ROUND(ⓈνCu/ⒸνCu;-2)' ]",
+    // *Copper thermal conductivity at 300 K - Measurement [M12]
+    "kCu",       "[ 401._W/(m*K) "
+                "  2.9_W/(m*K) "
+                "  'ROUND(ⓈkCu/ⒸkCu;-2)' ]",
+    // *Copper electrical resistivity at 300 K - Measurement [M23]
+    "ρCu",       "[ 1.725E-8_Ω·m "
+                "  0.005E-8_Ω·m "
+                "  'ROUND(ⓈρCu/ⒸρCu;-2)' ]",
+    // *Copper temperature coefficient of resistivity at 300 K - Calculation from [M23]
+    "αρCu",      "[ 0.003919_K⁻¹ "
+                "  0.000043_K⁻¹ "
+                "  'ROUND(ⓈαρCu/ⒸαρCu;-2)' ]",
+    // *Copper mean linear expansion 25-100°C - Measurement [M26]
+    "αLCu",      "[ 16.8E-6_K⁻¹ "
+                "  0.10E-6_K⁻¹ "
+                "  'ROUND(ⓈαLCu/ⒸαLCu;-2)' ]",
 
     "Materials/Fe Metal",     nullptr,
 
     // *Iron volumetric density (α phase) - Measurement [M12] [M2]
     "ρvFe",      "[ 7874._kg/m³ "
-                "  3._kg/m³ "
+                "  1.7_kg/m³ "
                 "  'ROUND(ⓈρvFe/ⒸρvFe;-2)' ]",
     // *Iron specific heat (α phase, BCC) - Measurement [M12] [M2]
     "cpFe",     "[ 450._J/(kg*K) "
-                "  2._J/(kg*K) "
+                "  1.2_J/(kg*K) "
                 "  'ROUND(ⓈcpFe/ⒸcpFe;-2)' ]",
+    // *Iron Young modulus (polycrystal) - Measurement [M21]
+    "EFe",       "[ 205._GPa "
+                "  12._GPa "
+                "  'ROUND(ⓈEFe/ⒸEFe;-2)' ]",
+    // *Iron Poisson ratio (polycrystal) - Measurement [M21]
+    "νFe",       "[ 0.282 "
+                "  0.019 "
+                "  'ROUND(ⓈνFe/ⒸνFe;-2)' ]",
+    // *Iron thermal conductivity at 300 K - Measurement [M12]
+    "kFe",       "[ 80.2_W/(m*K) "
+                "  0.81_W/(m*K) "
+                "  'ROUND(ⓈkFe/ⒸkFe;-2)' ]",
+    // *Iron electrical resistivity at 300 K - Measurement [M24]
+    "ρFe",       "[ 10.50E-8_Ω·m "
+                "  0.12E-8_Ω·m "
+                "  'ROUND(ⓈρFe/ⒸρFe;-2)' ]",
+    // *Iron temperature coefficient of resistivity at 300 K - Calculation from [M24]
+    "αρFe",      "[ 0.005241_K⁻¹ "
+                "  0.000142_K⁻¹ "
+                "  'ROUND(ⓈαρFe/ⒸαρFe;-2)' ]",
+    // *Iron mean linear expansion 20-100°C - Measurement [M26]
+    "αLFe",      "[ 12.2E-6_K⁻¹ "
+                "  0.07E-6_K⁻¹ "
+                "  'ROUND(ⓈαLFe/ⒸαLFe;-2)' ]",
+
+    "Materials/Al Alloy",     nullptr,
+
+    // *Aluminium alloy 6061 Young modulus - Typical value [M25], uncertainty estimated
+    "EAlAlloy",  "[ 68.3_GPa "
+                "  0.8_GPa "
+                "  'ROUND(ⓈEAlAlloy/ⒸEAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 Poisson ratio - Typical value [M25], uncertainty estimated
+    "νAlAlloy",  "[ 0.33 "
+                "  0.006 "
+                "  'ROUND(ⓈνAlAlloy/ⒸνAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 density - Typical value [M25], uncertainty estimated
+    "ρvAlAlloy", "[ 2713._kg/m³ "
+                "  8._kg/m³ "
+                "  'ROUND(ⓈρvAlAlloy/ⒸρvAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 specific heat at 21°C - Read on figure [M25], uncertainty estimated
+    "cpAlAlloy", "[ 900._J/(kg*K) "
+                "  16._J/(kg*K) "
+                "  'ROUND(ⓈcpAlAlloy/ⒸcpAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061-T6 thermal conductivity at 21°C - Read on figure [M25], uncertainty estimated
+    "kAlAlloy",  "[ 156._W/(m*K) "
+                "  3._W/(m*K) "
+                "  'ROUND(ⓈkAlAlloy/ⒸkAlAlloy;-2)' ]",
+    // *Aluminium alloy 6061 linear expansion at 21°C - Read on figure [M25], uncertainty estimated
+    "αLAlAlloy", "[ 22.7E-6_K⁻¹ "
+                "  0.4E-6_K⁻¹ "
+                "  'ROUND(ⓈαLAlAlloy/ⒸαLAlAlloy;-2)' ]",
+
+    "Materials/Carbon Steel",     nullptr,
+
+    // *Carbon steel AISI 1025 Young modulus - Typical value [M25], uncertainty estimated
+    "ESteel",    "[ 200._GPa "
+                "  2.3_GPa "
+                "  'ROUND(ⓈESteel/ⒸESteel;-2)' ]",
+    // *Carbon steel AISI 1025 Poisson ratio - Typical value [M25], uncertainty estimated
+    "νSteel",    "[ 0.32 "
+                "  0.006 "
+                "  'ROUND(ⓈνSteel/ⒸνSteel;-2)' ]",
+    // *Carbon steel AISI 1025 density - Typical value [M25], uncertainty estimated
+    "ρvSteel",   "[ 7861._kg/m³ "
+                "  23._kg/m³ "
+                "  'ROUND(ⓈρvSteel/ⒸρvSteel;-2)' ]",
+    // *Carbon steel AISI 1025 specific heat 50-100°C - Typical value [M25], uncertainty estimated
+    "cpSteel",   "[ 486._J/(kg*K) "
+                "  6._J/(kg*K) "
+                "  'ROUND(ⓈcpSteel/ⒸcpSteel;-2)' ]",
+    // *Carbon steel AISI 1025 thermal conductivity at 0°C - Typical value [M25], uncertainty estimated
+    "kSteel",    "[ 51.9_W/(m*K) "
+                "  0.6_W/(m*K) "
+                "  'ROUND(ⓈkSteel/ⒸkSteel;-2)' ]",
+    // *Carbon steel AISI 1025 mean linear expansion 21-66°C - Read on figure [M25], uncertainty estimated
+    "αLSteel",   "[ 10.8E-6_K⁻¹ "
+                "  0.19E-6_K⁻¹ "
+                "  'ROUND(ⓈαLSteel/ⒸαLSteel;-2)' ]",
 
     // ------------------------------------------------------------------------
     //  Computing

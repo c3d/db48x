@@ -2358,7 +2358,7 @@ comparison, and the metals compatible at the 5 % level.
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
 50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
-@ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
+@ Expecting { cs:382.36862 7451±σ16.93035 4181 J/(kg·K) }
 ```
 
 **3)** The same measurements as bounds, a±σb being taken as a±√3·b: ΔROOT gives
@@ -2370,7 +2370,7 @@ aluminium, 902 J/(kg·K), do not.
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
 50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
-@ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
+@ Expecting { cs:337.00178 1317…429.00994 4117 J/(kg·K) }
 ```
 
 **4)** The comparison with copper, by σConcord, which draws the law of the
@@ -2410,7 +2410,7 @@ See also: [σROOT](#σroot), [ΔROOT](#Δroot), [σConcord](#σconcord).
 
 ## WeakAcid
 
-The pH of a solution of acetic acid, a weak acid of pKa = 4.756 at 25 °C,
+The pH of a solution of acetic acid, a weak acid of pKa 4.756 at 25 °C,
 prepared by dilution: a volume V1 of a standard solution of concentration C0
 is taken with a pipette, and made up to V2 in a volumetric flask. Two
 equations, WeakAcid in the section Labs of `config/equations.csv`: the dilution
@@ -2421,7 +2421,10 @@ solved: ROOT does it. Concentrations are in mol/L, given as plain numbers.
 
 The measurements: C0 = 0.1000 mol/L, u = 0.0002; a pipette of class A,
 10 mL ± 0.02 mL, and a flask of class A, 100 mL ± 0.08 mL, two tolerances, that
-is bounds; pKa = 4.756, u = 0.010, and pKw = 14.00, u = 0.01, from tables.
+is bounds. The pKa and the pKw come from the constants library, at 25 °C:
+ⒸpKaAcetic, 4.756 with a standard uncertainty ⓈpKaAcetic of 0.002, and
+ⒸpKwH2O, 13.994 with 0.03. The examples turn each into a value with its
+standard uncertainty by →σRange.
 
 The key WeakAcid shows where the formula of the textbooks,
 pH ≈ ½(pKa − log C), holds: for C = 10⁻¹ … 10⁻⁸ mol/L it returns one line per
@@ -2432,7 +2435,7 @@ C=1E-8, is on the first level.
 
 ```rpl
 ⓁWeakAcid
-@ Expecting C=1E-8:{ 6.978 6.378 }
+@ Expecting C=1E-8:{ 6.976 6.378 }
 ```
 
 **2)** The dilution of the laboratory, 0.01 mol/L: the pH and its standard
@@ -2440,38 +2443,43 @@ uncertainty, by σROOT.
 
 ```rpl
 0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
-4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+ⒸpKaAcetic →Num ⓈpKaAcetic →Num →σRange 'pKa' Sto
+ⒸpKwH2O →Num ⓈpKwH2O →Num →σRange 'pKw' Sto
 'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁσROOT
-@ Expecting { C:0.01±σ2.35513 62310 2⁳⁻⁵ pH:3.38709 33091±σ4.92308 91271 9⁳⁻³ }
+@ Expecting { C:0.01±σ2.35513 62310 2⁳⁻⁵ pH:3.38709 33089 1±σ1.10958 32198 4⁳⁻³ }
 ```
 
 **3)** The same as bounds, by ΔROOT:
 
 ```rpl
 0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
-4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+ⒸpKaAcetic →Num ⓈpKaAcetic →Num →σRange 'pKa' Sto
+ⒸpKwH2O →Num ⓈpKwH2O →Num →σRange 'pKw' Sto
 'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT
-@ Expecting { C:9.93747 82832 5⁳⁻³…0.01006 27605 07 pH:3.37722 86399 3…3.39696 39512 8 }
+@ Expecting { C:9.93747 82832 5⁳⁻³…0.01006 27605 07 pH:3.38401 05105 6…3.39017 9519 }
 ```
 
 **4)** A very dilute solution, 10⁻⁶ mol/L: the pH is 6.018, where the formula
-gives ½(4.756 + 6) = 5.378.
+gives ½(4.756 + 6) = 5.378. This assumes water free of carbon dioxide: in
+contact with the air, the dissolved CO₂ alone brings pure water near pH 5.6,
+and acidifies so dilute a solution more than its acid does.
 
 ```rpl
-0.0001 'C0' Sto  1_mL 'V1' Sto  100_mL 'V2' Sto  4.756 'pKa' Sto  14 'pKw' Sto
+0.0001 'C0' Sto  1_mL 'V1' Sto  100_mL 'V2' Sto
+ⒸpKaAcetic →Num 'pKa' Sto  ⒸpKwH2O →Num 'pKw' Sto
 'ROOT(ⒺWeakAcid;[C;pH];[0.000001;6])' Eval
-@ Expecting [ C=0.00000 1 pH=6.01835 89947 9 ]
+@ Expecting [ C=0.00000 1 pH=6.01829 71079 9 ]
 ```
 
 **5)** The calculation checked by a measurement: a pH meter reads 3.40, to
 ±0.02 according to its manual, a bound. ΔConcord compares this reading with the
-range of the pH found by ΔROOT, 3.377…3.397, and draws both: they overlap, and
-their intersection covers 86 % of the computed range. The measurement confirms
-the calculation.
+range of the pH found by ΔROOT, 3.384…3.390, and draws both: the computed range
+lies wholly inside the reading. The measurement confirms the calculation.
 
 ```rpl
 0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
-4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+ⒸpKaAcetic →Num ⓈpKaAcetic →Num →σRange 'pKa' Sto
+ⒸpKwH2O →Num ⓈpKwH2O →Num →σRange 'pKw' Sto
 'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
 3.40±0.02 ⓁΔConcord
 ```
@@ -2483,16 +2491,19 @@ which.
 
 ```rpl
 0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
-4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+ⒸpKaAcetic →Num ⓈpKaAcetic →Num →σRange 'pKa' Sto
+ⒸpKwH2O →Num ⓈpKwH2O →Num →σRange 'pKw' Sto
 'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
 3.45±0.02 ⓁΔConcord
 ```
 
-Three lessons. The budget is all in the pKa: it contributes 0.0049 of the
-0.0049 of the pH, the glassware 0.0005 together, since the logarithm flattens
-the relative errors of the volumes. To know the pH better, know the pKa
-better, at the temperature of the solution, rather than measure the volumes
-more finely. Then, the formula of the textbooks errs by less than 0.03 down
+Three lessons. The pKa still leads the budget: it contributes 0.0010 of the
+0.0011 of the pH, the glassware 0.0005 together, a fifth of the variance,
+since the logarithm flattens the relative errors of the volumes; the pKw does
+not count at this concentration. With the 0.010 of an ordinary table instead of
+the 0.002 of the constant, the pKa would make up almost all of 0.0049: to know
+the pH better, know the pKa better, at the temperature of the solution, before
+measuring the volumes more finely. Then, the formula of the textbooks errs by less than 0.03 down
 to 10⁻³ mol/L, but by 0.27 at 10⁻⁵ and 0.91 at 10⁻⁷: a dilute weak acid is
 almost wholly dissociated, and the water then gives as many ions as the acid.
 The exact pH never goes beyond 7, while the formula would. Last, an independent

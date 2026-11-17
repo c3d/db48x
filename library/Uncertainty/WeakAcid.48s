@@ -1,6 +1,7 @@
 «
-@@ WeakAcid — a laboratory exercise: the pH of a weak acid, acetic acid
-@@ (pKa = 4.756 at 25 °C), by the equation WeakAcid of the Labs section of
+@@ WeakAcid — a laboratory exercise: the pH of a weak acid, acetic acid,
+@@ whose pKa, 4.756, and the pKw of water, 13.994, both at 25 °C, come from
+@@ the constants ⒸpKaAcetic and ⒸpKwH2O, by the equation WeakAcid of the Labs section of
 @@ config/equations.csv: a dilution C = C0·V1/V2 and the charge balance
 @@ [H⁺] = [A⁻] + [OH⁻], that is
 @@   10^(−pH) = C·Ka/(Ka + 10^(−pH)) + Kw/10^(−pH),  Ka = 10^(−pKa), Kw = 10^(−pKw)
@@ -10,13 +11,13 @@
 @@ of the acid that dissociates.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
-  4.756 'pKa' Sto 14 'pKw' Sto 100_mL 'V1' Sto 100_mL 'V2' Sto
+  ⒸpKaAcetic →Num 'pKa' Sto ⒸpKwH2O →Num 'pKw' Sto 100_mL 'V1' Sto 100_mL 'V2' Sto
   1 8 For wak
     10 wak Neg ^ →Num 'C0' Sto
     @ ROOT solves an unknown that already exists only from its value
     IfErr { C pH } Purge Then End
     'ROOT(ⒺWeakAcid;[C;pH];[0.01;4])' Eval Drop
-    pH 3 RND 4.756 wak + 2 / 3 RND
+    pH 3 RND pKa wak + 2 / 3 RND
     2 →List "C=1E-" wak →Text + →Tag
   Next
 »
