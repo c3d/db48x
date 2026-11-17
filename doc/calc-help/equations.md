@@ -2876,13 +2876,17 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 
 ## Chemistry
 
-Solutions and their colligative properties, acids and bases and their
-titration, and the absorption of light by a solution, at the level of a first
-course of general chemistry and of its laboratory, in five submenus:
+Solutions and their colligative properties, chemical equilibrium, acids and
+bases and their titration, solubility, and the absorption of light by a
+solution, at the level of a first course of general chemistry and of its
+laboratory, in eight submenus:
 [Solutions](#solutions),
 [Colligative Properties](#colligative properties),
+[Equilibria](#equilibria),
 [Acids & Bases](#acids & bases),
-[Titrations](#titrations) and
+[Polyprotic Acids](#polyprotic acids),
+[Titrations](#titrations),
+[Solubility](#solubility) and
 [Spectrophotometry](#spectrophotometry).
 
 **Units.** The concentrations are amount concentrations, in mol/l: DB48x has
@@ -2909,7 +2913,7 @@ than here, and the examples give the difference.
 textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
 result of the book is given with each of them.
 
-The 62 variables in the Chemistry section are:
+The 111 variables in the Chemistry section are:
 
 * `msl`: Mass of the solute (dim.: mass, in SI: g)
 * `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
@@ -2949,6 +2953,29 @@ The 62 variables in the Chemistry section are:
 * `ΔTf`: Depression of the freezing point (dim.: temperature difference)
 * `Posm`: Osmotic pressure (dim.: pressure)
 * `Tos`: Temperature of the solution (dim.: temperature)
+* `cR1`, `cR2`: Concentrations of the two reactants, at the moment considered or
+  at equilibrium (dim.: amount/volume)
+* `cP1`, `cP2`: Concentrations of the two products (dim.: amount/volume)
+* `νR1`, `νR2`, `νP1`, `νP2`: Stoichiometric coefficients of the reactants and
+  of the products: 0 for a species that is absent, whose concentration is then
+  set to 1 mol/l
+* `Qc`: Reaction quotient in concentrations
+* `Kcq`: Equilibrium constant in concentrations, Kc
+* `lQK`: Decimal logarithm of `Qc` over `Kcq`: negative, the reaction goes
+  forward; positive, it goes back
+* `Kp`: Equilibrium constant in partial pressures, in atm
+* `Δng`: Change of the number of moles of gas, from the reactants to the
+  products
+* `Teq`: Temperature of the reaction (dim.: temperature)
+* `Keq`: Thermodynamic equilibrium constant
+* `Qr`: Thermodynamic reaction quotient
+* `ΔG0`: Standard Gibbs energy of reaction (dim.: energy/amount, in SI: kJ/mol)
+* `ΔGr`: Gibbs energy of reaction under the conditions given (dim.:
+  energy/amount)
+* `Keq1`, `Keq2`: Equilibrium constants at the temperatures `Teq1` and `Teq2`
+* `Teq1`, `Teq2`: Two temperatures (dim.: temperature)
+* `ΔHr`: Standard enthalpy of reaction, taken as constant between `Teq1` and
+  `Teq2` (dim.: energy/amount, in SI: kJ/mol)
 * `pH`: Decimal logarithm, with a minus sign, of the concentration of the
   hydronium ion over 1 mol/l
 * `pOH`: The same for the hydroxide ion
@@ -2967,10 +2994,28 @@ The 62 variables in the Chemistry section are:
   buffer
 * `nacid`, `nbase`: Amounts of the acid and of its conjugate base in a buffer
   (dim.: amount, in SI: mol)
+* `Cpa`: Concentration of a polyprotic acid as prepared (dim.: amount/volume)
+* `Ka1`, `Ka2`, `Ka3`: Successive ionization constants of the polyprotic acid
+* `pKa1`, `pKa2`, `pKa3`: Their decimal logarithms, with a minus sign
+* `fp0`, `fp1`, `fp2`, `fp3`: Fractions of the acid that have lost 0, 1, 2 or 3
+  protons
 * `Cta`, `Vta`: Concentration and volume of the acid that is titrated
 * `Ctb`: Concentration of the strong base used as titrant
 * `Vtb`: Volume of base added (dim.: volume)
 * `Veq`: Volume of base at the equivalence point (dim.: volume)
+* `Ksp`: Solubility product
+* `νM`, `νX`: Numbers of cations and of anions of one formula unit of the salt
+* `ssol`: Molar solubility of the salt (dim.: amount/volume)
+* `Sg`: Solubility of the salt in grams per liter (dim.: mass/volume)
+* `cM0`, `cX0`: Concentrations of the cation and of the anion already present,
+  from another salt (dim.: amount/volume)
+* `cMs`, `VMs`, `cXs`, `VXs`: Concentrations and volumes of the two solutions
+  that are mixed, one bringing the cation, the other the anion
+* `cMi`, `cXi`: Concentrations of the cation and of the anion in the mixture,
+  before any precipitation (dim.: amount/volume)
+* `Qsp`: Ionic product of the solution
+* `SIp`: Saturation index, the decimal logarithm of `Qsp` over `Ksp`: positive,
+  the salt precipitates
 * `Absb`: Absorbance, the decimal logarithm of the incident intensity over the
   transmitted intensity
 * `Tsm`: Transmittance, the transmitted intensity over the incident intensity:
@@ -2982,9 +3027,11 @@ The 62 variables in the Chemistry section are:
 * References:
   [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
   OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 11.3, 11.6
-  to 11.13, 14.7, 14.8, 14.12, 14.13, 14.14 and 14.20 to 14.22, table 11.2, the
-  titration table of section 14.7 and the buffer of the blood in section 14.6:
-  numbers only, under the license CC BY-NC-SA 4.0 ;
+  to 11.13, 13.2 to 13.5, 14.7, 14.8, 14.12, 14.13, 14.14, 14.19 to 14.22,
+  15.3 to 15.5, 15.7, 15.8, 15.13, 16.12 and 16.13, table 11.2, the titration
+  table of section 14.7, the buffer of the blood in section 14.6 and the
+  ionization constants of phosphoric acid in section 14.5: numbers only, under
+  the license CC BY-NC-SA 4.0 ;
   [2] IAPWS R11-24, *Revised Release on the Ionization Constant of H₂O*,
   International Association for the Properties of Water and Steam, 2024 ;
   [3] R. N. Goldberg, N. Kishore and R. M. Lennen, *Thermodynamic Quantities
@@ -3250,6 +3297,125 @@ msl=10_g Vsn=0.5_l Posm=5.9_torr ivh=1 Tos=22_°C
 'ROOT(ⒺOsmotic Pressure;[Csl;nsl;MMsl];[1_(mol/l);1_mol;1_(g/mol)])'
 ```
 
+### Equilibria
+
+Chemical equilibrium: the reaction quotient and the direction of a reaction, the
+constants in concentrations and in pressures, the Gibbs energy and the
+equilibrium constant, and the effect of temperature.
+
+Entries: [Reaction Quotient](#reaction quotient),
+[Kp & Kc](#kp & kc),
+[Free Energy & K](#free energy & k) and
+[Van ’t Hoff](#van ’t hoff).
+
+#### Reaction Quotient
+
+The reaction quotient of a reaction with up to two reactants and two products,
+νR1 R1 + νR2 R2 ⇌ νP1 P1 + νP2 P2, and the direction in which it goes.
+
+* Main results: the quotient `Qc` from the concentrations `cR1`, `cR2`, `cP1`,
+  `cP2` and the coefficients `νR1`, `νR2`, `νP1`, `νP2`; with the equilibrium
+  constant `Kcq`, the decimal logarithm `lQK` of `Qc` over `Kcq`: negative, the
+  reaction goes forward; positive, it goes back; zero, it is at equilibrium.
+* With the concentrations at equilibrium, `Qc` is the equilibrium constant
+  itself.
+* For a species that is absent, set its coefficient to 0 and its concentration
+  to 1 mol/l.
+
+* To calculate: `[Qc;lQK]` (Quotient; Logarithm of Q over K) of CO + H₂O ⇌ CO₂ + H₂, of Kc 0.64, with 0.020 mol/l of CO and of H₂O and 0.0040 mol/l of CO₂ and of H₂. The source gives 0.040: the reaction goes forward [1]:
+```rpl
+cR1=0.02_(mol/l) cR2=0.02_(mol/l) cP1=0.004_(mol/l) cP2=0.004_(mol/l) νR1=1 νR2=1 νP1=1 νP2=1 Kcq=0.64
+@ Expecting [ Qc=0.04 lQK=-1.20411 99826 6 ]
+'ROOT(ⒺReaction Quotient;[Qc;lQK];[1;0])'
+```
+
+* To calculate: `[Qc;lQK]` with 0.011 mol/l of CO, 0.0011 of H₂O, 0.037 of CO₂ and 0.046 of H₂. The source gives 1.4·10²: the reaction goes back [1]:
+```rpl
+cR1=0.011_(mol/l) cR2=0.0011_(mol/l) cP1=0.037_(mol/l) cP2=0.046_(mol/l) νR1=1 νR2=1 νP1=1 νP2=1 Kcq=0.64
+@ Expecting [ Qc=140.66115 7025 lQK=2.34199 42114 5 ]
+'ROOT(ⒺReaction Quotient;[Qc;lQK];[1;0])'
+```
+
+* To calculate: `[Qc]` (Quotient) of 2 NO₂ ⇌ N₂O₄ at equilibrium, with 0.016 mol/l of NO₂ and 0.042 of N₂O₄: its equilibrium constant. The source gives 1.6·10² [1]:
+```rpl
+cR1=0.016_(mol/l) νR1=2 cR2=1_(mol/l) νR2=0 cP1=0.042_(mol/l) νP1=1 cP2=1_(mol/l) νP2=0
+@ Expecting [ Qc=164.0625 ]
+'ROOT(ⒺReaction Quotient;[Qc];[1])'
+```
+
+#### Kp & Kc
+
+The equilibrium constant of a reaction between gases, in partial pressures and
+in concentrations.
+
+* Main results: `Kp` from `Kcq`, or the reverse, at the temperature `Teq`, with
+  the change `Δng` of the number of moles of gas.
+* The pressures are in atm and the concentrations in mol/l, as in the textbooks.
+
+* To calculate: `[Kp]` (Constant in pressures) of CS₂ + 4 H₂ ⇌ CH₄ + 2 H₂S, of Kc 0.28 at 900 °C, where two moles of gas are lost. The source gives 3.0·10⁻⁵ [1]:
+```rpl
+Kcq=0.28 Teq=900_°C Δng=-2
+@ Expecting [ Kp=3.02145 26741⁳⁻⁵ ]
+'ROOT(ⒺKp & Kc;[Kp];[1E-5])'
+```
+
+* To calculate: `[Kp]` of N₂ + 3 H₂ ⇌ 2 NH₃, of Kc 0.50 at 400 °C [1]:
+```rpl
+Kcq=0.5 Teq=400_°C Δng=-2
+@ Expecting [ Kp=1.63874 41667⁳⁻⁴ ]
+'ROOT(ⒺKp & Kc;[Kp];[1E-4])'
+```
+
+#### Free Energy & K
+
+The equilibrium constant of a reaction from its standard Gibbs energy, and the
+Gibbs energy of the reaction away from equilibrium.
+
+* Main results: the equilibrium constant `Keq` from the standard Gibbs energy
+  `ΔG0` and the temperature `Teq`, or the reverse; and the Gibbs energy `ΔGr`
+  for the reaction quotient `Qr`: negative, the reaction goes forward.
+* The relation is written `K = exp(−ΔG°/RT)` rather than `ΔG° = −RT ln K`, for
+  the same reason as the pH.
+
+* To calculate: `[Keq]` (Equilibrium constant) of AgCl ⇌ Ag⁺ + Cl⁻, whose standard Gibbs energy is 55.7 kJ/mol at 25 °C: the solubility product. The source gives 1.74·10⁻¹⁰ [1]:
+```rpl
+ΔG0=55.7_(kJ/mol) Teq=298.15_K
+@ Expecting [ Keq=1.74494 67881 9⁳⁻¹⁰ ]
+'ROOT(ⒺFree Energy & K;[Keq];[1E-10])'
+```
+
+* To calculate: `[Keq;ΔGr]` (Equilibrium constant; Gibbs energy) of 2 NH₃ ⇌ 3 H₂ + N₂, of 33.0 kJ/mol at 298 K, with 0.250 atm of H₂, 0.870 atm of N₂ and 12.9 atm of NH₃: Q = 0.250³·0.870/12.9². The source gives 9.68 kJ/mol [1]:
+```rpl
+ΔG0=33_(kJ/mol) Teq=298_K Qr=8.16883E-5
+@ Expecting [ Keq=1.64338 77817 6⁳⁻⁶ ΔGr=9.67830 87317 2 kJ/mol ]
+'ROOT(ⒺFree Energy & K;[Keq;ΔGr];[1E-6;1_(kJ/mol)])'
+```
+
+#### Van ’t Hoff
+
+The change of an equilibrium constant with the temperature, by the equation of
+van ’t Hoff.
+
+* Main results: the constant `Keq2` at the temperature `Teq2`, from the constant
+  `Keq1` at `Teq1` and the standard enthalpy of reaction `ΔHr`; or the enthalpy
+  from two constants.
+* The enthalpy of reaction is taken as constant between the two temperatures. An
+  endothermic reaction, of positive `ΔHr`, goes further when it is heated.
+
+* To calculate: `[Keq2]` (Constant at the second temperature) at 350 K of a reaction of 57.2 kJ/mol whose constant is 0.15 at 25 °C:
+```rpl
+Keq1=0.15 Teq1=25_°C Teq2=350_K ΔHr=57.2_(kJ/mol)
+@ Expecting [ Keq2=4.57753 61732 1 ]
+'ROOT(ⒺVan ’t Hoff;[Keq2];[1])'
+```
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of a reaction whose constant goes from 0.15 at 25 °C to 4.0 at 350 K:
+```rpl
+Keq1=0.15 Teq1=25_°C Keq2=4 Teq2=350_K
+@ Expecting [ ΔHr=54.94320 30076 kJ/mol ]
+'ROOT(ⒺVan ’t Hoff;[ΔHr];[10_(kJ/mol)])'
+```
+
 ### Acids & Bases
 
 The acidity of aqueous solutions at 25 °C: the pH and the pOH, weak acids and
@@ -3424,6 +3590,67 @@ Ka=1.8E-5 nacid=0.0099_mol nbase=0.0101_mol Vsn=101_ml
 'ROOT(ⒺBuffer;[Cacid;Cbase;pKa;pH];[0.1_(mol/l);0.1_(mol/l);5;5])'
 ```
 
+### Polyprotic Acids
+
+Acids that give up two or three protons, one after the other: the pH of their
+solutions and the fraction of each of their forms.
+
+Entries: [Diprotic Acid](#diprotic acid) and
+[Triprotic Acid](#triprotic acid).
+
+#### Diprotic Acid
+
+A diprotic acid H₂A, such as carbonic acid: the pH of its solution, and the
+fractions of H₂A, HA⁻ and A²⁻.
+
+* Main results: the `pH` of a solution of the acid at the concentration `Cpa`,
+  from its constants `Ka1` and `Ka2` or `pKa1` and `pKa2`; and the fractions
+  `fp0`, `fp1` and `fp2` of the acid that have lost 0, 1 and 2 protons, at that
+  pH or at a pH given.
+* The concentration of each form is its fraction times `Cpa`.
+* The equation is the balance of the charges, with the ions of the water, as for
+  the titrations.
+
+* To calculate: `[pKa1;pKa2;pH;fp0;fp1;fp2]` (pKa; pH; Fractions) of carbonic acid at 0.033 mol/l, of Ka1 4.3·10⁻⁷ and Ka2 4.7·10⁻¹¹. The source gives 1.2·10⁻⁴ mol/l of H₃O⁺ and of HCO₃⁻, and 4.7·10⁻¹¹ mol/l of CO₃²⁻ [1]:
+```rpl
+Cpa=0.033_(mol/l) Ka1=4.3E-7 Ka2=4.7E-11
+@ Expecting [ pKa1=6.36653 15444 2 pKa2=10.32790 21421 pH=3.92479 23216 8 fp0=0.99639 67594 58 fp1=3.60323 91177 8⁳⁻³ fp2=1.42424 0277⁳⁻⁹ ]
+'ROOT(ⒺDiprotic Acid;[pKa1;pKa2;pH;fp0;fp1;fp2];[6;10;4;0.5;0.5;0.5])'
+```
+
+* To calculate: `[fp0;fp1;fp2]` (Fractions) of the carbonate forms at pH 8.30:
+```rpl
+pH=8.3 Ka1=4.3E-7 Ka2=4.7E-11
+@ Expecting [ fp0=0.01141 54138 09 fp1=0.97940 00342 86 fp2=9.18455 19045 5⁳⁻³ ]
+'ROOT(ⒺDiprotic Acid;[fp0;fp1;fp2];[0.5;0.5;0.5])'
+```
+
+#### Triprotic Acid
+
+A triprotic acid H₃A, such as phosphoric acid: the pH of its solution, and the
+fractions of its four forms.
+
+* Main results: the `pH` of a solution of the acid at the concentration `Cpa`,
+  from its constants `Ka1`, `Ka2` and `Ka3` or their pK; and the fractions `fp0`
+  to `fp3` of the acid that have lost 0 to 3 protons, at that pH or at a pH
+  given.
+* Near pH 7, the phosphate forms H₂PO₄⁻ and HPO₄²⁻ make the buffer of the cells
+  and of many biochemical media.
+
+* To calculate: `[pKa1;pKa2;pKa3;pH;fp0;fp1]` (pKa; pH; Fractions) of phosphoric acid at 0.10 mol/l, of Ka 7.5·10⁻³, 6.2·10⁻⁸ and 4.2·10⁻¹³ [1]:
+```rpl
+Cpa=0.1_(mol/l) Ka1=7.5E-3 Ka2=6.2E-8 Ka3=4.2E-13
+@ Expecting [ pKa1=2.12493 87366 1 pKa2=7.20760 83105 pKa3=12.37675 07096 pH=1.62175 21749 2 fp0=0.76108 31951 57 fp1=0.23891 61848 46 ]
+'ROOT(ⒺTriprotic Acid;[pKa1;pKa2;pKa3;pH;fp0;fp1];[2;7;12;2;0.5;0.5])'
+```
+
+* To calculate: `[fp0;fp1;fp2;fp3]` (Fractions) of the phosphate forms at pH 7.40:
+```rpl
+pH=7.4 Ka1=7.5E-3 Ka2=6.2E-8 Ka3=4.2E-13
+@ Expecting [ fp0=2.07558 99005⁳⁻⁶ fp1=0.39102 34581 34 fp2=0.60896 80417 1 fp3=6.42456 59570 2⁳⁻⁶ ]
+'ROOT(ⒺTriprotic Acid;[fp0;fp1;fp2;fp3];[0.5;0.5;0.5;0.5])'
+```
+
 ### Titrations
 
 The pH of an acid while it is titrated by a strong base, and the volume of base
@@ -3498,6 +3725,96 @@ Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=12.5_ml
 Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=25_ml
 @ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=8.71890 38730 1 ]
 'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+### Solubility
+
+The solubility of a sparingly soluble salt: its solubility product, the effect
+of a common ion, and whether a mixture precipitates.
+
+Entries: [Molar Solubility](#molar solubility),
+[Common Ion Effect](#common ion effect) and
+[Precipitation](#precipitation).
+
+#### Molar Solubility
+
+The molar solubility of a salt MνM XνX in pure water, from its solubility
+product, or the reverse.
+
+* Main results: the molar solubility `ssol` and the solubility `Sg` in grams per
+  liter, from the solubility product `Ksp`, the numbers `νM` and `νX` of cations
+  and anions of one formula unit, and the molar mass `MMsl`; or `Ksp` from a
+  measured solubility.
+* The ions are taken as not reacting with water and as ideal.
+
+* To calculate: `[ssol]` (Molar solubility) of CuBr, of Ksp 6.3·10⁻⁹. The source gives 7.9·10⁻⁵ mol/l [1]:
+```rpl
+Ksp=6.3E-9 νM=1 νX=1
+@ Expecting [ ssol=7.93725 39331 9⁳⁻⁵ mol/l ]
+'ROOT(ⒺMolar Solubility;[ssol];[1E-5_(mol/l)])'
+```
+
+* To calculate: `[ssol;Sg]` (Molar and mass solubility) of Ca(OH)₂, of Ksp 1.3·10⁻⁶ and 74.09 g/mol. The source gives 6.9·10⁻³ mol/l [1]:
+```rpl
+Ksp=1.3E-6 νM=1 νX=2 MMsl=74.09_(g/mol)
+@ Expecting [ ssol=6.87534 43353 7⁳⁻³ mol/l Sg=0.50939 42618 08 g/l ]
+'ROOT(ⒺMolar Solubility;[ssol;Sg];[1E-3_(mol/l);1_(g/l)])'
+```
+
+* To calculate: `[ssol;Ksp]` (Molar solubility; Solubility product) of PbCrO₄, of 323.19 g/mol, from its solubility of 4.6·10⁻⁶ g/l. The source gives 2.0·10⁻¹⁶ [1]:
+```rpl
+Sg=4.6E-6_(g/l) MMsl=323.19_(g/mol) νM=1 νX=1
+@ Expecting [ ssol=1.42331 13648 3⁳⁻⁸ mol/l Ksp=2.02581 52412 6⁳⁻¹⁶ ]
+'ROOT(ⒺMolar Solubility;[ssol;Ksp];[1E-8_(mol/l);1E-16])'
+```
+
+#### Common Ion Effect
+
+The molar solubility of a salt in a solution that already holds one of its ions.
+
+* Main results: the molar solubility `ssol` from the solubility product `Ksp`,
+  the numbers `νM` and `νX` of ions of one formula unit, and the concentrations
+  `cM0` and `cX0` of the cation and of the anion already present; one of them is
+  usually 0.
+
+* To calculate: `[ssol]` (Molar solubility) of CdS, of Ksp 1.0·10⁻²⁸, in a solution of CdBr₂ at 0.010 mol/l. The source gives 1.0·10⁻²⁶ mol/l [1]:
+```rpl
+Ksp=1.0E-28 νM=1 νX=1 cM0=0.01_(mol/l) cX0=0_(mol/l)
+@ Expecting [ ssol=1.⁳⁻²⁶ mol/l ]
+'ROOT(ⒺCommon Ion Effect;[ssol];[1E-20_(mol/l)])'
+```
+
+* To calculate: `[ssol]` of AgCl, of Ksp 1.6·10⁻¹⁰, in a solution of NaCl at 0.10 mol/l; in pure water it would be 1.3·10⁻⁵ mol/l:
+```rpl
+Ksp=1.6E-10 νM=1 νX=1 cM0=0_(mol/l) cX0=0.1_(mol/l)
+@ Expecting [ ssol=1.59999 99744⁳⁻⁹ mol/l ]
+'ROOT(ⒺCommon Ion Effect;[ssol];[1E-8_(mol/l)])'
+```
+
+#### Precipitation
+
+Whether a salt precipitates, from the ionic product of a solution or of a
+mixture of two solutions.
+
+* Main results: the concentrations `cMi` and `cXi` of the ions after mixing,
+  from the concentrations `cMs`, `cXs` and the volumes `VMs`, `VXs` of the two
+  solutions; the ionic product `Qsp`, and the saturation index `SIp`, the
+  decimal logarithm of `Qsp` over `Ksp`: positive, the salt precipitates;
+  negative, it does not.
+* For a single solution, give `cMi` and `cXi` directly.
+
+* To calculate: `[cMi;cXi;Qsp;SIp]` (Concentrations after mixing; Ionic product; Saturation index) of 100 ml of AgNO₃ and 100 ml of NaCl, both at 2.0·10⁻⁴ mol/l, for AgCl of Ksp 1.6·10⁻¹⁰. The source gives 1.0·10⁻⁸: AgCl precipitates [1]:
+```rpl
+cMs=2E-4_(mol/l) VMs=100_ml cXs=2E-4_(mol/l) VXs=100_ml νM=1 νX=1 Ksp=1.6E-10
+@ Expecting [ cMi=0.0001 mol/l cXi=0.0001 mol/l Qsp=0.00000 001 SIp=1.79588 00173 4 ]
+'ROOT(ⒺPrecipitation;[cMi;cXi;Qsp;SIp];[1E-4_(mol/l);1E-4_(mol/l);1E-8;1])'
+```
+
+* To calculate: `[Qsp;SIp]` (Ionic product; Saturation index) of a solution with 0.0537 mol/l of Mg²⁺ and 0.0010 mol/l of OH⁻, for Mg(OH)₂ of Ksp 8.9·10⁻¹². The source gives 5.4·10⁻⁸: Mg(OH)₂ precipitates [1]:
+```rpl
+cMi=0.0537_(mol/l) cXi=0.001_(mol/l) νM=1 νX=2 Ksp=8.9E-12
+@ Expecting [ Qsp=0.00000 00537 SIp=3.78058 42790 5 ]
+'ROOT(ⒺPrecipitation;[Qsp;SIp];[1E-8;1])'
 ```
 
 ### Spectrophotometry

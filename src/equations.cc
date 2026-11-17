@@ -1455,6 +1455,21 @@ static const cstring basic_equations[] =
     "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
     "  '(Posm_atm)=ivh·(Csl_(mol/l))·ⒸR·(Tos_K)' "
     "}",
+    "Chemistry/Equilibria", nullptr,
+    "Reaction Quotient",  "{ "
+    "  'Qc=((cP1_(mol/l))/(1_(mol/l)))^νP1·((cP2_(mol/l))/(1_(mol/l)))^νP2/(((cR1_(mol/l))/(1_(mol/l)))^νR1·((cR2_(mol/l))/(1_(mol/l)))^νR2)' "
+    "  'lQK=LOG(Qc/Kcq)' "
+    "}",
+    "Kp & Kc",  "{ "
+    "  'Kp=Kcq·((ⒸR·(Teq_K))/(1_(atm*l/mol)))^Δng' "
+    "}",
+    "Free Energy & K",  "{ "
+    "  'Keq=EXP(-(ΔG0_(J/mol))/(ⒸR·(Teq_K)))' "
+    "  '(ΔGr_(J/mol))=(ΔG0_(J/mol))+ⒸR·(Teq_K)·LN(Qr)' "
+    "}",
+    "Van ’t Hoff",  "{ "
+    "  'Keq2=Keq1·EXP((ΔHr_(J/mol))/(ⒸR·(Teq1_K))-(ΔHr_(J/mol))/(ⒸR·(Teq2_K)))' "
+    "}",
     "Chemistry/Acids & Bases", nullptr,
     "pH & pOH",  "{ "
     "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
@@ -1488,6 +1503,25 @@ static const cstring basic_equations[] =
     "  '(Cbase_(mol/l))=(nbase_mol)/(Vsn_l)' "
     "  '(Cbase_(mol/l))=(Cacid_(mol/l))·10^(pH-pKa)' "
     "}",
+    "Chemistry/Polyprotic Acids", nullptr,
+    "Diprotic Acid",  "{ "
+    "  'Ka1=10^(-pKa1)' "
+    "  'Ka2=10^(-pKa2)' "
+    "  '(1_(mol/l))·10^(-pH)=(Cpa_(mol/l))·(Ka1·10^(-pH)+2·Ka1·Ka2)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "  'fp0=10^(-2·pH)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "  'fp1=Ka1·10^(-pH)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "  'fp2=Ka1·Ka2/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "}",
+    "Triprotic Acid",  "{ "
+    "  'Ka1=10^(-pKa1)' "
+    "  'Ka2=10^(-pKa2)' "
+    "  'Ka3=10^(-pKa3)' "
+    "  '(1_(mol/l))·10^(-pH)=(Cpa_(mol/l))·(Ka1·10^(-2·pH)+2·Ka1·Ka2·10^(-pH)+3·Ka1·Ka2·Ka3)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "  'fp0=10^(-3·pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp1=Ka1·10^(-2·pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp2=Ka1·Ka2·10^(-pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp3=Ka1·Ka2·Ka3/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "}",
     "Chemistry/Titrations", nullptr,
     // Balance of the charges, with the ions of the water: one equation
     // from the start of the titration to beyond the equivalence point
@@ -1499,6 +1533,20 @@ static const cstring basic_equations[] =
     "  'Ka=10^(-pKa)' "
     "  '(Veq_ml)=(Cta_(mol/l))·(Vta_ml)/(Ctb_(mol/l))' "
     "  '(1_(mol/l))·10^(-pH)+(Ctb_(mol/l))·(Vtb_ml)/((Vta_ml)+(Vtb_ml))=(Cta_(mol/l))·(Vta_ml)/((Vta_ml)+(Vtb_ml))·Ka/(Ka+10^(-pH))+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "}",
+    "Chemistry/Solubility", nullptr,
+    "Molar Solubility",  "{ "
+    "  'Ksp=(νM·(ssol_(mol/l))/(1_(mol/l)))^νM·(νX·(ssol_(mol/l))/(1_(mol/l)))^νX' "
+    "  '(Sg_(g/l))=(ssol_(mol/l))·(MMsl_(g/mol))' "
+    "}",
+    "Common Ion Effect",  "{ "
+    "  'Ksp=((νM·(ssol_(mol/l))+(cM0_(mol/l)))/(1_(mol/l)))^νM·((νX·(ssol_(mol/l))+(cX0_(mol/l)))/(1_(mol/l)))^νX' "
+    "}",
+    "Precipitation",  "{ "
+    "  '(cMi_(mol/l))=(cMs_(mol/l))·(VMs_ml)/((VMs_ml)+(VXs_ml))' "
+    "  '(cXi_(mol/l))=(cXs_(mol/l))·(VXs_ml)/((VMs_ml)+(VXs_ml))' "
+    "  'Qsp=((cMi_(mol/l))/(1_(mol/l)))^νM·((cXi_(mol/l))/(1_(mol/l)))^νX' "
+    "  'SIp=LOG(Qsp/Ksp)' "
     "}",
     "Chemistry/Spectrophotometry", nullptr,
     "Beer Lambert Law",  "{ "
