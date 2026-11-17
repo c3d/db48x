@@ -98,6 +98,20 @@ A dedication, in French, to all those who remember Maubert Électronique.
 A reminder that the library is defined by the file `config/library.csv`,
 which can be edited to add your own entries.
 
+## DemoLibrary
+
+Demonstration programs, in eleven submenus:
+[Mathematics](#mathematicslibrary), [Physics](#physicslibrary),
+[Graphics](#graphicslibrary), [Sound](#soundlibrary),
+[Performance](#performancelibrary), [Examples](#exampleslibrary),
+[Anagram](#anagramlibrary), [Probability](#probabilitylibrary),
+[StatTests](#stattestslibrary), [Uncertainty](#uncertaintylibrary) and
+[Astronomy](#astronomylibrary).
+
+Most of them were stored in the Demo state file. They are now library
+entries, which that state file refers to, so that they can be run from the
+library without loading the state.
+
 ## PhysicsLibrary
 
 Physics programs and formulas.
@@ -151,6 +165,21 @@ equations such as Pythagoras' theorem and the law of sines.
 
 Plots the function `x³·(sin(5x)+1)/(eˣ-1)`.
 
+### EquationSolving
+
+Stores in `EQ` a system of ten equations for a triangle: Pythagoras' theorem
+for the sides `AA`, `BB` and `CC` of a right triangle, and for any triangle
+the laws of sines and cosines, the sum of the angles and Heron's formula for
+the area `A`. It sets `AA` to 10 m, `BB` to 85 ft and `CC` to 1 cm, units
+mixed on purpose, and opens the solver menu: solving for `CC` gives the
+hypotenuse, 27.77 m.
+
+### MultiSolver
+
+Solves with the multiple-equation solver the system `sin(X)=0.5·cos(Y)` and
+`sin(X)=0.3·cos(X)` for `X` and `Y`, from 1 and 1, after opening the solver
+menu. In degrees, `X` is 16.70° and `Y` 54.92°.
+
 ## GraphicsLibrary
 
 Examples of graphics programs.
@@ -189,6 +218,13 @@ Draws one random point in each column of the screen.
 
 Draws 25 000 random points on the screen.
 
+### XYPlots
+
+Draws and times three plots of a function of `x` and `y` with `Truth`: the
+region where an inequality holds, the shades of gray of a real function, and
+a complex function. Each is drawn with 32, 128 and 64 for `XYPlotBins`, its
+time shown for 5 seconds; the nine times are left in a list.
+
 ## SoundLibrary
 
 Examples of sound programs.
@@ -224,11 +260,90 @@ does not decrease: tail recursion uses no memory. Stop it with `EXIT`.
 
 Times 26 conversions of speeds from `m/s` to `km/yr`.
 
+### MatrixMultiplyBenchmark
+
+Times the product of two random N×N matrices, N being 20 when the stack is
+empty. Each matrix is made with `RanM`, then the sine of its elements is
+taken; the times are shown on the screen, and the garbage collector runs
+between the steps. Its statistics before and after the product are stored in
+`PreGC` and `PostGC`.
+
 ### InteractiveMenu
 
 An example of interactive program, in the Examples section: it stops in the
 solver menu for `C=√(A²+B²)`; once `A`, `B` and `C` are solved, `=` resumes
 it, and it displays the results.
+
+### PathHeader
+
+Replaces the header of the screen with the time, the current directory, the
+date and the free memory, refreshed every 10 seconds.
+
+### BatteryLevelHeader
+
+Shows the battery voltage in the header, and whether the battery is low,
+refreshed every 10 seconds.
+
+### RuntimeStatsHeader
+
+Shows in the header the statistics of the main loop given by
+`RuntimeStatistics`: the number of runs, and the time spent running and
+sleeping, refreshed every 10 seconds.
+
+### BatteryStatsHeader
+
+Records the time and the battery voltage every 10 seconds, and shows in the
+header the number of records, the time, the voltage and whether the battery
+is low: a discharge curve. The records go to `ΣData`, which it first sets to
+the file `BATTERY.CSV`, so that they survive a crash at low battery.
+
+### IfTETest
+
+The two forms of `IFTE`. With programs, it tells whether the number on the
+stack is 1, less or more: "One", "Less" or "More". With expressions,
+`'1=1' '1+1' '1*3' IFTE` gives 2.
+
+### IfThenElseEval
+
+An `IF` whose test is an expression on a local variable, `'x<1'`: it gives
+"less" for a number below 1, and "more" otherwise.
+
+### CaseTest
+
+Gives "Alpha", "Beta", "Gamma" or "Delta" for the texts "A", "B", "C" or
+"D", with `CASE`; the last one uses the `WHEN` form. The text stays below
+the answer, and any other text is left alone.
+
+### Prompting
+
+Stops with `PROMPT` and its message. Enter a value and press the Run key: the
+program adds 1 to it and tags the result "Next value".
+
+### Inputting
+
+The same with `INPUT`, which opens the command line under the message, with
+the default text "What?".
+
+## AnagramLibrary
+
+A recursive program in three parts, which shows all the anagrams of a word.
+
+### ANAG
+
+Shows on the screen, one after the other, all the anagrams of the text on the
+stack, made by permuting its characters: six for "ABC", 24 for "ABCD". It
+keeps its counters in the global variables `B` and `C`, which it purges at the
+end.
+
+### PRANAG
+
+The recursive part of `ANAG`: it permutes the characters on the stack, and
+shows each arrangement.
+
+### PRDEPTH
+
+The number of characters on the stack above the depth that `ANAG` recorded
+in `C`.
 
 ## ConfigsLibrary
 
