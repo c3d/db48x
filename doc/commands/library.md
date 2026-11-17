@@ -331,14 +331,14 @@ A recursive program in three parts, which shows all the anagrams of a word.
 ### ANAG
 
 Shows on the screen, one after the other, all the anagrams of the text on the
-stack, made by permuting its characters: six for "ABC", 24 for "ABCD". It
-keeps its counters in the global variables `B` and `C`, which it purges at the
-end.
+stack, made by permuting its characters, each for 0.3 s: six for "ABC", 24 for
+"ABCD". It keeps its counters in the global variables `B` and `C`, which it
+purges at the end.
 
 ### PRANAG
 
 The recursive part of `ANAG`: it permutes the characters on the stack, and
-shows each arrangement.
+shows each arrangement for 0.3 s.
 
 ### PRDEPTH
 

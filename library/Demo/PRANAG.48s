@@ -12,6 +12,6 @@
     START
       + -1
     STEP
-    4 DISP
+    4 DISP 0.3 WAIT
   END
 »
