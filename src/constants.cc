@@ -2521,6 +2521,14 @@ static const cstring basic_constants[] =
     "pKwH2O",    "[ 13.994 "
                 "  0.03 "
                 "  'ROUND(ⓈpKwH2O/ⒸpKwH2O;-2)' ]",
+    // *Ebullioscopic constant of water, R·Tb²/Δh_vap - Calculation from [M32]
+    "KbH2O",     "[ 'CONVERT(ⒸR*(373.1243_K)^2/(2256.47_kJ/kg);1_K*kg/mol)' "
+                "  0.0003_K*kg/mol "
+                "  'ROUND(ⓈKbH2O/ⒸKbH2O;-2)' ]",
+    // *Cryoscopic constant of water, R·Tf²/Δh_melt - Calculation from [M31] [M32]
+    "KfH2O",     "[ 'CONVERT(ⒸR*(273.152519_K)^2/(333.4265_kJ/kg);1_K*kg/mol)' "
+                "  0.0011_K*kg/mol "
+                "  'ROUND(ⓈKfH2O/ⒸKfH2O;-2)' ]",
 
     // ========================================================================
     //   C. SOLIDS (at T = 293.15 K = 20°C, P = 101.325 kPa)

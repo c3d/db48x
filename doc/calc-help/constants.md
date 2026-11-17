@@ -3421,6 +3421,35 @@ temperature: that bound is taken as a rectangular distribution, whose standard
 uncertainty is `0.05/√3`. In pure water at `25 °C`, `pH = pKw/2 ≈ 7.00`.
 [Materials 27](#materials-27), section 5 and table 3
 
+### KbH2O constant
+
+Ebullioscopic constant of water
+
+Calculation. The elevation of the boiling point of water per unit of molality
+of a dilute solute, `Kb = R·Tb²/Δh_vap`, with the normal boiling point
+`Tb = 373.1243 K` and the specific enthalpy of vaporization there,
+`Δh_vap = 2256.47 kJ/kg`, of IAPWS-95: `0.51299 K·kg/mol`. The textbooks give
+`0.512` or `0.513`. IAPWS-95 states no uncertainty for an enthalpy of
+vaporization, only that the relative uncertainty of an enthalpy difference is
+below that of `cp`, `0.1 %` here: that bound is taken as a rectangular
+distribution, whose standard uncertainty is `0.1 %/√3` of `Kb`.
+[Materials 32](#materials-32)
+
+### KfH2O constant
+
+Cryoscopic constant of water
+
+Calculation. The depression of the freezing point of water per unit of
+molality of a dilute solute, `Kf = R·Tf²/Δh_melt`, with the melting
+temperature of ice at normal pressure `Tf = 273.152519 K` and the specific
+melting enthalpy there, `Δh_melt = 333.4265 kJ/kg`: the enthalpy of liquid
+water, of IAPWS-95, less that of ice, of table 6 of the release on ice Ih.
+This gives `1.8606 K·kg/mol`; the textbooks give `1.86`. The release gives a
+combined standard uncertainty of `200 J/kg` for the melting enthalpy, `0.06 %`
+of `Kf`.
+[Materials 31](#materials-31), tables 5 and 6
+[Materials 32](#materials-32)
+
 ## C. SOLIDS (at `T = 293.15 K = 20°C`, `StdP = 101.325 kPa`)
   Parameters: `ρv`, `n`, `cp`, `ε`, `ρ*`, `Ed*`  * when relevant
 
@@ -4671,3 +4700,11 @@ Maryott, A.A., & Buckley, F. (1953). Table of Dielectric Constants and Electric 
 ### Materials 30
 
 Li, H.H. (1980). "Refractive index of silicon and germanium and its wavelength and temperature derivatives". Journal of Physical and Chemical Reference Data, 9(3), 561–658. DOI: 10.1063/1.555624 — Refractive index of silicon at 293 K, 3.4757 at 1.55 µm, source for `nSi`.
+
+### Materials 31
+
+IAPWS (2009). R10-06(2009), "Revised Release on the Equation of State 2006 for H₂O Ice Ih". International Association for the Properties of Water and Steam, Doorwerth, September 2009. [Source](https://iapws.org/documents/release/Ice-2009.download) — table 5, uncertainty of the melting enthalpy; table 6, enthalpy of ice at the normal pressure melting point, source for `KfH2O`.
+
+### Materials 32
+
+Lemmon, E.W., Bell, I.H., Huber, M.L., & McLinden, M.O. "Thermophysical Properties of Fluid Systems". NIST Chemistry WebBook, NIST Standard Reference Database 69, computed from the IAPWS-95 formulation of Wagner & Pruss (2002). [Source](https://webbook.nist.gov/chemistry/fluid/) — saturation properties of water around 373.12 K, and liquid water at 273.16 K and 101.325 kPa, sources for `KbH2O` and `KfH2O`.

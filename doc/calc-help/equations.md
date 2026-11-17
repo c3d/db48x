@@ -2937,13 +2937,13 @@ The 62 variables in the Chemistry section are:
 * `ΔPv`: Lowering of the vapor pressure (dim.: pressure)
 * `ivh`: Van ’t Hoff factor, the number of particles that a formula unit gives
   in solution: 1 for a solute that does not dissociate
-* `Keb`: Ebullioscopic constant of the solvent: 0.512 K·kg/mol for water (dim.:
-  temperature·mass/amount)
+* `Keb`: Ebullioscopic constant of the solvent; for water, the constant ⒸKbH2O,
+  0.513 K·kg/mol (dim.: temperature·mass/amount)
 * `Tb0`, `Tbs`: Boiling points of the pure solvent and of the solution (dim.:
   temperature)
 * `ΔTb`: Elevation of the boiling point (dim.: temperature difference)
-* `Kcr`: Cryoscopic constant of the solvent: 1.86 K·kg/mol for water (dim.:
-  temperature·mass/amount)
+* `Kcr`: Cryoscopic constant of the solvent; for water, the constant ⒸKfH2O,
+  1.861 K·kg/mol (dim.: temperature·mass/amount)
 * `Tf0`, `Tfs`: Freezing points of the pure solvent and of the solution (dim.:
   temperature)
 * `ΔTf`: Depression of the freezing point (dim.: temperature difference)
@@ -3171,7 +3171,8 @@ its molality.
   mass `MMsl` of the solute and the mass `msv` of the solvent, and from the
   ebullioscopic constant `Keb` and the boiling point `Tb0` of the solvent and
   the van ’t Hoff factor `ivh`.
-* `Keb` is 0.512 K·kg/mol for water [1].
+* For water, the textbooks give 0.512 K·kg/mol for `Keb` [1], and the constant
+  ⒸKbH2O 0.513.
 
 * To calculate: `[ΔTb;Tbs]` (Elevation; Boiling point) of a solution at 0.33 mol/kg in benzene, of 2.53 K·kg/mol, which boils at 80.1 °C. The source gives 80.9 °C [1]:
 ```rpl
@@ -3198,7 +3199,8 @@ measured, it gives the molar mass of the solute.
   cryoscopic constant `Kcr` and the freezing point `Tf0` of the solvent and the
   van ’t Hoff factor `ivh`; or the molar mass `MMsl` from a measured freezing
   point.
-* `Kcr` is 1.86 K·kg/mol for water [1].
+* For water, the textbooks give 1.86 K·kg/mol for `Kcr` [1], and the constant
+  ⒸKfH2O 1.861.
 * `ivh` is 1 for a solute that does not dissociate, and 2 for NaCl if it
   dissociates completely; the measured factor is lower, as ions pair.
 
