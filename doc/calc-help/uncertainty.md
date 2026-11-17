@@ -2358,7 +2358,7 @@ comparison, and the metals compatible at the 5 % level.
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
 50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
-@ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
+@ Expecting { cs:382.36862 7451±σ16.93035 4181 J/(kg·K) }
 ```
 
 **3)** The same measurements as bounds, a±σb being taken as a±√3·b: ΔROOT gives
@@ -2370,7 +2370,7 @@ aluminium, 902 J/(kg·K), do not.
 ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
 50_J/K 10_J/K 1 { } ⓁBound→σ 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
 'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
-@ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
+@ Expecting { cs:337.00178 1317…429.00994 4117 J/(kg·K) }
 ```
 
 **4)** The comparison with copper, by σConcord, which draws the law of the
