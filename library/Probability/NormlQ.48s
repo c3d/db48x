@@ -2,11 +2,36 @@
   @ ------------------------------------------------------------
   @  NormlQ
   @  Quantile: the X below which the probability is p.
+  @  Wichura's AS241 (Applied Statistics 37, 1988) gives the standard
+  @  quantile to 16 digits; two Newton steps on erfc, in the tail where p
+  @  lies, bring it to the working precision. p <= 0 and p >= 1 give
+  @  μ-12·sx and μ+12·sx.
   @  Author & design          : Jean Wilson
   @  Co-authors & programming  : Claude & Claude Code (Anthropic)
   @  Arguments may be given loose or bundled in a list of 3; that list is
   @  what LastArguments reports, and its length is checked before use.
   @ ------------------------------------------------------------
   IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "NormlQ: needs 3 arguments" DoError END Explode Drop END
-  → μv sxv pv « μv 0 + sxv 0 + pv 0 + → μ sx p « 'μ-12*sx' →Num 'μ+12*sx' →Num 0 0 → lo hi x d « 1 40 START '(lo+hi)/2' →Num 'x' STO '(0.5*(1+erf((x-μ)/(sx*√(2)))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(1/(sx*√(2*Ⓒπ))*EXP(-((x-μ)²)/(2*sx²)))>0.000000000000000000000000000001;x-((0.5*(1+erf((x-μ)/(sx*√(2)))))-p)/(1/(sx*√(2*Ⓒπ))*EXP(-((x-μ)²)/(2*sx²)));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x μv sxv pv 3 →List Drop » » »
+  → μv sxv pv « μv 0 + sxv 0 + pv 0 + → μ sx p «
+    CASE
+      p 0 ≤ THEN 'μ-12.*sx' →Num END
+      p 1 ≥ THEN 'μ+12.*sx' →Num END
+      'p-0.5' →Num 0 → qq zz «
+        IF qq ABS 0.425 ≤ THEN
+          '0.180625-qq^2' →Num → rq « '(qq*((((((((2509.0809287301226727)*rq+33430.575583588128105)*rq+67265.770927008700853)*rq+45921.953931549871457)*rq+13731.693765509461125)*rq+1971.5909503065514427)*rq+133.14166789178437745)*rq+3.387132872796366608)/((((((((5226.495278852854561)*rq+28729.085735721942674)*rq+39307.89580009271061)*rq+21213.794301586595867)*rq+5394.1960214247511077)*rq+687.1870074920579083)*rq+42.313330701600911252)*rq+1))' →Num 'zz' STO »
+        ELSE
+          'IFTE(qq≤0;p;1-p)' →Num LN NEG √ → rq «
+            IF rq 5 ≤ THEN
+              'rq-1.6' →Num 'rq' STO '((((((((0.00077454501427834140764)*rq+0.0227238449892691845833)*rq+0.24178072517745061177)*rq+1.27045825245236838258)*rq+3.64784832476320460504)*rq+5.7694972214606914055)*rq+4.6303378461565452959)*rq+1.42343711074968357734)/((((((((1.05075007164441684324E-9)*rq+0.0005475938084995344946)*rq+0.0151986665636164571966)*rq+0.14810397642748007459)*rq+0.68976733498510000455)*rq+1.6763848301838038494)*rq+2.05319162663775882187)*rq+1)' →Num 'zz' STO
+            ELSE
+              'rq-5' →Num 'rq' STO '((((((((2.01033439929228813265E-7)*rq+0.0000271155556874348757815)*rq+0.0012426609473880784386)*rq+0.026532189526576123093)*rq+0.29656057182850489123)*rq+1.7848265399172913358)*rq+5.4637849111641143699)*rq+6.6579046435011037772)/((((((((2.04426310338993978564E-15)*rq+1.42151175831644588870E-7)*rq+0.000018463183175100546818)*rq+0.0007868691311456132591)*rq+0.0148753612908506148525)*rq+0.13692988092273580531)*rq+0.59983220655588793769)*rq+1)' →Num 'zz' STO
+            END
+          »
+          IF qq 0 < THEN zz NEG 'zz' STO END
+        END
+        1 2 START 'zz-IFTE(p<0.5;0.5*erfc(-zz/√(2))-p;(1-p)-0.5*erfc(zz/√(2)))/(EXP(-(zz^2)/2)/√(2*Ⓒπ))' →Num 'zz' STO NEXT
+        'μ+sx*zz' →Num
+      »
+    END
+    μv sxv pv 3 →List Drop » »
 »
