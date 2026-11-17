@@ -5,6 +5,6 @@
     FOR X
       A X DUP SUB
     NEXT
-    PRANAG PRDEPTH DROPN { B C } PURGE
+    ⓁPRANAG ⓁPRDEPTH DROPN { B C } PURGE
   »
 »
