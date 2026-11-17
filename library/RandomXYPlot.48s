@@ -1,5 +1,0 @@
-«
-	0 25000 start
-		{} 0 399 random R->B + 0 239 random R->B + pixon
-	next
-»
