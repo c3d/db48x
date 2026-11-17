@@ -1401,7 +1401,8 @@ static const cstring basic_equations[] =
     // ------------------------------------------------------------------------
     "Chemistry", nullptr,
     // ------------------------------------------------------------------------
-    // Solutions, acids and bases, spectrophotometry. Concentrations are in
+    // Solutions and colligative properties, acids and bases and titrations,
+    // spectrophotometry. Concentrations are in
     // mol/l, since DB48x has no unit M; molalities in mol/kg. A pH or a pK is
     // the logarithm of a number: concentrations are divided by 1 mol/l, and
     // Ka and Kb are numbers. Water: ⒸpKwH2O, 13.994 at 25 °C, not 14.
@@ -1428,6 +1429,31 @@ static const cstring basic_equations[] =
     "  '(nsv_mol)=(msv_g)/(MMsv_(g/mol))' "
     "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
     "  'xsl=(nsl_mol)/((nsl_mol)+(nsv_mol))' "
+    "}",
+    "Chemistry/Colligative Properties", nullptr,
+    "Raoult’s Law",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(nsv_mol)=(msv_g)/(MMsv_(g/mol))' "
+    "  'xsv=(nsv_mol)/((nsl_mol)+(nsv_mol))' "
+    "  '(Psn_atm)=xsv·(Psv0_atm)' "
+    "  '(ΔPv_atm)=(Psv0_atm)-(Psn_atm)' "
+    "}",
+    "Boiling Point Elevation",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  '(ΔTb_K)=ivh·(Keb_(K*kg/mol))·(bm_(mol/kg))' "
+    "  '(Tbs_K)=(Tb0_K)+(ΔTb_K)' "
+    "}",
+    "Freezing Point Depression",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  '(ΔTf_K)=ivh·(Kcr_(K*kg/mol))·(bm_(mol/kg))' "
+    "  '(Tfs_K)=(Tf0_K)-(ΔTf_K)' "
+    "}",
+    "Osmotic Pressure",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "  '(Posm_atm)=ivh·(Csl_(mol/l))·ⒸR·(Tos_K)' "
     "}",
     "Chemistry/Acids & Bases", nullptr,
     "pH & pOH",  "{ "
@@ -1461,6 +1487,18 @@ static const cstring basic_equations[] =
     "  '(Cacid_(mol/l))=(nacid_mol)/(Vsn_l)' "
     "  '(Cbase_(mol/l))=(nbase_mol)/(Vsn_l)' "
     "  '(Cbase_(mol/l))=(Cacid_(mol/l))·10^(pH-pKa)' "
+    "}",
+    "Chemistry/Titrations", nullptr,
+    // Balance of the charges, with the ions of the water: one equation
+    // from the start of the titration to beyond the equivalence point
+    "Strong Acid Titration",  "{ "
+    "  '(Veq_ml)=(Cta_(mol/l))·(Vta_ml)/(Ctb_(mol/l))' "
+    "  '(1_(mol/l))·10^(-pH)+(Ctb_(mol/l))·(Vtb_ml)/((Vta_ml)+(Vtb_ml))=(Cta_(mol/l))·(Vta_ml)/((Vta_ml)+(Vtb_ml))+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "}",
+    "Weak Acid Titration",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(Veq_ml)=(Cta_(mol/l))·(Vta_ml)/(Ctb_(mol/l))' "
+    "  '(1_(mol/l))·10^(-pH)+(Ctb_(mol/l))·(Vtb_ml)/((Vta_ml)+(Vtb_ml))=(Cta_(mol/l))·(Vta_ml)/((Vta_ml)+(Vtb_ml))·Ka/(Ka+10^(-pH))+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
     "}",
     "Chemistry/Spectrophotometry", nullptr,
     "Beer Lambert Law",  "{ "

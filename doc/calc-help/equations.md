@@ -2876,17 +2876,23 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 
 ## Chemistry
 
-Solutions, acids and bases, and the absorption of light by a solution, at the
-level of a first course of general chemistry and of its laboratory, in three
-submenus:
+Solutions and their colligative properties, acids and bases and their
+titration, and the absorption of light by a solution, at the level of a first
+course of general chemistry and of its laboratory, in five submenus:
 [Solutions](#solutions),
-[Acids & Bases](#acids & bases) and
+[Colligative Properties](#colligative properties),
+[Acids & Bases](#acids & bases),
+[Titrations](#titrations) and
 [Spectrophotometry](#spectrophotometry).
 
 **Units.** The concentrations are amount concentrations, in mol/l: DB48x has
 no unit M, and 0.5 M is entered as `0.5_mol/l`. DB48x writes the liter l,
 as the HP calculators, and the milliliter ml. The molalities are in mol/kg.
 Masses and volumes can be entered in any unit, and DB48x converts.
+
+**Temperatures.** A temperature, like the boiling point `Tb0`, can be entered
+in °C or in K, and a difference of temperature, like `ΔTb`, in K: DB48x
+converts each one.
 
 **Logarithms.** A pH or a pK is the decimal logarithm of a number, with a
 minus sign: the equations divide the concentrations by 1 mol/l, and the
@@ -2903,7 +2909,7 @@ than here, and the examples give the difference.
 textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
 result of the book is given with each of them.
 
-The 42 variables in the Chemistry section are:
+The 62 variables in the Chemistry section are:
 
 * `msl`: Mass of the solute (dim.: mass, in SI: g)
 * `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
@@ -2925,6 +2931,24 @@ The 42 variables in the Chemistry section are:
 * `bm`: Molality of the solute, its amount per mass of solvent (dim.:
   amount/mass, in SI: mol/kg)
 * `xsl`: Mole fraction of the solute
+* `xsv`: Mole fraction of the solvent
+* `Psv0`: Vapor pressure of the pure solvent (dim.: pressure)
+* `Psn`: Vapor pressure of the solvent over the solution (dim.: pressure)
+* `ΔPv`: Lowering of the vapor pressure (dim.: pressure)
+* `ivh`: Van ’t Hoff factor, the number of particles that a formula unit gives
+  in solution: 1 for a solute that does not dissociate
+* `Keb`: Ebullioscopic constant of the solvent: 0.512 K·kg/mol for water (dim.:
+  temperature·mass/amount)
+* `Tb0`, `Tbs`: Boiling points of the pure solvent and of the solution (dim.:
+  temperature)
+* `ΔTb`: Elevation of the boiling point (dim.: temperature difference)
+* `Kcr`: Cryoscopic constant of the solvent: 1.86 K·kg/mol for water (dim.:
+  temperature·mass/amount)
+* `Tf0`, `Tfs`: Freezing points of the pure solvent and of the solution (dim.:
+  temperature)
+* `ΔTf`: Depression of the freezing point (dim.: temperature difference)
+* `Posm`: Osmotic pressure (dim.: pressure)
+* `Tos`: Temperature of the solution (dim.: temperature)
 * `pH`: Decimal logarithm, with a minus sign, of the concentration of the
   hydronium ion over 1 mol/l
 * `pOH`: The same for the hydroxide ion
@@ -2943,6 +2967,10 @@ The 42 variables in the Chemistry section are:
   buffer
 * `nacid`, `nbase`: Amounts of the acid and of its conjugate base in a buffer
   (dim.: amount, in SI: mol)
+* `Cta`, `Vta`: Concentration and volume of the acid that is titrated
+* `Ctb`: Concentration of the strong base used as titrant
+* `Vtb`: Volume of base added (dim.: volume)
+* `Veq`: Volume of base at the equivalence point (dim.: volume)
 * `Absb`: Absorbance, the decimal logarithm of the incident intensity over the
   transmitted intensity
 * `Tsm`: Transmittance, the transmitted intensity over the incident intensity:
@@ -2953,9 +2981,10 @@ The 42 variables in the Chemistry section are:
 
 * References:
   [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
-  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 11.3, 14.7,
-  14.8, 14.12, 14.13, 14.14 and 14.20, and the buffer of the blood in
-  section 14.6: numbers only, under the license CC BY-NC-SA 4.0 ;
+  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 11.3, 11.6
+  to 11.13, 14.7, 14.8, 14.12, 14.13, 14.14 and 14.20 to 14.22, table 11.2, the
+  titration table of section 14.7 and the buffer of the blood in section 14.6:
+  numbers only, under the license CC BY-NC-SA 4.0 ;
   [2] IAPWS R11-24, *Revised Release on the Ionization Constant of H₂O*,
   International Association for the Properties of Water and Steam, 2024 ;
   [3] R. N. Goldberg, N. Kishore and R. M. Lennen, *Thermodynamic Quantities
@@ -3094,6 +3123,129 @@ msl=2220_g MMsl=62.07_(g/mol) msv=2000_g MMsv=18.015_(g/mol)
 bm=0.1_(mol/kg) MMsl=342.3_(g/mol) msv=500_g MMsv=18.015_(g/mol)
 @ Expecting [ nsl=0.05 mol msl=17.115 g nsv=27.75464 89037 mol xsl=1.79826 04338 3⁳⁻³ ]
 'ROOT(ⒺMolality & Mole Fraction;[nsl;msl;nsv;xsl];[1_mol;1_g;1_mol;0.5])'
+```
+
+### Colligative Properties
+
+The properties of a solution that depend on the number of dissolved particles,
+not on their nature: the lowering of the vapor pressure, the elevation of the
+boiling point, the depression of the freezing point and the osmotic pressure.
+
+Entries: [Raoult’s Law](#raoult’s law),
+[Boiling Point Elevation](#boiling point elevation),
+[Freezing Point Depression](#freezing point depression) and
+[Osmotic Pressure](#osmotic pressure).
+
+#### Raoult’s Law
+
+The vapor pressure of a solvent over a solution of a nonvolatile solute, lowered
+in proportion to the mole fraction of the solvent.
+
+* Main results: the amounts `nsl` and `nsv`, the mole fraction `xsv` of the
+  solvent, the vapor pressure `Psn` of the solution and its lowering `ΔPv`, from
+  the masses `msl`, `msv` and the molar masses `MMsl`, `MMsv` of the solute and
+  of the solvent, and the vapor pressure `Psv0` of the pure solvent.
+* The law holds for an ideal solution, and the solute is taken as nonvolatile.
+
+* To calculate: `[nsl;nsv;xsv;Psn;ΔPv]` (Amounts of solute and solvent; Mole fraction of the solvent; Vapor pressure; Lowering) of a solution of 92.1 g of glycerin, of 92.094 g/mol, in 184.4 g of ethanol, of 46.069 g/mol, whose vapor pressure is 0.178 atm at 40 °C. The source gives 0.142 atm [1]:
+```rpl
+msl=92.1_g MMsl=92.094_(g/mol) msv=184.4_g MMsv=46.069_(g/mol) Psv0=0.178_atm
+@ Expecting [ nsl=1.00006 51508 2 mol nsv=4.00269 16147 5 mol xsv=0.80009 71868 74 Psn=0.14241 72992 64 atm ΔPv=0.03558 27007 36 atm ]
+'ROOT(ⒺRaoult’s Law;[nsl;nsv;xsv;Psn;ΔPv];[1_mol;1_mol;0.5;1_atm;1_atm])'
+```
+
+* To calculate: `[nsl;nsv;xsv;Psn;ΔPv]` for 20.0 g of glucose, of 180.16 g/mol, in 100.0 g of water, whose vapor pressure is 23.76 torr at 25 °C:
+```rpl
+msl=20_g MMsl=180.16_(g/mol) msv=100_g MMsv=18.015_(g/mol) Psv0=23.76_torr
+@ Expecting [ nsl=0.11101 24333 93 mol nsv=5.55092 97807 4 mol xsv=0.98039 32238 81 Psn=23.29414 29994 torr ΔPv=0.46585 70005 93 torr ]
+'ROOT(ⒺRaoult’s Law;[nsl;nsv;xsv;Psn;ΔPv];[1_mol;1_mol;0.5;1_torr;1_torr])'
+```
+
+#### Boiling Point Elevation
+
+The boiling point of a solution of a nonvolatile solute, raised in proportion to
+its molality.
+
+* Main results: the molality `bm`, the elevation `ΔTb` and the boiling point
+  `Tbs` of the solution, from the molality, or from the mass `msl` and the molar
+  mass `MMsl` of the solute and the mass `msv` of the solvent, and from the
+  ebullioscopic constant `Keb` and the boiling point `Tb0` of the solvent and
+  the van ’t Hoff factor `ivh`.
+* `Keb` is 0.512 K·kg/mol for water [1].
+
+* To calculate: `[ΔTb;Tbs]` (Elevation; Boiling point) of a solution at 0.33 mol/kg in benzene, of 2.53 K·kg/mol, which boils at 80.1 °C. The source gives 80.9 °C [1]:
+```rpl
+bm=0.33_(mol/kg) ivh=1 Keb=2.53_(K*kg/mol) Tb0=80.1_°C
+@ Expecting [ ΔTb=0.8349 K Tbs=80.9349 °C ]
+'ROOT(ⒺBoiling Point Elevation;[ΔTb;Tbs];[1_K;1_°C])'
+```
+
+* To calculate: `[nsl;bm;ΔTb;Tbs]` (Amount; Molality; Elevation; Boiling point) of a solution of 92.1 g of iodine, of 253.81 g/mol, in 800.0 g of chloroform, of 3.63 K·kg/mol, which boils at 61.26 °C. The source gives 62.91 °C [1]:
+```rpl
+msl=92.1_g MMsl=253.81_(g/mol) msv=800_g ivh=1 Keb=3.63_(K*kg/mol) Tb0=61.26_°C
+@ Expecting [ nsl=0.36286 98632 84 mol bm=0.45358 73291 04 mol/kg ΔTb=1.64652 20046 5 K Tbs=62.90652 20046 °C ]
+'ROOT(ⒺBoiling Point Elevation;[nsl;bm;ΔTb;Tbs];[1_mol;1_(mol/kg);1_K;1_°C])'
+```
+
+#### Freezing Point Depression
+
+The freezing point of a solution, lowered in proportion to its molality;
+measured, it gives the molar mass of the solute.
+
+* Main results: the molality `bm`, the depression `ΔTf` and the freezing point
+  `Tfs` of the solution, from the molality, or from the mass `msl` and the molar
+  mass `MMsl` of the solute and the mass `msv` of the solvent, and from the
+  cryoscopic constant `Kcr` and the freezing point `Tf0` of the solvent and the
+  van ’t Hoff factor `ivh`; or the molar mass `MMsl` from a measured freezing
+  point.
+* `Kcr` is 1.86 K·kg/mol for water [1].
+* `ivh` is 1 for a solute that does not dissociate, and 2 for NaCl if it
+  dissociates completely; the measured factor is lower, as ions pair.
+
+* To calculate: `[ΔTf;Tfs]` (Depression; Freezing point) of a solution at 0.33 mol/kg in benzene, of 5.12 K·kg/mol, which freezes at 5.5 °C. The source gives 3.8 °C [1]:
+```rpl
+bm=0.33_(mol/kg) ivh=1 Kcr=5.12_(K*kg/mol) Tf0=5.5_°C
+@ Expecting [ ΔTf=1.6896 K Tfs=3.8104 °C ]
+'ROOT(ⒺFreezing Point Depression;[ΔTf;Tfs];[1_K;1_°C])'
+```
+
+* To calculate: `[ΔTf;bm;nsl;MMsl]` (Depression; Molality; Amount; Molar mass) of a solute of which 4.00 g in 55.0 g of benzene freeze at 2.32 °C. The source gives 1.1·10² g/mol [1]:
+```rpl
+msl=4_g msv=55_g ivh=1 Kcr=5.12_(K*kg/mol) Tf0=5.5_°C Tfs=2.32_°C
+@ Expecting [ ΔTf=3.18 K bm=0.62109 375 mol/kg nsl=0.03416 01562 5 mol MMsl=117.09548 3133 g/mol ]
+'ROOT(ⒺFreezing Point Depression;[ΔTf;bm;nsl;MMsl];[1_K;1_(mol/kg);1_mol;1_(g/mol)])'
+```
+
+* To calculate: `[nsl;bm;ΔTf;Tfs]` of 4.2 g of NaCl, of 58.44 g/mol, in 125 g of water, taken as fully dissociated. The source gives −2.1 °C [1]:
+```rpl
+msl=4.2_g MMsl=58.44_(g/mol) msv=125_g ivh=2 Kcr=1.86_(K*kg/mol) Tf0=0_°C
+@ Expecting [ nsl=0.07186 85831 62 mol bm=0.57494 86652 98 mol/kg ΔTf=2.13880 90349 1 K Tfs=-2.13880 90349 1 °C ]
+'ROOT(ⒺFreezing Point Depression;[nsl;bm;ΔTf;Tfs];[1_mol;1_(mol/kg);1_K;1_°C])'
+```
+
+#### Osmotic Pressure
+
+The osmotic pressure of a solution, by the equation of van ’t Hoff; measured, it
+gives the molar mass of a large molecule.
+
+* Main results: the osmotic pressure `Posm`, from the concentration `Csl` of the
+  solute, or from its mass `msl`, its molar mass `MMsl` and the volume `Vsn` of
+  the solution, and from the temperature `Tos` and the van ’t Hoff factor `ivh`;
+  or the molar mass from a measured pressure.
+* The gas constant is ⒸR.
+
+* To calculate: `[Posm]` (Osmotic pressure) of a solution of glucose at 0.30 mol/l, at 37 °C. The source gives 7.6 atm [1]:
+```rpl
+Csl=0.3_(mol/l) ivh=1 Tos=37_°C
+@ Expecting [ Posm=7.63502 7627 atm ]
+'ROOT(ⒺOsmotic Pressure;[Posm];[1_atm])'
+```
+
+* To calculate: `[Csl;nsl;MMsl]` (Concentration; Amount; Molar mass) of hemoglobin, of which 10.0 g in 0.500 l give an osmotic pressure of 5.9 torr at 22 °C. The source gives 6.2·10⁴ g/mol [1]:
+```rpl
+msl=10_g Vsn=0.5_l Posm=5.9_torr ivh=1 Tos=22_°C
+@ Expecting [ Csl=3.20536 91972 3⁳⁻⁴ mol/l nsl=1.60268 45986 2⁳⁻⁴ mol MMsl=62 395.30852 57 g/mol ]
+'ROOT(ⒺOsmotic Pressure;[Csl;nsl;MMsl];[1_(mol/l);1_mol;1_(g/mol)])'
 ```
 
 ### Acids & Bases
@@ -3268,6 +3420,82 @@ Ka=1.8E-5 Cbase=0.1_(mol/l) Cacid=0.1_(mol/l)
 Ka=1.8E-5 nacid=0.0099_mol nbase=0.0101_mol Vsn=101_ml
 @ Expecting [ Cacid=0.09801 98019 8 mol/l Cbase=0.1 mol/l pKa=4.74472 74949 pH=4.75341 36740 8 ]
 'ROOT(ⒺBuffer;[Cacid;Cbase;pKa;pH];[0.1_(mol/l);0.1_(mol/l);5;5])'
+```
+
+### Titrations
+
+The pH of an acid while it is titrated by a strong base, and the volume of base
+at the equivalence point.
+
+Entries: [Strong Acid Titration](#strong acid titration) and
+[Weak Acid Titration](#weak acid titration).
+
+#### Strong Acid Titration
+
+A strong acid, such as HCl, titrated by a strong base, such as NaOH.
+
+* Main results: the equivalence volume `Veq`, and the `pH` after a volume `Vtb`
+  of base, from the concentration `Cta` and the volume `Vta` of the acid and the
+  concentration `Ctb` of the base; or the volume of base that gives a chosen pH.
+* The equation is the balance of the charges, with the ions of the water: it
+  holds before, at and after the equivalence point, which is at pH 6.997, half
+  of ⒸpKwH2O. The volumes are taken to add up.
+
+* To calculate: `[Veq;pH]` (Equivalence volume; pH) of 25.00 ml of hydrochloric acid at 0.100 mol/l, after 12.50 ml of sodium hydroxide at 0.100 mol/l. The source gives 0.0333 mol/l of hydronium ions, pH 1.477 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) Vtb=12.5_ml
+@ Expecting [ Veq=25. ml pH=1.47712 12547 2 ]
+'ROOT(ⒺStrong Acid Titration;[Veq;pH];[1_ml;7])'
+```
+
+* To calculate: `[Veq;pH]` after 37.50 ml of base. The source gives 12.30 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) Vtb=37.5_ml
+@ Expecting [ Veq=25. ml pH=12.29502 99957 ]
+'ROOT(ⒺStrong Acid Titration;[Veq;pH];[1_ml;7])'
+```
+
+* To calculate: `[Vtb]` (Volume of base) that brings the pH to 3.00. The table of the source gives pH 3.00 for 24.5 ml [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) pH=3
+@ Expecting [ Vtb=24.50495 05 ml ]
+'ROOT(ⒺStrong Acid Titration;[Vtb];[20_ml])'
+```
+
+#### Weak Acid Titration
+
+A weak acid, such as acetic acid, titrated by a strong base.
+
+* Main results: the equivalence volume `Veq`, and the `pH` after a volume `Vtb`
+  of base, from the concentration `Cta` and the volume `Vta` of the acid, its
+  ionization constant `Ka` or its `pKa`, and the concentration `Ctb` of the
+  base.
+* One equation, the balance of the charges, holds over the whole titration: at
+  the start, in the buffer region, at the equivalence point and beyond. The
+  textbooks treat each region with its own approximation, and agree with it to
+  their rounding.
+* At half the equivalence volume, the pH is close to the pKa; at the equivalence
+  point it is above 7, the conjugate base being basic.
+
+* To calculate: `[pKa;Veq;pH]` (pKa; Equivalence volume; pH) of 25.00 ml of acetic acid at 0.100 mol/l, of Ka 1.8·10⁻⁵, before any sodium hydroxide at 0.100 mol/l. The source gives 2.87 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=0_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=2.87527 70603 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+* To calculate: `[pKa;Veq;pH]` after 12.50 ml of base, half the equivalence volume. The source gives 4.74, the pKa [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=12.5_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=4.74519 60125 6 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+* To calculate: `[pKa;Veq;pH]` at the equivalence point, after 25.00 ml of base. The source gives 8.72 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=25_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=8.71890 38730 1 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
 ```
 
 ### Spectrophotometry
