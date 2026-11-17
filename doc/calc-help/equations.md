@@ -2874,6 +2874,438 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 ```
 
 
+## Chemistry
+
+Solutions, acids and bases, and the absorption of light by a solution, at the
+level of a first course of general chemistry and of its laboratory, in three
+submenus:
+[Solutions](#solutions),
+[Acids & Bases](#acids & bases) and
+[Spectrophotometry](#spectrophotometry).
+
+**Units.** The concentrations are amount concentrations, in mol/l: DB48x has
+no unit M, and 0.5 M is entered as `0.5_mol/l`. DB48x writes the liter l,
+as the HP calculators, and the milliliter ml. The molalities are in mol/kg.
+Masses and volumes can be entered in any unit, and DB48x converts.
+
+**Logarithms.** A pH or a pK is the decimal logarithm of a number, with a
+minus sign: the equations divide the concentrations by 1 mol/l, and the
+ionization constants `Ka` and `Kb` are numbers, without unit. They are written
+`[H₃O⁺] = 10^−pH` rather than `pH = −log [H₃O⁺]`: the solver then finds either
+one from the other, without leaving the domain of the logarithm.
+
+**Water.** The ion product of water is the constant ⒸpKwH2O, 13.994 at 25 °C
+with a standard uncertainty of 0.03 [2]. The textbooks round it to 14, which
+is within this uncertainty; but a pH computed from a pOH is then 0.006 higher
+than here, and the examples give the difference.
+
+**Sources.** The numbers of most examples come from the examples of the
+textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
+result of the book is given with each of them.
+
+The 42 variables in the Chemistry section are:
+
+* `msl`: Mass of the solute (dim.: mass, in SI: g)
+* `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
+* `nsl`: Amount of solute (dim.: amount, in SI: mol)
+* `Vsn`: Volume of the solution (dim.: volume, in SI: l)
+* `Csl`: Amount concentration of the solute, its molarity (dim.: amount/volume,
+  in SI: mol/l)
+* `ρsn`: Density of the solution (dim.: mass/volume, in SI: g/ml)
+* `msn`: Mass of the solution (dim.: mass, in SI: g)
+* `wsl`: Mass fraction of the solute: 0.372 for 37.2 % by mass
+* `Csk`, `Vsk`: Concentration and volume of the stock solution
+* `Cdl`, `Vdl`: Concentration and volume of the diluted solution
+* `Cm1`, `Vm1`, `Cm2`, `Vm2`: Concentrations and volumes of the two solutions
+  that are mixed
+* `Cmix`, `Vmix`: Concentration and volume of the mixture
+* `msv`: Mass of the solvent (dim.: mass, in SI: g)
+* `MMsv`: Molar mass of the solvent (dim.: mass/amount, in SI: g/mol)
+* `nsv`: Amount of solvent (dim.: amount, in SI: mol)
+* `bm`: Molality of the solute, its amount per mass of solvent (dim.:
+  amount/mass, in SI: mol/kg)
+* `xsl`: Mole fraction of the solute
+* `pH`: Decimal logarithm, with a minus sign, of the concentration of the
+  hydronium ion over 1 mol/l
+* `pOH`: The same for the hydroxide ion
+* `cH3O`: Concentration of the hydronium ion H₃O⁺ (dim.: amount/volume, in SI:
+  mol/l)
+* `cOH`: Concentration of the hydroxide ion OH⁻ (dim.: amount/volume, in SI:
+  mol/l)
+* `Ca`: Concentration of a weak acid as prepared, before it ionizes
+* `Ka`, `pKa`: Ionization constant of the acid, a number, and its decimal
+  logarithm with a minus sign
+* `Cb`: Concentration of a weak base as prepared
+* `Kb`, `pKb`: Ionization constant of the base, and its decimal logarithm with a
+  minus sign
+* `PIon`: Percent ionization of the acid
+* `Cacid`, `Cbase`: Concentrations of the acid and of its conjugate base in a
+  buffer
+* `nacid`, `nbase`: Amounts of the acid and of its conjugate base in a buffer
+  (dim.: amount, in SI: mol)
+* `Absb`: Absorbance, the decimal logarithm of the incident intensity over the
+  transmitted intensity
+* `Tsm`: Transmittance, the transmitted intensity over the incident intensity:
+  0.5 for 50 %
+* `εm`: Molar absorption coefficient of the solute at the wavelength used (dim.:
+  volume/(amount·length), in SI: l/(mol·cm))
+* `lp`: Path length of the light in the cell (dim.: length, in SI: cm)
+
+* References:
+  [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
+  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 11.3, 14.7,
+  14.8, 14.12, 14.13, 14.14 and 14.20, and the buffer of the blood in
+  section 14.6: numbers only, under the license CC BY-NC-SA 4.0 ;
+  [2] IAPWS R11-24, *Revised Release on the Ionization Constant of H₂O*,
+  International Association for the Properties of Water and Steam, 2024 ;
+  [3] R. N. Goldberg, N. Kishore and R. M. Lennen, *Thermodynamic Quantities
+  for the Ionization Reactions of Buffers*, J. Phys. Chem. Ref. Data 31 (2002)
+  231-370 ;
+  [4] B. L. Horecker and A. Kornberg, *The extinction coefficients of the
+  reduced band of pyridine nucleotides*, J. Biol. Chem. 175 (1948) 385-390.
+
+### Solutions
+
+The concentration of a solution, its dilution and the mixing of two solutions,
+and the molality and mole fraction used for the colligative properties.
+
+Entries: [Molar Concentration](#molar concentration),
+[Mass Percent](#mass percent),
+[Dilution](#dilution),
+[Mixing](#mixing) and
+[Molality & Mole Fraction](#molality & mole fraction).
+
+#### Molar Concentration
+
+The amount concentration of a solute, its molarity, from its mass and its molar
+mass.
+
+* Main results: the amount of solute `nsl` and its concentration `Csl`, from the
+  mass `msl` of the solute, its molar mass `MMsl` and the volume `Vsn` of the
+  solution.
+* The volume is that of the solution, not that of the solvent.
+
+* To calculate: `[nsl;Csl]` (Amount of solute; Concentration) for 25.2 g of acetic acid, of 60.05 g/mol, in 0.500 l of vinegar. The source gives 0.839 mol/l [1]:
+```rpl
+msl=25.2_g MMsl=60.05_(g/mol) Vsn=0.5_l
+@ Expecting [ nsl=0.41965 02914 24 mol Csl=0.83930 05828 48 mol/l ]
+'ROOT(ⒺMolar Concentration;[nsl;Csl];[1_mol;1_(mol/l)])'
+```
+
+* To calculate: `[nsl;msl]` (Amount and mass of solute) of sodium chloride, of 58.44 g/mol, to prepare 250 ml of a solution at 0.100 mol/l:
+```rpl
+Csl=0.1_(mol/l) MMsl=58.44_(g/mol) Vsn=250_ml
+@ Expecting [ nsl=0.025 mol msl=1.461 g ]
+'ROOT(ⒺMolar Concentration;[nsl;msl];[1_mol;1_g])'
+```
+
+#### Mass Percent
+
+The mass of solute in a volume of solution, from its mass fraction and the
+density of the solution, and the concentration that follows.
+
+* Main results: the mass of the solution `msn`, the mass `msl`, the amount `nsl`
+  and the concentration `Csl` of the solute, from the mass fraction `wsl`, the
+  density `ρsn` and the volume `Vsn` of the solution, and the molar mass `MMsl`
+  of the solute.
+* A mass percent of 37.2 % is a mass fraction `wsl` of 0.372.
+
+* To calculate: `[msn;msl;nsl;Csl]` (Mass of the solution; Mass, amount and concentration of the solute) in 500 ml of concentrated hydrochloric acid, of 37.2 % by mass and 1.19 g/ml; HCl is 36.46 g/mol. The source gives 221 g of HCl [1]:
+```rpl
+wsl=0.372 ρsn=1.19_(g/ml) Vsn=500_ml MMsl=36.46_(g/mol)
+@ Expecting [ msn=595. g msl=221.34 g nsl=6.07076 24794 3 mol Csl=12.14152 49589 mol/l ]
+'ROOT(ⒺMass Percent;[msn;msl;nsl;Csl];[1_g;1_g;1_mol;1_(mol/l)])'
+```
+
+* To calculate: `[msn;Vsn;nsl;Csl]` the other way: the volume of this acid that holds 100 g of HCl. The concentration does not change:
+```rpl
+wsl=0.372 ρsn=1.19_(g/ml) msl=100_g MMsl=36.46_(g/mol)
+@ Expecting [ msn=268.81720 4301 g Vsn=225.89681 0337 ml nsl=2.74273 17608 3 mol Csl=12.14152 49589 mol/l ]
+'ROOT(ⒺMass Percent;[msn;Vsn;nsl;Csl];[1_g;1_ml;1_mol;1_(mol/l)])'
+```
+
+#### Dilution
+
+The dilution of a stock solution: the amount of solute does not change.
+
+* Main results: one of the concentrations `Csk` and `Cdl` or of the volumes
+  `Vsk` and `Vdl` of the stock and of the diluted solutions, from the other
+  three.
+
+* To calculate: `[Cdl]` (Concentration of the diluted solution) when 0.850 l of a solution at 5.00 mol/l is diluted to 1.80 l. The source gives 2.36 mol/l [1]:
+```rpl
+Csk=5_(mol/l) Vsk=0.85_l Vdl=1.8_l
+@ Expecting [ Cdl=2.36111 11111 1 mol/l ]
+'ROOT(ⒺDilution;[Cdl];[1_(mol/l)])'
+```
+
+* To calculate: `[Vsk]` (Volume of the stock solution) to take from a solution at 1.59 mol/l to prepare 5.00 l at 0.100 mol/l. The source gives 0.314 l [1]:
+```rpl
+Csk=1.59_(mol/l) Cdl=0.1_(mol/l) Vdl=5_l
+@ Expecting [ Vsk=0.31446 54088 05 l ]
+'ROOT(ⒺDilution;[Vsk];[1_l])'
+```
+
+#### Mixing
+
+Two solutions of the same solute, mixed: the amounts of solute add up, and so do
+the volumes.
+
+* Main results: the concentration `Cmix` and the volume `Vmix` of the mixture,
+  from the concentrations `Cm1`, `Cm2` and the volumes `Vm1`, `Vm2` of the two
+  solutions; or the volume of one of them that gives a chosen concentration.
+* The volumes of two dilute aqueous solutions add up within a few parts per
+  thousand; those of water and ethanol do not.
+
+* To calculate: `[Cmix;Vmix]` (Concentration and volume of the mixture) for 50 ml at 0.100 mol/l mixed with 150 ml at 0.300 mol/l:
+```rpl
+Cm1=0.1_(mol/l) Vm1=50_ml Cm2=0.3_(mol/l) Vm2=150_ml
+@ Expecting [ Cmix=0.25 mol/l Vmix=200 ml ]
+'ROOT(ⒺMixing;[Cmix;Vmix];[1_(mol/l);1_ml])'
+```
+
+* To calculate: `[Vm2;Vmix]` (Volume to add; Volume of the mixture) of a solution at 1.00 mol/l to add to 100 ml at 0.100 mol/l to reach 0.250 mol/l:
+```rpl
+Cm1=0.1_(mol/l) Vm1=100_ml Cm2=1_(mol/l) Cmix=0.25_(mol/l)
+@ Expecting [ Vm2=20. ml Vmix=120. ml ]
+'ROOT(ⒺMixing;[Vm2;Vmix];[1_ml;1_ml])'
+```
+
+#### Molality & Mole Fraction
+
+The composition of a solution as the amount of solute per mass of solvent, its
+molality, and as the fraction of its molecules that are solute, its mole
+fraction: two measures that do not change with the temperature, used for the
+colligative properties.
+
+* Main results: the amounts of solute `nsl` and of solvent `nsv`, the molality
+  `bm` and the mole fraction `xsl` of the solute, from the masses `msl`, `msv`
+  and the molar masses `MMsl`, `MMsv` of the solute and of the solvent.
+
+* To calculate: `[nsl;nsv;bm;xsl]` (Amounts of solute and solvent; Molality; Mole fraction) for an antifreeze of 2 220 g of ethylene glycol, of 62.07 g/mol, in 2 000 g of water, of 18.015 g/mol. The source gives 17.9 mol/kg and 0.244 [1]:
+```rpl
+msl=2220_g MMsl=62.07_(g/mol) msv=2000_g MMsv=18.015_(g/mol)
+@ Expecting [ nsl=35.76607 05655 mol nsv=111.01859 5615 mol bm=17.88303 52827 mol/kg xsl=0.24366 35344 56 ]
+'ROOT(ⒺMolality & Mole Fraction;[nsl;nsv;bm;xsl];[1_mol;1_mol;1_(mol/kg);0.5])'
+```
+
+* To calculate: `[nsl;msl;nsv;xsl]` (Amount and mass of solute; Amount of solvent; Mole fraction) of sucrose, of 342.30 g/mol, to dissolve in 500 g of water for a molality of 0.100 mol/kg:
+```rpl
+bm=0.1_(mol/kg) MMsl=342.3_(g/mol) msv=500_g MMsv=18.015_(g/mol)
+@ Expecting [ nsl=0.05 mol msl=17.115 g nsv=27.75464 89037 mol xsl=1.79826 04338 3⁳⁻³ ]
+'ROOT(ⒺMolality & Mole Fraction;[nsl;msl;nsv;xsl];[1_mol;1_g;1_mol;0.5])'
+```
+
+### Acids & Bases
+
+The acidity of aqueous solutions at 25 °C: the pH and the pOH, weak acids and
+weak bases, conjugate pairs and buffers.
+
+Entries: [pH & pOH](#ph & poh),
+[Weak Acid](#weak acid),
+[Weak Base](#weak base),
+[Percent Ionization](#percent ionization),
+[Conjugate Pair](#conjugate pair) and
+[Buffer](#buffer).
+
+#### pH & pOH
+
+The pH and the pOH of an aqueous solution, and the concentrations of the
+hydronium and hydroxide ions.
+
+* Main results: three of the values `pH`, `pOH`, `cH3O` and `cOH`, from the
+  fourth.
+* The pH and the pOH add up to ⒸpKwH2O, 13.994 at 25 °C, and not to the rounded
+  14 of the textbooks.
+
+* To calculate: `[pH;pOH;cOH]` (pH; pOH; Concentration of the hydroxide ion) for a concentration of hydronium ions of 4.0·10⁻⁴ mol/l. With 14, the pOH would be 10.60:
+```rpl
+cH3O=4.0E-4_(mol/l)
+@ Expecting [ pH=3.39794 00086 7 pOH=10.59605 99913 cOH=2.53477 84643 4⁳⁻¹¹ mol/l ]
+'ROOT(ⒺpH & pOH;[pH;pOH;cOH];[7;7;1_(mol/l)])'
+```
+
+* To calculate: `[cH3O;pOH;cOH]` (Concentrations of the ions; pOH) for a blood plasma of pH 7.40:
+```rpl
+pH=7.4
+@ Expecting [ cH3O=3.98107 17055 3⁳⁻⁸ mol/l pOH=6.594 cOH=2.54683 02525 9⁳⁻⁷ mol/l ]
+'ROOT(ⒺpH & pOH;[cH3O;pOH;cOH];[1_(mol/l);7;1_(mol/l)])'
+```
+
+#### Weak Acid
+
+A weak acid HA in water, HA + H₂O ⇌ H₃O⁺ + A⁻: its ionization constant and the
+pH of its solution.
+
+* Main results: the concentration `cH3O` of the hydronium ion and the `pH`, from
+  the concentration `Ca` of the acid as prepared and its ionization constant
+  `Ka` or its `pKa`; or `Ka` and `pKa` from a measured pH.
+* The equilibrium is solved without the approximation √(Ka·Ca) of the textbooks,
+  which holds only for an acid ionized less than about 5 %.
+* The ions given by the water itself are neglected, which holds while `cH3O`
+  exceeds 10⁻⁶ mol/l. For a very dilute or very weak acid, the WeakAcid equation
+  of the Labs section of config/equations.csv makes the complete balance.
+
+* To calculate: `[pKa;cH3O;pH]` (pKa; Concentration of the hydronium ion; pH) of a solution of formic acid at 0.534 mol/l, of Ka 1.8·10⁻⁴. The source gives 2.01 [1]:
+```rpl
+Ca=0.534_(mol/l) Ka=1.8E-4
+@ Expecting [ pKa=3.74472 74949 cH3O=9.71449 38676 1⁳⁻³ mol/l pH=2.01257 98215 4 ]
+'ROOT(ⒺWeak Acid;[pKa;cH3O;pH];[4;0.01_(mol/l);2])'
+```
+
+* To calculate: `[pKa;cH3O;pH]` of a solution of hydrogen sulfate HSO₄⁻ at 0.50 mol/l, of Ka 1.2·10⁻². The source gives 1.14; the approximation would give 1.11 [1]:
+```rpl
+Ca=0.5_(mol/l) Ka=1.2E-2
+@ Expecting [ pKa=1.92081 87539 5 cH3O=7.16916 98398 2⁳⁻² mol/l pH=1.14453 11309 2 ]
+'ROOT(ⒺWeak Acid;[pKa;cH3O;pH];[2;0.01_(mol/l);2])'
+```
+
+#### Weak Base
+
+A weak base B in water, B + H₂O ⇌ BH⁺ + OH⁻: its ionization constant, and the
+pOH and the pH of its solution.
+
+* Main results: the concentration `cOH` of the hydroxide ion, the `pOH` and the
+  `pH`, from the concentration `Cb` of the base as prepared and its ionization
+  constant `Kb` or its `pKb`.
+* As for a weak acid, the equilibrium is solved exactly and the ions given by
+  the water are neglected.
+* The pH is ⒸpKwH2O minus the pOH: 0.006 lower than with the 14 of the
+  textbooks.
+
+* To calculate: `[pKb;cOH;pOH;pH]` (pKb; Concentration of the hydroxide ion; pOH; pH) of a solution of trimethylamine at 0.25 mol/l, of Kb 6.3·10⁻⁵. The source gives 2.40 and 11.60, with 14 [1]:
+```rpl
+Cb=0.25_(mol/l) Kb=6.3E-5
+@ Expecting [ pKb=4.20065 94505 5 cOH=3.93725 19763 8⁳⁻³ mol/l pOH=2.40480 67903 3 pH=11.58919 32097 ]
+'ROOT(ⒺWeak Base;[pKb;cOH;pOH;pH];[4;0.01_(mol/l);2;12])'
+```
+
+* To calculate: `[Kb;cOH;pOH;pH]` of ammonia at 0.10 mol/l, of pKb 4.75:
+```rpl
+Cb=0.1_(mol/l) pKb=4.75
+@ Expecting [ Kb=1.77827 94100 4⁳⁻⁵ cOH=1.32465 96769 6⁳⁻³ mol/l pOH=2.87789 56835 4 pH=11.11610 43165 ]
+'ROOT(ⒺWeak Base;[Kb;cOH;pOH;pH];[1E-5;0.01_(mol/l);2;12])'
+```
+
+#### Percent Ionization
+
+The fraction of a weak acid that is ionized, from the pH of its solution.
+
+* Main results: the concentration `cH3O` of the hydronium ion and the percent
+  ionization `PIon`, from the `pH` and the concentration `Ca` of the acid as
+  prepared; or the pH from the percent ionization.
+* A weak acid ionizes more when it is more dilute.
+
+* To calculate: `[cH3O;PIon]` (Concentration of the hydronium ion; Percent ionization) of a solution of nitrous acid at 0.125 mol/l, of pH 2.09. The source gives 6.5 % [1]:
+```rpl
+Ca=0.125_(mol/l) pH=2.09
+@ Expecting [ cH3O=8.12830 51616 4⁳⁻³ mol/l PIon=6.50264 41293 1 ]
+'ROOT(ⒺPercent Ionization;[cH3O;PIon];[0.01_(mol/l);5])'
+```
+
+* To calculate: `[cH3O;pH]` (Concentration of the hydronium ion; pH) of an acid at 0.050 mol/l that is 3.0 % ionized:
+```rpl
+Ca=0.05_(mol/l) PIon=3
+@ Expecting [ cH3O=0.0015 mol/l pH=2.82390 87409 4 ]
+'ROOT(ⒺPercent Ionization;[cH3O;pH];[0.01_(mol/l);2])'
+```
+
+#### Conjugate Pair
+
+An acid and its conjugate base, such as HNO₂ and NO₂⁻: the product of their
+ionization constants is the ion product of water.
+
+* Main results: three of the values `Ka`, `pKa`, `Kb` and `pKb` of the pair,
+  from the fourth.
+* The product of `Ka` and `Kb` is 10^−13.994 = 1.014·10⁻¹⁴, not the 1.0·10⁻¹⁴ of
+  the textbooks: a constant computed from the other is 1.4 % higher.
+
+* To calculate: `[pKb;pKa;Ka]` (pKb; pKa; Ka) of nitrous acid, from the Kb of the nitrite ion, 2.17·10⁻¹¹. The source gives 4.6·10⁻⁴, with 1.0·10⁻¹⁴ [1]:
+```rpl
+Kb=2.17E-11
+@ Expecting [ pKb=10.66354 02662 pKa=3.33045 97338 5 Ka=4.67240 26992 5⁳⁻⁴ ]
+'ROOT(ⒺConjugate Pair;[pKb;pKa;Ka];[10;3;1E-3])'
+```
+
+* To calculate: `[pKb;Kb]` (pKb; Kb) of ammonia, from the pKa 9.25 of the ammonium ion:
+```rpl
+pKa=9.25
+@ Expecting [ pKb=4.744 Kb=1.80301 77408 6⁳⁻⁵ ]
+'ROOT(ⒺConjugate Pair;[pKb;Kb];[5;1E-5])'
+```
+
+#### Buffer
+
+A buffer, a weak acid and its conjugate base in comparable amounts: the equation
+of Henderson and Hasselbalch.
+
+* Main results: the `pH` of the buffer, from the `pKa` or the `Ka` of the acid
+  and the concentrations `Cacid` and `Cbase` of the acid and of its conjugate
+  base, or from their amounts `nacid` and `nbase` in the volume `Vsn` of the
+  buffer.
+* Only the ratio of the two concentrations matters, which is that of the
+  amounts.
+* The equation holds while this ratio stays between 0.1 and 10.
+* For acetic acid, the constant ⒸpKaAcetic gives 4.756 [3]; the textbooks take a
+  Ka of 1.8·10⁻⁵, or a pKa of 4.74.
+
+* To calculate: `[pH]` (pH) of the blood, buffered by hydrogen carbonate at 0.024 mol/l and carbonic acid at 0.0012 mol/l, with the pKa 6.4 of the source, which gives 7.7 [1]:
+```rpl
+pKa=6.4 Cbase=0.024_(mol/l) Cacid=0.0012_(mol/l)
+@ Expecting [ pH=7.70102 99956 6 ]
+'ROOT(ⒺBuffer;[pH];[7])'
+```
+
+* To calculate: `[pKa;pH]` (pKa; pH) of a buffer of acetic acid and sodium acetate, both at 0.10 mol/l, with a Ka of 1.8·10⁻⁵. The source gives 4.74 [1]:
+```rpl
+Ka=1.8E-5 Cbase=0.1_(mol/l) Cacid=0.1_(mol/l)
+@ Expecting [ pKa=4.74472 74949 pH=4.74472 74949 ]
+'ROOT(ⒺBuffer;[pKa;pH];[5;5])'
+```
+
+* To calculate: `[Cacid;Cbase;pKa;pH]` (Concentrations; pKa; pH) of 100 ml of this buffer after the addition of 1.0 ml of sodium hydroxide at 0.10 mol/l: 0.0099 mol of acid and 0.0101 mol of base in 101 ml. The source gives 4.75 [1]:
+```rpl
+Ka=1.8E-5 nacid=0.0099_mol nbase=0.0101_mol Vsn=101_ml
+@ Expecting [ Cacid=0.09801 98019 8 mol/l Cbase=0.1 mol/l pKa=4.74472 74949 pH=4.75341 36740 8 ]
+'ROOT(ⒺBuffer;[Cacid;Cbase;pKa;pH];[0.1_(mol/l);0.1_(mol/l);5;5])'
+```
+
+### Spectrophotometry
+
+The absorption of light by a solution, the basis of the spectrophotometric
+assays.
+
+Entry: [Beer Lambert Law](#beer lambert law).
+
+#### Beer Lambert Law
+
+The absorbance of a solution at one wavelength is proportional to the
+concentration of the absorbing solute and to the path length of the light: the
+Beer-Lambert law.
+
+* Main results: the absorbance `Absb` and the transmittance `Tsm`, from the
+  molar absorption coefficient `εm` of the solute, the path length `lp` and the
+  concentration `Csl`; or the concentration from a measured absorbance.
+* The law holds for dilute solutions, usually for absorbances below about 1.
+* The coefficient `εm` depends on the wavelength. For NADH, it is 6 220
+  l/(mol·cm) at 340 nm [4], the wavelength of the enzymatic assays that follow
+  its appearance or its disappearance.
+
+* To calculate: `[Absb;Tsm]` (Absorbance; Transmittance) of a solution of NADH at 50 µmol/l in a cell of 1 cm, at 340 nm:
+```rpl
+εm=6220_(l/(mol*cm)) lp=1_cm Csl=50_(µmol/l)
+@ Expecting [ Absb=0.311 Tsm=0.48865 23593 43 ]
+'ROOT(ⒺBeer Lambert Law;[Absb;Tsm];[0.5;0.5])'
+```
+
+* To calculate: `[Csl;Tsm]` (Concentration; Transmittance) of NADH in a cell of 1 cm that absorbs 0.622 at 340 nm:
+```rpl
+εm=6220_(l/(mol*cm)) lp=1_cm Absb=0.622
+@ Expecting [ Csl=100. µmol/l Tsm=0.23878 11282 91 ]
+'ROOT(ⒺBeer Lambert Law;[Csl;Tsm];[1_(µmol/l);0.5])'
+```
+
+
 ## Finance
 
 The `Finance` section contains equations to compute time value of money (TVM).

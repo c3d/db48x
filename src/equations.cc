@@ -1398,6 +1398,76 @@ static const cstring basic_equations[] =
     "}",
 
 
+    // ------------------------------------------------------------------------
+    "Chemistry", nullptr,
+    // ------------------------------------------------------------------------
+    // Solutions, acids and bases, spectrophotometry. Concentrations are in
+    // mol/l, since DB48x has no unit M; molalities in mol/kg. A pH or a pK is
+    // the logarithm of a number: concentrations are divided by 1 mol/l, and
+    // Ka and Kb are numbers. Water: ⒸpKwH2O, 13.994 at 25 °C, not 14.
+    "Chemistry/Solutions", nullptr,
+    "Molar Concentration",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "}",
+    "Mass Percent",  "{ "
+    "  '(msn_g)=(ρsn_(g/ml))·(Vsn_ml)' "
+    "  'wsl=(msl_g)/(msn_g)' "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "}",
+    "Dilution",  "{ "
+    "  '(Csk_(mol/l))·(Vsk_l)=(Cdl_(mol/l))·(Vdl_l)' "
+    "}",
+    "Mixing",  "{ "
+    "  '(Cmix_(mol/l))·((Vm1_l)+(Vm2_l))=(Cm1_(mol/l))·(Vm1_l)+(Cm2_(mol/l))·(Vm2_l)' "
+    "  '(Vmix_l)=(Vm1_l)+(Vm2_l)' "
+    "}",
+    "Molality & Mole Fraction",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(nsv_mol)=(msv_g)/(MMsv_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  'xsl=(nsl_mol)/((nsl_mol)+(nsv_mol))' "
+    "}",
+    "Chemistry/Acids & Bases", nullptr,
+    "pH & pOH",  "{ "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "  '(cOH_(mol/l))=(1_(mol/l))·10^(-pOH)' "
+    "  'pH+pOH=ⒸpKwH2O' "
+    "}",
+    // Ka·(Ca-h)=h², the quadratic form; the water is neglected
+    "Weak Acid",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  'Ka·(1_(mol/l))·((Ca_(mol/l))-(cH3O_(mol/l)))=(cH3O_(mol/l))²' "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "}",
+    "Weak Base",  "{ "
+    "  'Kb=10^(-pKb)' "
+    "  'Kb·(1_(mol/l))·((Cb_(mol/l))-(cOH_(mol/l)))=(cOH_(mol/l))²' "
+    "  '(cOH_(mol/l))=(1_(mol/l))·10^(-pOH)' "
+    "  'pH=ⒸpKwH2O-pOH' "
+    "}",
+    "Percent Ionization",  "{ "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "  'PIon=100·(cH3O_(mol/l))/(Ca_(mol/l))' "
+    "}",
+    "Conjugate Pair",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  'Kb=10^(-pKb)' "
+    "  'pKa+pKb=ⒸpKwH2O' "
+    "}",
+    "Buffer",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(Cacid_(mol/l))=(nacid_mol)/(Vsn_l)' "
+    "  '(Cbase_(mol/l))=(nbase_mol)/(Vsn_l)' "
+    "  '(Cbase_(mol/l))=(Cacid_(mol/l))·10^(pH-pKa)' "
+    "}",
+    "Chemistry/Spectrophotometry", nullptr,
+    "Beer Lambert Law",  "{ "
+    "  'Absb=(εm_(l/(mol*cm)))·(lp_cm)·(Csl_(mol/l))' "
+    "  'Tsm=10^(-Absb)' "
+    "}",
+
     "Finance", nullptr,
     "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
