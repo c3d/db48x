@@ -7,7 +7,7 @@ This sections tracks some performance measurements across releases.
 
 The [NQueens benchmark][nqueens] has been used quite a bit to compare various
 calcualtors. It is tracked across releases below, the code being executed being
-the one [now in the demo library](../library/NQueens.48s) and the time being
+the one [now in the demo library](../library/Demo/NQueens.48s) and the time being
 best of 5 runs.
 
 The calculators are also quite different in how they behave when on battery and

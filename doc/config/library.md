@@ -33,8 +33,8 @@ The value is read in one of three ways:
 - anything else is parsed on the spot as an RPL object.
 
 ```
-	"KineticEnergy",	"="			; library/KineticEnergy.48s
-	"PeriSel",	"=/library/PeriSel.48s"	; that exact path
+	"PeriSel",	"="			; library/PeriSel.48s
+	"KineticEnergy",	"=/library/Demo/KineticEnergy.48s"	; that exact path
 	"Dedicace",	"""À tous ceux…"""	; a text object, inline
 ```
 
