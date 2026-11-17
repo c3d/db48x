@@ -39,8 +39,15 @@ Two menus of the library are named Examples:
 * in Missions, Earth To Mars & Back: four worked missions with a Venus-flyby
   return, [ETMB1](#etmb1) (2022), [ETMB2](#etmb2) (2035), [ETMB3](#etmb3)
   (2042) and [ETMB4](#etmb4) (2048);
-* the Examples section: [InteractiveMenu](#interactivemenu), a program that
-  stops in the solver menu, then resumes with `=` to show the results.
+* in Demo, small programming examples: [InteractiveMenu](#interactivemenu),
+  a program that stops in the solver menu, then resumes with `=` to show the
+  results; four custom headers, [PathHeader](#pathheader),
+  [BatteryLevelHeader](#batterylevelheader),
+  [RuntimeStatsHeader](#runtimestatsheader) and
+  [BatteryStatsHeader](#batterystatsheader); the tests [IfTETest](#iftetest),
+  [IfThenElseEval](#ifthenelseeval) and [CaseTest](#casetest); the prompts
+  [Prompting](#prompting) and [Inputting](#inputting); and CustomMenu, a
+  matrix of names to give to the `CustomMenu` command.
 
 ## RTPlan
 
