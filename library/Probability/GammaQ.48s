@@ -2,11 +2,45 @@
   @ ------------------------------------------------------------
   @  GammaQ
   @  Quantile: the X below which the probability is p.
+  @  Start from the Wilson-Hilferty cube, or for a <= 1 from the small x
+  @  form, as in Numerical Recipes (invgammp), then Halley steps on GammaP
+  @  until the step is below 10^-(Precision-3), 12 at most. p <= 0 gives
+  @  0, p >= 1 gives a·sc+40·sc·√a+50·sc.
   @  Author & design          : Jean Wilson
   @  Co-authors & programming  : Claude & Claude Code (Anthropic)
   @  Arguments may be given loose or bundled in a list of 3; that list is
   @  what LastArguments reports, and its length is checked before use.
   @ ------------------------------------------------------------
   IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "GammaQ: needs 3 arguments" DoError END Explode Drop END
-  → av scv pv « av 0 + scv 0 + pv 0 + → a sc p « '0' →Num 'a*sc+40*sc*√(a)+50*sc' →Num 0 0 → lo hi x d « 1 34 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x≤0;0;GammaP(a;x/sc)))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x≤0;0;(x^(a-1))*EXP(-x/sc)/((sc^a)*Γ(a))))>0.000000000000000000000000000001;x-((IFTE(x≤0;0;GammaP(a;x/sc)))-p)/(IFTE(x≤0;0;(x^(a-1))*EXP(-x/sc)/((sc^a)*Γ(a))));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x av scv pv 3 →List Drop » » »
+  → av scv pv « av 0 + scv 0 + pv 0 + → a sc p «
+    CASE
+      p 0 ≤ THEN 0. END
+      p 1 ≥ THEN 'a*sc+40*sc*√(a)+50.*sc' →Num END
+      a lnΓ 0 0 0 10 'Precision' RCL 3 - NEG ^ → lga yy tt kk tol «
+        IF a 1 > THEN
+          'IFTE(p<0.5;p;1-p)' →Num LN -2 * √ → tq «
+            '(2.30753+tq*0.27061)/(1+tq*(0.99229+tq*0.04481))-tq' →Num
+            IF p 0.5 < THEN NEG END → wq «
+              'MAX(0.001;a*(1-1/(9*a)-wq/(3*√(a)))^3)' →Num 'yy' STO
+            »
+          »
+        ELSE
+          '1-a*(0.253+a*0.12)' →Num → t0 «
+            IF p t0 < THEN '(p/t0)^(1/a)' →Num ELSE '1-LN(1-(p-t0)/(1-t0))' →Num END 'yy' STO
+          »
+        END
+        DO
+          kk 1 + 'kk' STO
+          '(GammaP(a;yy)-p)/EXP(-yy+(a-1)*LN(yy)-lga)' →Num → uu «
+            'uu/(1-0.5*MIN(1;uu*((a-1)/yy-1)))' →Num 'tt' STO
+          »
+          'yy-tt' →Num 'yy' STO
+          IF yy 0 ≤ THEN '0.5*(yy+tt)' →Num 'yy' STO END
+        UNTIL
+          'ABS(tt)<tol*yy' →Num kk 12 ≥ OR
+        END
+        'sc*yy' →Num
+      »
+    END
+    av scv pv 3 →List Drop » »
 »
