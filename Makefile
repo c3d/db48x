@@ -405,7 +405,7 @@ HELP_SOURCES = $(filter-out doc/8-menus-tree-%.md,$(wildcard doc/*.md doc/calc-h
 PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
 PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
-VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
+VERSION := $(shell (git describe --dirty=Z --abbrev=4 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo unknown) | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
 CHUCK_H = $(CHUCK:%=src/$(PLATFORM)/chuck-norris.h)
 FONTS=Editor Help Reduced Stack
 
@@ -565,7 +565,7 @@ QRC_EXT_state=*.48[sS]
 sim/config.qrc:   $(wildcard $(QRC_EXT_config:%=config/%))
 sim/state.qrc:    $(wildcard $(QRC_EXT_state:%=state/%))
 sim/library.qrc:  $(wildcard $(QRC_EXT_library:%=library/%))
-sim/help/img.qrc: $(wildcard $(QRC_EXT_help/img:%=help/img/%))
+sim/help/img.qrc: help/$(NAME).md $(wildcard $(QRC_EXT_help/img:%=doc/img/%))
 
 keyboard:				\
 	Keyboard-Layout.png 		\

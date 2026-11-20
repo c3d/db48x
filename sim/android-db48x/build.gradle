@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'com.android.tools.build:gradle:9.2.1'
     }
 }
 
@@ -37,13 +37,17 @@ android {
      * Changing them manually might break the compilation!
      *******************************************************/
 
-    namespace androidPackageName
-    compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion androidBuildToolsVersion
-    ndkVersion androidNdkVersion
+    namespace = androidPackageName
+    compileSdkVersion = androidCompileSdkVersion
+    buildToolsVersion = androidBuildToolsVersion
+    ndkVersion = androidNdkVersion
 
     // Extract native libraries from the APK
-    packagingOptions.jniLibs.useLegacyPackaging true
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 
     sourceSets {
         main {
@@ -58,29 +62,29 @@ android {
        }
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.incremental = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
-    lintOptions {
-        abortOnError false
+    lint {
+        abortOnError = false
     }
 
     // Do not compress Qt binary resources file
-    aaptOptions {
-        noCompress 'rcc'
+    androidResources {
+        noCompress += 'rcc'
     }
 
     defaultConfig {
-        resConfig "en"
-        minSdkVersion qtMinSdkVersion
-        // Use Qt's target SDK, but ensure minimum of 35 for Google Play Store (Android 15)
-        targetSdkVersion Math.max(qtTargetSdkVersion as Integer, 35)
+        resourceConfigurations += ["en"]
+        minSdkVersion = qtMinSdkVersion
+        // Use Qt's target SDK, but ensure minimum for Google Play Store.
+        targetSdkVersion = Math.max(qtTargetSdkVersion as Integer, 36)
         ndk.abiFilters = qtTargetAbiList.split(",")
     }
 
@@ -103,8 +107,8 @@ android {
             if (file(keystorePath).exists()) {
                 signingConfig signingConfigs.release
             }
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
