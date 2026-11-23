@@ -2874,6 +2874,1282 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 ```
 
 
+## Chemistry
+
+Solutions and their colligative properties, chemical equilibrium, kinetics
+and thermochemistry, acids and bases and their titration, solubility, and the
+absorption of light by a solution, at the level of a first course of general
+chemistry and of its laboratory, in ten submenus:
+[Solutions](#solutions),
+[Colligative Properties](#colligative properties),
+[Equilibria](#equilibria),
+[Kinetics](#kinetics),
+[Thermochemistry](#thermochemistry),
+[Acids & Bases](#acids & bases),
+[Polyprotic Acids](#polyprotic acids),
+[Titrations](#titrations),
+[Solubility](#solubility) and
+[Spectrophotometry](#spectrophotometry).
+
+**Units.** The concentrations are amount concentrations, in mol/l: DB48x has
+no unit M, and 0.5 M is entered as `0.5_mol/l`. DB48x writes the liter l,
+as the HP calculators, and the milliliter ml. The molalities are in mol/kg.
+Masses and volumes can be entered in any unit, and DB48x converts.
+
+**Temperatures.** A temperature, like the boiling point `Tb0`, can be entered
+in °C or in K, and a difference of temperature, like `ΔTb`, in K: DB48x
+converts each one.
+
+**Logarithms.** A pH or a pK is the decimal logarithm of a number, with a
+minus sign: the equations divide the concentrations by 1 mol/l, and the
+ionization constants `Ka` and `Kb` are numbers, without unit. They are written
+`[H₃O⁺] = 10^−pH` rather than `pH = −log [H₃O⁺]`: the solver then finds either
+one from the other, without leaving the domain of the logarithm.
+
+**Water.** The ion product of water is the constant ⒸpKwH2O, 13.994 at 25 °C
+with a standard uncertainty of 0.03 [2]. The textbooks round it to 14, which
+is within this uncertainty; but a pH computed from a pOH is then 0.006 higher
+than here, and the examples give the difference.
+
+**Sources.** The numbers of most examples come from the examples of the
+textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
+result of the book is given with each of them.
+
+The 143 variables in the Chemistry section are:
+
+* `msl`: Mass of the solute (dim.: mass, in SI: g)
+* `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
+* `nsl`: Amount of solute (dim.: amount, in SI: mol)
+* `Vsn`: Volume of the solution (dim.: volume, in SI: l)
+* `Csl`: Amount concentration of the solute, its molarity (dim.: amount/volume,
+  in SI: mol/l)
+* `ρsn`: Density of the solution (dim.: mass/volume, in SI: g/ml)
+* `msn`: Mass of the solution (dim.: mass, in SI: g)
+* `wsl`: Mass fraction of the solute: 0.372 for 37.2 % by mass
+* `Csk`, `Vsk`: Concentration and volume of the stock solution
+* `Cdl`, `Vdl`: Concentration and volume of the diluted solution
+* `Cm1`, `Vm1`, `Cm2`, `Vm2`: Concentrations and volumes of the two solutions
+  that are mixed
+* `Cmix`, `Vmix`: Concentration and volume of the mixture
+* `msv`: Mass of the solvent (dim.: mass, in SI: g)
+* `MMsv`: Molar mass of the solvent (dim.: mass/amount, in SI: g/mol)
+* `nsv`: Amount of solvent (dim.: amount, in SI: mol)
+* `bm`: Molality of the solute, its amount per mass of solvent (dim.:
+  amount/mass, in SI: mol/kg)
+* `xsl`: Mole fraction of the solute
+* `xsv`: Mole fraction of the solvent
+* `Psv0`: Vapor pressure of the pure solvent (dim.: pressure)
+* `Psn`: Vapor pressure of the solvent over the solution (dim.: pressure)
+* `ΔPv`: Lowering of the vapor pressure (dim.: pressure)
+* `ivh`: Van ’t Hoff factor, the number of particles that a formula unit gives
+  in solution: 1 for a solute that does not dissociate
+* `Keb`: Ebullioscopic constant of the solvent; for water, the constant ⒸKbH2O,
+  0.513 K·kg/mol (dim.: temperature·mass/amount)
+* `Tb0`, `Tbs`: Boiling points of the pure solvent and of the solution (dim.:
+  temperature)
+* `ΔTb`: Elevation of the boiling point (dim.: temperature difference)
+* `Kcr`: Cryoscopic constant of the solvent; for water, the constant ⒸKfH2O,
+  1.861 K·kg/mol (dim.: temperature·mass/amount)
+* `Tf0`, `Tfs`: Freezing points of the pure solvent and of the solution (dim.:
+  temperature)
+* `ΔTf`: Depression of the freezing point (dim.: temperature difference)
+* `Posm`: Osmotic pressure (dim.: pressure)
+* `Tos`: Temperature of the solution (dim.: temperature)
+* `cR1`, `cR2`: Concentrations of the two reactants, at the moment considered or
+  at equilibrium (dim.: amount/volume)
+* `cP1`, `cP2`: Concentrations of the two products (dim.: amount/volume)
+* `νR1`, `νR2`, `νP1`, `νP2`: Stoichiometric coefficients of the reactants and
+  of the products: 0 for a species that is absent, whose concentration is then
+  set to 1 mol/l
+* `Qc`: Reaction quotient in concentrations
+* `Kcq`: Equilibrium constant in concentrations, Kc
+* `lQK`: Decimal logarithm of `Qc` over `Kcq`: negative, the reaction goes
+  forward; positive, it goes back
+* `Kp`: Equilibrium constant in partial pressures, in atm
+* `Δng`: Change of the number of moles of gas, from the reactants to the
+  products
+* `Teq`: Temperature of the reaction (dim.: temperature)
+* `Keq`: Thermodynamic equilibrium constant
+* `Qr`: Thermodynamic reaction quotient
+* `ΔG0`: Standard Gibbs energy of reaction (dim.: energy/amount, in SI: kJ/mol)
+* `ΔGr`: Gibbs energy of reaction under the conditions given (dim.:
+  energy/amount)
+* `Keq1`, `Keq2`: Equilibrium constants at the temperatures `Teq1` and `Teq2`
+* `Teq1`, `Teq2`: Two temperatures (dim.: temperature)
+* `ΔHr`: Standard enthalpy of reaction, taken as constant between `Teq1` and
+  `Teq2` (dim.: energy/amount, in SI: kJ/mol)
+* `pH`: Decimal logarithm, with a minus sign, of the concentration of the
+  hydronium ion over 1 mol/l
+* `pOH`: The same for the hydroxide ion
+* `cH3O`: Concentration of the hydronium ion H₃O⁺ (dim.: amount/volume, in SI:
+  mol/l)
+* `cOH`: Concentration of the hydroxide ion OH⁻ (dim.: amount/volume, in SI:
+  mol/l)
+* `Ca`: Concentration of a weak acid as prepared, before it ionizes
+* `Ka`, `pKa`: Ionization constant of the acid, a number, and its decimal
+  logarithm with a minus sign
+* `Cb`: Concentration of a weak base as prepared
+* `Kb`, `pKb`: Ionization constant of the base, and its decimal logarithm with a
+  minus sign
+* `PIon`: Percent ionization of the acid
+* `Cacid`, `Cbase`: Concentrations of the acid and of its conjugate base in a
+  buffer
+* `nacid`, `nbase`: Amounts of the acid and of its conjugate base in a buffer
+  (dim.: amount, in SI: mol)
+* `cA0`, `cAt`: Concentrations of a reactant at the start and at the time `trx`
+  (dim.: amount/volume)
+* `trx`: Time elapsed since the start of the reaction (dim.: time)
+* `thalf`: Half-life of the reactant (dim.: time)
+* `kr0`, `kr1`, `kr2`: Rate constants of a reaction of order 0, in mol/(l·s), of
+  order 1, in s⁻¹, and of order 2, in l/(mol·s)
+* `kT1`, `kT2`: Rate constants at the temperatures `Teq1` and `Teq2`, as numbers
+  in the same unit
+* `Eact`: Activation energy (dim.: energy/amount, in SI: kJ/mol)
+* `Afr`: Frequency factor of Arrhenius, in the unit of the rate constants
+* `kEy`: Rate constant of an elementary step by the equation of Eyring (dim.:
+  1/time)
+* `ΔGa`: Gibbs energy of activation (dim.: energy/amount, in SI: kJ/mol)
+* `v0`: Initial rate of an enzymatic reaction (dim.: amount/(volume·time))
+* `Vmax`: Maximum rate, at saturating substrate (dim.: amount/(volume·time))
+* `KMm`: Michaelis constant, the concentration of substrate at half the maximum
+  rate (dim.: amount/volume)
+* `cS`: Concentration of the substrate (dim.: amount/volume)
+* `ΔH1`, `ΔH2`, `ΔH3`: Enthalpies of the reactions that are combined (dim.:
+  energy/amount)
+* `nh1`, `nh2`, `nh3`: Number of times each of them is taken: negative in
+  reverse, 0 if unused
+* `HfP1`, `HfP2`, `HfR1`, `HfR2`: Standard enthalpies of formation of the
+  products and of the reactants, used with the coefficients `νP1`, `νP2`, `νR1`,
+  `νR2` (dim.: energy/amount)
+* `ΔHk1`, `ΔHk2`: Enthalpies of reaction at the temperatures `Teq1` and `Teq2`
+  (dim.: energy/amount)
+* `ΔCpr`: Molar heat capacity of the products less that of the reactants (dim.:
+  energy/(amount·temperature), in SI: J/(mol·K))
+* `ΔSr`: Entropy of reaction (dim.: energy/(amount·temperature), in SI:
+  J/(mol·K))
+* `Tsp`: Temperature at which the Gibbs energy of reaction is zero (dim.:
+  temperature)
+* `Cpa`: Concentration of a polyprotic acid as prepared (dim.: amount/volume)
+* `Ka1`, `Ka2`, `Ka3`: Successive ionization constants of the polyprotic acid
+* `pKa1`, `pKa2`, `pKa3`: Their decimal logarithms, with a minus sign
+* `fp0`, `fp1`, `fp2`, `fp3`: Fractions of the acid that have lost 0, 1, 2 or 3
+  protons
+* `Cta`, `Vta`: Concentration and volume of the acid that is titrated
+* `Ctb`: Concentration of the strong base used as titrant
+* `Vtb`: Volume of base added (dim.: volume)
+* `Veq`: Volume of base at the equivalence point (dim.: volume)
+* `Ksp`: Solubility product
+* `νM`, `νX`: Numbers of cations and of anions of one formula unit of the salt
+* `ssol`: Molar solubility of the salt (dim.: amount/volume)
+* `Sg`: Solubility of the salt in grams per liter (dim.: mass/volume)
+* `cM0`, `cX0`: Concentrations of the cation and of the anion already present,
+  from another salt (dim.: amount/volume)
+* `cMs`, `VMs`, `cXs`, `VXs`: Concentrations and volumes of the two solutions
+  that are mixed, one bringing the cation, the other the anion
+* `cMi`, `cXi`: Concentrations of the cation and of the anion in the mixture,
+  before any precipitation (dim.: amount/volume)
+* `Qsp`: Ionic product of the solution
+* `SIp`: Saturation index, the decimal logarithm of `Qsp` over `Ksp`: positive,
+  the salt precipitates
+* `Absb`: Absorbance, the decimal logarithm of the incident intensity over the
+  transmitted intensity
+* `Tsm`: Transmittance, the transmitted intensity over the incident intensity:
+  0.5 for 50 %
+* `εm`: Molar absorption coefficient of the solute at the wavelength used (dim.:
+  volume/(amount·length), in SI: l/(mol·cm))
+* `lp`: Path length of the light in the cell (dim.: length, in SI: cm)
+
+* References:
+  [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
+  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 5.11, 5.13
+  to 5.15, 11.3, 11.6 to 11.13, 12.6 and 12.8 to 12.13, 13.2 to 13.5, 14.7,
+  14.8, 14.12, 14.13, 14.14, 14.19 to 14.22, 15.3 to 15.5, 15.7, 15.8, 15.13,
+  16.7, 16.8 and 16.11 to 16.13, table 11.2, the titration
+  table of section 14.7, the buffer of the blood in section 14.6 and the
+  ionization constants of phosphoric acid in section 14.5: numbers only, under
+  the license CC BY-NC-SA 4.0 ;
+  [2] IAPWS R11-24, *Revised Release on the Ionization Constant of H₂O*,
+  International Association for the Properties of Water and Steam, 2024 ;
+  [3] R. N. Goldberg, N. Kishore and R. M. Lennen, *Thermodynamic Quantities
+  for the Ionization Reactions of Buffers*, J. Phys. Chem. Ref. Data 31 (2002)
+  231-370 ;
+  [4] B. L. Horecker and A. Kornberg, *The extinction coefficients of the
+  reduced band of pyridine nucleotides*, J. Biol. Chem. 175 (1948) 385-390.
+
+### Solutions
+
+The concentration of a solution, its dilution and the mixing of two solutions,
+and the molality and mole fraction used for the colligative properties.
+
+Entries: [Molar Concentration](#molar concentration),
+[Mass Percent](#mass percent),
+[Dilution](#dilution),
+[Mixing](#mixing) and
+[Molality & Mole Fraction](#molality & mole fraction).
+
+#### Molar Concentration
+
+The amount concentration of a solute, its molarity, from its mass and its molar
+mass.
+
+* Main results: the amount of solute `nsl` and its concentration `Csl`, from the
+  mass `msl` of the solute, its molar mass `MMsl` and the volume `Vsn` of the
+  solution.
+* The volume is that of the solution, not that of the solvent.
+
+* To calculate: `[nsl;Csl]` (Amount of solute; Concentration) for 25.2 g of acetic acid, of 60.05 g/mol, in 0.500 l of vinegar. The source gives 0.839 mol/l [1]:
+```rpl
+msl=25.2_g MMsl=60.05_(g/mol) Vsn=0.5_l
+@ Expecting [ nsl=0.41965 02914 24 mol Csl=0.83930 05828 48 mol/l ]
+'ROOT(ⒺMolar Concentration;[nsl;Csl];[1_mol;1_(mol/l)])'
+```
+
+* To calculate: `[nsl;msl]` (Amount and mass of solute) of sodium chloride, of 58.44 g/mol, to prepare 250 ml of a solution at 0.100 mol/l:
+```rpl
+Csl=0.1_(mol/l) MMsl=58.44_(g/mol) Vsn=250_ml
+@ Expecting [ nsl=0.025 mol msl=1.461 g ]
+'ROOT(ⒺMolar Concentration;[nsl;msl];[1_mol;1_g])'
+```
+
+#### Mass Percent
+
+The mass of solute in a volume of solution, from its mass fraction and the
+density of the solution, and the concentration that follows.
+
+* Main results: the mass of the solution `msn`, the mass `msl`, the amount `nsl`
+  and the concentration `Csl` of the solute, from the mass fraction `wsl`, the
+  density `ρsn` and the volume `Vsn` of the solution, and the molar mass `MMsl`
+  of the solute.
+* A mass percent of 37.2 % is a mass fraction `wsl` of 0.372.
+
+* To calculate: `[msn;msl;nsl;Csl]` (Mass of the solution; Mass, amount and concentration of the solute) in 500 ml of concentrated hydrochloric acid, of 37.2 % by mass and 1.19 g/ml; HCl is 36.46 g/mol. The source gives 221 g of HCl [1]:
+```rpl
+wsl=0.372 ρsn=1.19_(g/ml) Vsn=500_ml MMsl=36.46_(g/mol)
+@ Expecting [ msn=595. g msl=221.34 g nsl=6.07076 24794 3 mol Csl=12.14152 49589 mol/l ]
+'ROOT(ⒺMass Percent;[msn;msl;nsl;Csl];[1_g;1_g;1_mol;1_(mol/l)])'
+```
+
+* To calculate: `[msn;Vsn;nsl;Csl]` the other way: the volume of this acid that holds 100 g of HCl. The concentration does not change:
+```rpl
+wsl=0.372 ρsn=1.19_(g/ml) msl=100_g MMsl=36.46_(g/mol)
+@ Expecting [ msn=268.81720 4301 g Vsn=225.89681 0337 ml nsl=2.74273 17608 3 mol Csl=12.14152 49589 mol/l ]
+'ROOT(ⒺMass Percent;[msn;Vsn;nsl;Csl];[1_g;1_ml;1_mol;1_(mol/l)])'
+```
+
+#### Dilution
+
+The dilution of a stock solution: the amount of solute does not change.
+
+* Main results: one of the concentrations `Csk` and `Cdl` or of the volumes
+  `Vsk` and `Vdl` of the stock and of the diluted solutions, from the other
+  three.
+
+* To calculate: `[Cdl]` (Concentration of the diluted solution) when 0.850 l of a solution at 5.00 mol/l is diluted to 1.80 l. The source gives 2.36 mol/l [1]:
+```rpl
+Csk=5_(mol/l) Vsk=0.85_l Vdl=1.8_l
+@ Expecting [ Cdl=2.36111 11111 1 mol/l ]
+'ROOT(ⒺDilution;[Cdl];[1_(mol/l)])'
+```
+
+* To calculate: `[Vsk]` (Volume of the stock solution) to take from a solution at 1.59 mol/l to prepare 5.00 l at 0.100 mol/l. The source gives 0.314 l [1]:
+```rpl
+Csk=1.59_(mol/l) Cdl=0.1_(mol/l) Vdl=5_l
+@ Expecting [ Vsk=0.31446 54088 05 l ]
+'ROOT(ⒺDilution;[Vsk];[1_l])'
+```
+
+#### Mixing
+
+Two solutions of the same solute, mixed: the amounts of solute add up, and so do
+the volumes.
+
+* Main results: the concentration `Cmix` and the volume `Vmix` of the mixture,
+  from the concentrations `Cm1`, `Cm2` and the volumes `Vm1`, `Vm2` of the two
+  solutions; or the volume of one of them that gives a chosen concentration.
+* The volumes of two dilute aqueous solutions add up within a few parts per
+  thousand; those of water and ethanol do not.
+
+* To calculate: `[Cmix;Vmix]` (Concentration and volume of the mixture) for 50 ml at 0.100 mol/l mixed with 150 ml at 0.300 mol/l:
+```rpl
+Cm1=0.1_(mol/l) Vm1=50_ml Cm2=0.3_(mol/l) Vm2=150_ml
+@ Expecting [ Cmix=0.25 mol/l Vmix=200 ml ]
+'ROOT(ⒺMixing;[Cmix;Vmix];[1_(mol/l);1_ml])'
+```
+
+* To calculate: `[Vm2;Vmix]` (Volume to add; Volume of the mixture) of a solution at 1.00 mol/l to add to 100 ml at 0.100 mol/l to reach 0.250 mol/l:
+```rpl
+Cm1=0.1_(mol/l) Vm1=100_ml Cm2=1_(mol/l) Cmix=0.25_(mol/l)
+@ Expecting [ Vm2=20. ml Vmix=120. ml ]
+'ROOT(ⒺMixing;[Vm2;Vmix];[1_ml;1_ml])'
+```
+
+#### Molality & Mole Fraction
+
+The composition of a solution as the amount of solute per mass of solvent, its
+molality, and as the fraction of its molecules that are solute, its mole
+fraction: two measures that do not change with the temperature, used for the
+colligative properties.
+
+* Main results: the amounts of solute `nsl` and of solvent `nsv`, the molality
+  `bm` and the mole fraction `xsl` of the solute, from the masses `msl`, `msv`
+  and the molar masses `MMsl`, `MMsv` of the solute and of the solvent.
+
+* To calculate: `[nsl;nsv;bm;xsl]` (Amounts of solute and solvent; Molality; Mole fraction) for an antifreeze of 2 220 g of ethylene glycol, of 62.07 g/mol, in 2 000 g of water, of 18.015 g/mol. The source gives 17.9 mol/kg and 0.244 [1]:
+```rpl
+msl=2220_g MMsl=62.07_(g/mol) msv=2000_g MMsv=18.015_(g/mol)
+@ Expecting [ nsl=35.76607 05655 mol nsv=111.01859 5615 mol bm=17.88303 52827 mol/kg xsl=0.24366 35344 56 ]
+'ROOT(ⒺMolality & Mole Fraction;[nsl;nsv;bm;xsl];[1_mol;1_mol;1_(mol/kg);0.5])'
+```
+
+* To calculate: `[nsl;msl;nsv;xsl]` (Amount and mass of solute; Amount of solvent; Mole fraction) of sucrose, of 342.30 g/mol, to dissolve in 500 g of water for a molality of 0.100 mol/kg:
+```rpl
+bm=0.1_(mol/kg) MMsl=342.3_(g/mol) msv=500_g MMsv=18.015_(g/mol)
+@ Expecting [ nsl=0.05 mol msl=17.115 g nsv=27.75464 89037 mol xsl=1.79826 04338 3⁳⁻³ ]
+'ROOT(ⒺMolality & Mole Fraction;[nsl;msl;nsv;xsl];[1_mol;1_g;1_mol;0.5])'
+```
+
+### Colligative Properties
+
+The properties of a solution that depend on the number of dissolved particles,
+not on their nature: the lowering of the vapor pressure, the elevation of the
+boiling point, the depression of the freezing point and the osmotic pressure.
+
+Entries: [Raoult’s Law](#raoult’s law),
+[Boiling Point Elevation](#boiling point elevation),
+[Freezing Point Depression](#freezing point depression) and
+[Osmotic Pressure](#osmotic pressure).
+
+#### Raoult’s Law
+
+The vapor pressure of a solvent over a solution of a nonvolatile solute, lowered
+in proportion to the mole fraction of the solvent.
+
+* Main results: the amounts `nsl` and `nsv`, the mole fraction `xsv` of the
+  solvent, the vapor pressure `Psn` of the solution and its lowering `ΔPv`, from
+  the masses `msl`, `msv` and the molar masses `MMsl`, `MMsv` of the solute and
+  of the solvent, and the vapor pressure `Psv0` of the pure solvent.
+* The law holds for an ideal solution, and the solute is taken as nonvolatile.
+
+* To calculate: `[nsl;nsv;xsv;Psn;ΔPv]` (Amounts of solute and solvent; Mole fraction of the solvent; Vapor pressure; Lowering) of a solution of 92.1 g of glycerin, of 92.094 g/mol, in 184.4 g of ethanol, of 46.069 g/mol, whose vapor pressure is 0.178 atm at 40 °C. The source gives 0.142 atm [1]:
+```rpl
+msl=92.1_g MMsl=92.094_(g/mol) msv=184.4_g MMsv=46.069_(g/mol) Psv0=0.178_atm
+@ Expecting [ nsl=1.00006 51508 2 mol nsv=4.00269 16147 5 mol xsv=0.80009 71868 74 Psn=0.14241 72992 64 atm ΔPv=0.03558 27007 36 atm ]
+'ROOT(ⒺRaoult’s Law;[nsl;nsv;xsv;Psn;ΔPv];[1_mol;1_mol;0.5;1_atm;1_atm])'
+```
+
+* To calculate: `[nsl;nsv;xsv;Psn;ΔPv]` for 20.0 g of glucose, of 180.16 g/mol, in 100.0 g of water, whose vapor pressure is 23.76 torr at 25 °C:
+```rpl
+msl=20_g MMsl=180.16_(g/mol) msv=100_g MMsv=18.015_(g/mol) Psv0=23.76_torr
+@ Expecting [ nsl=0.11101 24333 93 mol nsv=5.55092 97807 4 mol xsv=0.98039 32238 81 Psn=23.29414 29994 torr ΔPv=0.46585 70005 93 torr ]
+'ROOT(ⒺRaoult’s Law;[nsl;nsv;xsv;Psn;ΔPv];[1_mol;1_mol;0.5;1_torr;1_torr])'
+```
+
+#### Boiling Point Elevation
+
+The boiling point of a solution of a nonvolatile solute, raised in proportion to
+its molality.
+
+* Main results: the molality `bm`, the elevation `ΔTb` and the boiling point
+  `Tbs` of the solution, from the molality, or from the mass `msl` and the molar
+  mass `MMsl` of the solute and the mass `msv` of the solvent, and from the
+  ebullioscopic constant `Keb` and the boiling point `Tb0` of the solvent and
+  the van ’t Hoff factor `ivh`.
+* For water, the textbooks give 0.512 K·kg/mol for `Keb` [1], and the constant
+  ⒸKbH2O 0.513.
+
+* To calculate: `[ΔTb;Tbs]` (Elevation; Boiling point) of a solution at 0.33 mol/kg in benzene, of 2.53 K·kg/mol, which boils at 80.1 °C. The source gives 80.9 °C [1]:
+```rpl
+bm=0.33_(mol/kg) ivh=1 Keb=2.53_(K*kg/mol) Tb0=80.1_°C
+@ Expecting [ ΔTb=0.8349 K Tbs=80.9349 °C ]
+'ROOT(ⒺBoiling Point Elevation;[ΔTb;Tbs];[1_K;1_°C])'
+```
+
+* To calculate: `[nsl;bm;ΔTb;Tbs]` (Amount; Molality; Elevation; Boiling point) of a solution of 92.1 g of iodine, of 253.81 g/mol, in 800.0 g of chloroform, of 3.63 K·kg/mol, which boils at 61.26 °C. The source gives 62.91 °C [1]:
+```rpl
+msl=92.1_g MMsl=253.81_(g/mol) msv=800_g ivh=1 Keb=3.63_(K*kg/mol) Tb0=61.26_°C
+@ Expecting [ nsl=0.36286 98632 84 mol bm=0.45358 73291 04 mol/kg ΔTb=1.64652 20046 5 K Tbs=62.90652 20046 °C ]
+'ROOT(ⒺBoiling Point Elevation;[nsl;bm;ΔTb;Tbs];[1_mol;1_(mol/kg);1_K;1_°C])'
+```
+
+#### Freezing Point Depression
+
+The freezing point of a solution, lowered in proportion to its molality;
+measured, it gives the molar mass of the solute.
+
+* Main results: the molality `bm`, the depression `ΔTf` and the freezing point
+  `Tfs` of the solution, from the molality, or from the mass `msl` and the molar
+  mass `MMsl` of the solute and the mass `msv` of the solvent, and from the
+  cryoscopic constant `Kcr` and the freezing point `Tf0` of the solvent and the
+  van ’t Hoff factor `ivh`; or the molar mass `MMsl` from a measured freezing
+  point.
+* For water, the textbooks give 1.86 K·kg/mol for `Kcr` [1], and the constant
+  ⒸKfH2O 1.861.
+* `ivh` is 1 for a solute that does not dissociate, and 2 for NaCl if it
+  dissociates completely; the measured factor is lower, as ions pair.
+
+* To calculate: `[ΔTf;Tfs]` (Depression; Freezing point) of a solution at 0.33 mol/kg in benzene, of 5.12 K·kg/mol, which freezes at 5.5 °C. The source gives 3.8 °C [1]:
+```rpl
+bm=0.33_(mol/kg) ivh=1 Kcr=5.12_(K*kg/mol) Tf0=5.5_°C
+@ Expecting [ ΔTf=1.6896 K Tfs=3.8104 °C ]
+'ROOT(ⒺFreezing Point Depression;[ΔTf;Tfs];[1_K;1_°C])'
+```
+
+* To calculate: `[ΔTf;bm;nsl;MMsl]` (Depression; Molality; Amount; Molar mass) of a solute of which 4.00 g in 55.0 g of benzene freeze at 2.32 °C. The source gives 1.1·10² g/mol [1]:
+```rpl
+msl=4_g msv=55_g ivh=1 Kcr=5.12_(K*kg/mol) Tf0=5.5_°C Tfs=2.32_°C
+@ Expecting [ ΔTf=3.18 K bm=0.62109 375 mol/kg nsl=0.03416 01562 5 mol MMsl=117.09548 3133 g/mol ]
+'ROOT(ⒺFreezing Point Depression;[ΔTf;bm;nsl;MMsl];[1_K;1_(mol/kg);1_mol;1_(g/mol)])'
+```
+
+* To calculate: `[nsl;bm;ΔTf;Tfs]` of 4.2 g of NaCl, of 58.44 g/mol, in 125 g of water, taken as fully dissociated. The source gives −2.1 °C [1]:
+```rpl
+msl=4.2_g MMsl=58.44_(g/mol) msv=125_g ivh=2 Kcr=1.86_(K*kg/mol) Tf0=0_°C
+@ Expecting [ nsl=0.07186 85831 62 mol bm=0.57494 86652 98 mol/kg ΔTf=2.13880 90349 1 K Tfs=-2.13880 90349 1 °C ]
+'ROOT(ⒺFreezing Point Depression;[nsl;bm;ΔTf;Tfs];[1_mol;1_(mol/kg);1_K;1_°C])'
+```
+
+#### Osmotic Pressure
+
+The osmotic pressure of a solution, by the equation of van ’t Hoff; measured, it
+gives the molar mass of a large molecule.
+
+* Main results: the osmotic pressure `Posm`, from the concentration `Csl` of the
+  solute, or from its mass `msl`, its molar mass `MMsl` and the volume `Vsn` of
+  the solution, and from the temperature `Tos` and the van ’t Hoff factor `ivh`;
+  or the molar mass from a measured pressure.
+* The gas constant is ⒸR.
+
+* To calculate: `[Posm]` (Osmotic pressure) of a solution of glucose at 0.30 mol/l, at 37 °C. The source gives 7.6 atm [1]:
+```rpl
+Csl=0.3_(mol/l) ivh=1 Tos=37_°C
+@ Expecting [ Posm=7.63502 7627 atm ]
+'ROOT(ⒺOsmotic Pressure;[Posm];[1_atm])'
+```
+
+* To calculate: `[Csl;nsl;MMsl]` (Concentration; Amount; Molar mass) of hemoglobin, of which 10.0 g in 0.500 l give an osmotic pressure of 5.9 torr at 22 °C. The source gives 6.2·10⁴ g/mol [1]:
+```rpl
+msl=10_g Vsn=0.5_l Posm=5.9_torr ivh=1 Tos=22_°C
+@ Expecting [ Csl=3.20536 91972 3⁳⁻⁴ mol/l nsl=1.60268 45986 2⁳⁻⁴ mol MMsl=62 395.30852 57 g/mol ]
+'ROOT(ⒺOsmotic Pressure;[Csl;nsl;MMsl];[1_(mol/l);1_mol;1_(g/mol)])'
+```
+
+### Equilibria
+
+Chemical equilibrium: the reaction quotient and the direction of a reaction, the
+constants in concentrations and in pressures, the Gibbs energy and the
+equilibrium constant, and the effect of temperature.
+
+Entries: [Reaction Quotient](#reaction quotient),
+[Kp & Kc](#kp & kc),
+[Free Energy & K](#free energy & k) and
+[Van ’t Hoff](#van ’t hoff).
+
+#### Reaction Quotient
+
+The reaction quotient of a reaction with up to two reactants and two products,
+νR1 R1 + νR2 R2 ⇌ νP1 P1 + νP2 P2, and the direction in which it goes.
+
+* Main results: the quotient `Qc` from the concentrations `cR1`, `cR2`, `cP1`,
+  `cP2` and the coefficients `νR1`, `νR2`, `νP1`, `νP2`; with the equilibrium
+  constant `Kcq`, the decimal logarithm `lQK` of `Qc` over `Kcq`: negative, the
+  reaction goes forward; positive, it goes back; zero, it is at equilibrium.
+* With the concentrations at equilibrium, `Qc` is the equilibrium constant
+  itself.
+* For a species that is absent, set its coefficient to 0 and its concentration
+  to 1 mol/l.
+
+* To calculate: `[Qc;lQK]` (Quotient; Logarithm of Q over K) of CO + H₂O ⇌ CO₂ + H₂, of Kc 0.64, with 0.020 mol/l of CO and of H₂O and 0.0040 mol/l of CO₂ and of H₂. The source gives 0.040: the reaction goes forward [1]:
+```rpl
+cR1=0.02_(mol/l) cR2=0.02_(mol/l) cP1=0.004_(mol/l) cP2=0.004_(mol/l) νR1=1 νR2=1 νP1=1 νP2=1 Kcq=0.64
+@ Expecting [ Qc=0.04 lQK=-1.20411 99826 6 ]
+'ROOT(ⒺReaction Quotient;[Qc;lQK];[1;0])'
+```
+
+* To calculate: `[Qc;lQK]` with 0.011 mol/l of CO, 0.0011 of H₂O, 0.037 of CO₂ and 0.046 of H₂. The source gives 1.4·10²: the reaction goes back [1]:
+```rpl
+cR1=0.011_(mol/l) cR2=0.0011_(mol/l) cP1=0.037_(mol/l) cP2=0.046_(mol/l) νR1=1 νR2=1 νP1=1 νP2=1 Kcq=0.64
+@ Expecting [ Qc=140.66115 7025 lQK=2.34199 42114 5 ]
+'ROOT(ⒺReaction Quotient;[Qc;lQK];[1;0])'
+```
+
+* To calculate: `[Qc]` (Quotient) of 2 NO₂ ⇌ N₂O₄ at equilibrium, with 0.016 mol/l of NO₂ and 0.042 of N₂O₄: its equilibrium constant. The source gives 1.6·10² [1]:
+```rpl
+cR1=0.016_(mol/l) νR1=2 cR2=1_(mol/l) νR2=0 cP1=0.042_(mol/l) νP1=1 cP2=1_(mol/l) νP2=0
+@ Expecting [ Qc=164.0625 ]
+'ROOT(ⒺReaction Quotient;[Qc];[1])'
+```
+
+#### Kp & Kc
+
+The equilibrium constant of a reaction between gases, in partial pressures and
+in concentrations.
+
+* Main results: `Kp` from `Kcq`, or the reverse, at the temperature `Teq`, with
+  the change `Δng` of the number of moles of gas.
+* The pressures are in atm and the concentrations in mol/l, as in the textbooks.
+
+* To calculate: `[Kp]` (Constant in pressures) of CS₂ + 4 H₂ ⇌ CH₄ + 2 H₂S, of Kc 0.28 at 900 °C, where two moles of gas are lost. The source gives 3.0·10⁻⁵ [1]:
+```rpl
+Kcq=0.28 Teq=900_°C Δng=-2
+@ Expecting [ Kp=3.02145 26741⁳⁻⁵ ]
+'ROOT(ⒺKp & Kc;[Kp];[1E-5])'
+```
+
+* To calculate: `[Kp]` of N₂ + 3 H₂ ⇌ 2 NH₃, of Kc 0.50 at 400 °C [1]:
+```rpl
+Kcq=0.5 Teq=400_°C Δng=-2
+@ Expecting [ Kp=1.63874 41667⁳⁻⁴ ]
+'ROOT(ⒺKp & Kc;[Kp];[1E-4])'
+```
+
+#### Free Energy & K
+
+The equilibrium constant of a reaction from its standard Gibbs energy, and the
+Gibbs energy of the reaction away from equilibrium.
+
+* Main results: the equilibrium constant `Keq` from the standard Gibbs energy
+  `ΔG0` and the temperature `Teq`, or the reverse; and the Gibbs energy `ΔGr`
+  for the reaction quotient `Qr`: negative, the reaction goes forward.
+* The relation is written `K = exp(−ΔG°/RT)` rather than `ΔG° = −RT ln K`, for
+  the same reason as the pH.
+
+* To calculate: `[Keq]` (Equilibrium constant) of AgCl ⇌ Ag⁺ + Cl⁻, whose standard Gibbs energy is 55.7 kJ/mol at 25 °C: the solubility product. The source gives 1.74·10⁻¹⁰ [1]:
+```rpl
+ΔG0=55.7_(kJ/mol) Teq=298.15_K
+@ Expecting [ Keq=1.74494 67881 9⁳⁻¹⁰ ]
+'ROOT(ⒺFree Energy & K;[Keq];[1E-10])'
+```
+
+* To calculate: `[Keq;ΔGr]` (Equilibrium constant; Gibbs energy) of 2 NH₃ ⇌ 3 H₂ + N₂, of 33.0 kJ/mol at 298 K, with 0.250 atm of H₂, 0.870 atm of N₂ and 12.9 atm of NH₃: Q = 0.250³·0.870/12.9². The source gives 9.68 kJ/mol [1]:
+```rpl
+ΔG0=33_(kJ/mol) Teq=298_K Qr=8.16883E-5
+@ Expecting [ Keq=1.64338 77817 6⁳⁻⁶ ΔGr=9.67830 87317 2 kJ/mol ]
+'ROOT(ⒺFree Energy & K;[Keq;ΔGr];[1E-6;1_(kJ/mol)])'
+```
+
+#### Van ’t Hoff
+
+The change of an equilibrium constant with the temperature, by the equation of
+van ’t Hoff.
+
+* Main results: the constant `Keq2` at the temperature `Teq2`, from the constant
+  `Keq1` at `Teq1` and the standard enthalpy of reaction `ΔHr`; or the enthalpy
+  from two constants.
+* The enthalpy of reaction is taken as constant between the two temperatures. An
+  endothermic reaction, of positive `ΔHr`, goes further when it is heated.
+
+* To calculate: `[Keq2]` (Constant at the second temperature) at 350 K of a reaction of 57.2 kJ/mol whose constant is 0.15 at 25 °C:
+```rpl
+Keq1=0.15 Teq1=25_°C Teq2=350_K ΔHr=57.2_(kJ/mol)
+@ Expecting [ Keq2=4.57753 61732 1 ]
+'ROOT(ⒺVan ’t Hoff;[Keq2];[1])'
+```
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of a reaction whose constant goes from 0.15 at 25 °C to 4.0 at 350 K:
+```rpl
+Keq1=0.15 Teq1=25_°C Keq2=4 Teq2=350_K
+@ Expecting [ ΔHr=54.94320 30076 kJ/mol ]
+'ROOT(ⒺVan ’t Hoff;[ΔHr];[10_(kJ/mol)])'
+```
+
+### Kinetics
+
+The rate of a reaction: the integrated rate laws of order 0, 1 and 2 and their
+half-lives, the effect of temperature by Arrhenius and Eyring, and the kinetics
+of an enzyme.
+
+Entries: [First Order Reaction](#first order reaction),
+[Second Order Reaction](#second order reaction),
+[Zero Order Reaction](#zero order reaction),
+[Arrhenius](#arrhenius),
+[Eyring](#eyring) and
+[Michaelis Menten](#michaelis menten).
+
+#### First Order Reaction
+
+A reaction of first order: the concentration of the reactant decays
+exponentially, with a constant half-life.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr1`; the time to reach a
+  concentration; and the half-life `thalf` from the rate constant, or the
+  reverse.
+* Only the ratio of the two concentrations matters: for a reactant 80 %
+  decomposed, take 1 and 0.2 mol/l.
+
+* To calculate: `[trx;thalf]` (Time; Half-life) for cyclobutane, of rate constant 9.2·10⁻³ s⁻¹ at 500 °C, to be 80.0 % decomposed. The source gives 1.7·10² s [1]:
+```rpl
+kr1=9.2E-3_(s^-1) cA0=1_(mol/l) cAt=0.2_(mol/l)
+@ Expecting [ trx=174.93890 3525 s thalf=75.34208 48435 s ]
+'ROOT(ⒺFirst Order Reaction;[trx;thalf];[100_s;100_s])'
+```
+
+* To calculate: `[kr1]` (Rate constant) of the decomposition of hydrogen peroxide at 40 °C, of half-life 2.16·10⁴ s. The source gives 3.21·10⁻⁵ s⁻¹ [1]:
+```rpl
+thalf=2.16E4_s
+@ Expecting [ kr1=3.20901 47248 1⁳⁻⁵ s⁻¹ ]
+'ROOT(ⒺFirst Order Reaction;[kr1];[1E-5_(s^-1)])'
+```
+
+#### Second Order Reaction
+
+A reaction of second order in one reactant: the inverse of its concentration
+grows linearly with time.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr2`; and the half-life `thalf`,
+  which depends on the initial concentration.
+* The equation is 1/[A] = 1/[A]₀ + k·t, written without inverse.
+
+* To calculate: `[cAt;thalf]` (Concentration; Half-life) of butadiene after 10.0 min of dimerization, from 0.200 mol/l, with a rate constant of 5.76·10⁻² l/(mol·min). The source gives 0.179 mol/l and 86.8 min [1]:
+```rpl
+kr2=5.76E-2_(l/(mol*min)) cA0=0.2_(mol/l) trx=10_min
+@ Expecting [ cAt=0.17934 00286 94 mol/l thalf=86.80555 55556 min ]
+'ROOT(ⒺSecond Order Reaction;[cAt;thalf];[0.1_(mol/l);10_min])'
+```
+
+* To calculate: `[kr2]` (Rate constant) of butadiene, whose concentration falls from 1.00·10⁻² to 5.04·10⁻³ mol/l in 1600 s. The source gives 0.0614 l/(mol·s), from five points [1]:
+```rpl
+cA0=1E-2_(mol/l) cAt=5.04E-3_(mol/l) trx=1600_s
+@ Expecting [ kr2=0.06150 79365 08 l/(mol·s) ]
+'ROOT(ⒺSecond Order Reaction;[kr2];[0.01_(l/(mol*s))])'
+```
+
+#### Zero Order Reaction
+
+A reaction of zero order, such as a decomposition on a saturated surface: the
+concentration falls linearly with time.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr0`; the rate constant from two
+  concentrations; and the half-life `thalf`.
+
+* To calculate: `[kr0;thalf]` (Rate constant; Half-life) of the decomposition of ammonia on tungsten, from 0.0028 to 0.0015 mol/l in 1000 s. The source gives 1.3·10⁻⁶ mol/(l·s) [1]:
+```rpl
+cA0=0.0028_(mol/l) cAt=0.0015_(mol/l) trx=1000_s
+@ Expecting [ kr0=0.00000 13 mol/(l·s) thalf=1 076.92307 692 s ]
+'ROOT(ⒺZero Order Reaction;[kr0;thalf];[1E-6_(mol/(l*s));100_s])'
+```
+
+#### Arrhenius
+
+The rate constant of a reaction at two temperatures, its activation energy and
+its frequency factor, by the equation of Arrhenius.
+
+* Main results: the activation energy `Eact` from the rate constants `kT1` and
+  `kT2` at the temperatures `Teq1` and `Teq2`, or a rate constant at another
+  temperature; and the frequency factor `Afr`.
+* The rate constants and the frequency factor are numbers, all in the same unit,
+  whatever the order of the reaction.
+
+* To calculate: `[Eact;Afr]` (Activation energy; Frequency factor) of the decomposition of HI, whose rate constant is 3.52·10⁻⁷ l/(mol·s) at 555 K and 3.95·10⁻² at 781 K. The source gives 1.8·10⁵ J/mol [1]:
+```rpl
+kT1=3.52E-7 Teq1=555_K kT2=3.95E-2 Teq2=781_K
+@ Expecting [ Eact=185.43064 5792 kJ/mol Afr=9.96046 10165 6⁳¹⁰ ]
+'ROOT(ⒺArrhenius;[Eact;Afr];[100_(kJ/mol);1E10])'
+```
+
+* To calculate: `[Eact]` (Activation energy) of the decomposition of N₂O₅, of rate constants 1.66 at 650 K and 7.39 at 700 K. The source gives 1.1·10⁵ J/mol [1]:
+```rpl
+kT1=1.66 Teq1=650_K kT2=7.39 Teq2=700_K
+@ Expecting [ Eact=112.98624 86 kJ/mol ]
+'ROOT(ⒺArrhenius;[Eact];[100_(kJ/mol)])'
+```
+
+* To calculate: `[kT2]` (Rate constant) at 35 °C of a reaction of 50 kJ/mol whose rate constant is 1 at 25 °C: the rule of the doubling every 10 °C:
+```rpl
+kT1=1 Teq1=25_°C Teq2=35_°C Eact=50_(kJ/mol)
+@ Expecting [ kT2=1.92426 48158 3 ]
+'ROOT(ⒺArrhenius;[kT2];[2])'
+```
+
+#### Eyring
+
+The rate constant of an elementary step from its Gibbs energy of activation, by
+the equation of Eyring of transition state theory.
+
+* Main results: the rate constant `kEy` from the Gibbs energy of activation
+  `ΔGa` and the temperature `Teq`, or the reverse.
+* The transmission coefficient is taken as 1. The constants of Boltzmann and
+  Planck are Ⓒk and Ⓒh.
+
+* To calculate: `[kEy]` (Rate constant) at 25 °C of a step of 80 kJ/mol:
+```rpl
+ΔGa=80_(kJ/mol) Teq=25_°C
+@ Expecting [ kEy=0.05996 09411 24 s⁻¹ ]
+'ROOT(ⒺEyring;[kEy];[1_(s^-1)])'
+```
+
+* To calculate: `[ΔGa]` (Gibbs energy of activation) of a step of 1 s⁻¹ at 37 °C:
+```rpl
+kEy=1_(s^-1) Teq=37_°C
+@ Expecting [ ΔGa=76.06490 32691 kJ/mol ]
+'ROOT(ⒺEyring;[ΔGa];[50_(kJ/mol)])'
+```
+
+#### Michaelis Menten
+
+The initial rate of a reaction catalyzed by an enzyme, as a function of the
+concentration of the substrate.
+
+* Main results: the initial rate `v0` from the maximum rate `Vmax`, the
+  Michaelis constant `KMm` and the concentration `cS` of the substrate; or the
+  concentration that gives a chosen rate.
+* At a concentration equal to `KMm`, the rate is half of `Vmax`.
+
+* To calculate: `[v0]` (Initial rate) for a substrate at 0.50 mmol/l, with a maximum rate of 100 µmol/(l·min) and a Michaelis constant of 2.0 mmol/l:
+```rpl
+Vmax=100_(µmol/(l*min)) KMm=2_(mmol/l) cS=0.5_(mmol/l)
+@ Expecting [ v0=20. µmol/(l·min) ]
+'ROOT(ⒺMichaelis Menten;[v0];[1_(µmol/(l*min))])'
+```
+
+* To calculate: `[cS]` (Concentration of the substrate) that gives three quarters of the maximum rate:
+```rpl
+Vmax=100_(µmol/(l*min)) KMm=2_(mmol/l) v0=75_(µmol/(l*min))
+@ Expecting [ cS=6. mmol/l ]
+'ROOT(ⒺMichaelis Menten;[cS];[1_(mmol/l)])'
+```
+
+### Thermochemistry
+
+The heat of a reaction: Hess’s law, the enthalpies of formation, the change of
+an enthalpy with temperature, and the Gibbs energy that tells whether the
+reaction is spontaneous.
+
+Entries: [Hess’s Law](#hess’s law),
+[Formation Enthalpies](#formation enthalpies),
+[Kirchhoff’s Law](#kirchhoff’s law) and
+[Gibbs Energy](#gibbs energy).
+
+#### Hess’s Law
+
+The enthalpy of a reaction that is the sum of up to three others, each taken a
+number of times.
+
+* Main results: the enthalpy of reaction `ΔHr` from the enthalpies `ΔH1`, `ΔH2`,
+  `ΔH3` of the steps and their multipliers `nh1`, `nh2`, `nh3`: negative for a
+  step taken in reverse, 0 for a step that is not used.
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of formation of FeCl₃, from the steps Fe + Cl₂ → FeCl₂, of −341.8 kJ, and FeCl₂ + ½ Cl₂ → FeCl₃, of −57.7 kJ. The source gives −399.5 kJ/mol [1]:
+```rpl
+nh1=1 ΔH1=-341.8_(kJ/mol) nh2=1 ΔH2=-57.7_(kJ/mol) nh3=0 ΔH3=0_(kJ/mol)
+@ Expecting [ ΔHr=-399.5 kJ/mol ]
+'ROOT(ⒺHess’s Law;[ΔHr];[1_(kJ/mol)])'
+```
+
+* To calculate: `[ΔHr]` of ClF + F₂ → ClF₃, from three reactions of −49.4, +214.0 and +236.2 kJ taken −½, +½ and −1 times. The source gives −104.5 kJ [1]:
+```rpl
+nh1=-0.5 ΔH1=-49.4_(kJ/mol) nh2=0.5 ΔH2=214_(kJ/mol) nh3=-1 ΔH3=236.2_(kJ/mol)
+@ Expecting [ ΔHr=-104.5 kJ/mol ]
+'ROOT(ⒺHess’s Law;[ΔHr];[1_(kJ/mol)])'
+```
+
+#### Formation Enthalpies
+
+The enthalpy of a reaction from the standard enthalpies of formation of its
+products and of its reactants.
+
+* Main results: the enthalpy of reaction `ΔHr` from the enthalpies of formation
+  `HfP1`, `HfP2` of the products and `HfR1`, `HfR2` of the reactants, with their
+  coefficients `νP1`, `νP2`, `νR1`, `νR2`; or one enthalpy of formation from a
+  measured enthalpy of reaction.
+* The enthalpy of formation of an element in its standard state is 0.
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of the combustion of ethanol, C₂H₅OH + 3 O₂ → 2 CO₂ + 3 H₂O, with −394, −286 and −278 kJ/mol for CO₂, H₂O and ethanol. The source gives −1368 kJ/mol [1]:
+```rpl
+νP1=2 HfP1=-394_(kJ/mol) νP2=3 HfP2=-286_(kJ/mol) νR1=1 HfR1=-278_(kJ/mol) νR2=3 HfR2=0_(kJ/mol)
+@ Expecting [ ΔHr=-1 368 kJ/mol ]
+'ROOT(ⒺFormation Enthalpies;[ΔHr];[1_(kJ/mol)])'
+```
+
+* To calculate: `[HfR1]` (Enthalpy of formation) of ozone, from 3 O₂ → 2 O₃, of +286 kJ: the ozone is the product, so the reaction is entered in reverse, with −286 kJ. The source gives +143 kJ/mol [1]:
+```rpl
+ΔHr=-286_(kJ/mol) νP1=3 HfP1=0_(kJ/mol) νP2=0 HfP2=0_(kJ/mol) νR1=2 νR2=0 HfR2=0_(kJ/mol)
+@ Expecting [ HfR1=143 kJ/mol ]
+'ROOT(ⒺFormation Enthalpies;[HfR1];[1_(kJ/mol)])'
+```
+
+#### Kirchhoff’s Law
+
+The change of an enthalpy of reaction with the temperature, from the difference
+of the heat capacities of the products and of the reactants.
+
+* Main results: the enthalpy `ΔHk2` at the temperature `Teq2`, from the enthalpy
+  `ΔHk1` at `Teq1` and the difference `ΔCpr` of the molar heat capacities, taken
+  as constant between the two.
+
+* To calculate: `[ΔHk2]` (Enthalpy at the second temperature) of vaporization of water at 100 °C, from 44.01 kJ/mol at 25 °C, with heat capacities of 33.6 J/(mol·K) for the vapor and 75.3 for the liquid, a difference of −41.7. The accepted value is 40.65 kJ/mol:
+```rpl
+ΔHk1=44.01_(kJ/mol) Teq1=25_°C Teq2=100_°C ΔCpr=-41.7_(J/(mol*K))
+@ Expecting [ ΔHk2=40.8825 kJ/mol ]
+'ROOT(ⒺKirchhoff’s Law;[ΔHk2];[1_(kJ/mol)])'
+```
+
+#### Gibbs Energy
+
+The Gibbs energy of a reaction from its enthalpy and its entropy, and the
+temperature at which it changes sign.
+
+* Main results: the Gibbs energy `ΔGr` at the temperature `Teq`, from the
+  enthalpy `ΔHr` and the entropy `ΔSr` of reaction: negative, the reaction is
+  spontaneous; and the temperature `Tsp` at which `ΔGr` is zero, where the
+  reaction turns.
+* For a change of state, `Tsp` is the temperature of the transition: the boiling
+  point for a vaporization.
+* The enthalpy and the entropy are taken as constant with the temperature.
+
+* To calculate: `[ΔGr;Tsp]` (Gibbs energy; Temperature of the turn) of the vaporization of water at 298 K, of enthalpy 44.01 kJ/mol and entropy 118.8 J/(mol·K). The source gives +8.6 kJ and a boiling point of 370.5 K [1]:
+```rpl
+ΔHr=44.01_(kJ/mol) ΔSr=118.8_(J/(mol*K)) Teq=298_K
+@ Expecting [ ΔGr=8.6076 kJ/mol Tsp=370.45454 5455 K ]
+'ROOT(ⒺGibbs Energy;[ΔGr;Tsp];[1_(kJ/mol);300_K])'
+```
+
+* To calculate: `[ΔGr;Tsp]` of the decomposition of HgO, of 90.46 kJ/mol and 107.4 J/(mol·K), at 25 °C. The source gives +58.4 kJ/mol [1]:
+```rpl
+ΔHr=90.46_(kJ/mol) ΔSr=107.4_(J/(mol*K)) Teq=298.15_K
+@ Expecting [ ΔGr=58.43869 kJ/mol Tsp=842.27188 0819 K ]
+'ROOT(ⒺGibbs Energy;[ΔGr;Tsp];[1_(kJ/mol);300_K])'
+```
+
+### Acids & Bases
+
+The acidity of aqueous solutions at 25 °C: the pH and the pOH, weak acids and
+weak bases, conjugate pairs and buffers.
+
+Entries: [pH & pOH](#ph & poh),
+[Weak Acid](#weak acid),
+[Weak Base](#weak base),
+[Percent Ionization](#percent ionization),
+[Conjugate Pair](#conjugate pair) and
+[Buffer](#buffer).
+
+#### pH & pOH
+
+The pH and the pOH of an aqueous solution, and the concentrations of the
+hydronium and hydroxide ions.
+
+* Main results: three of the values `pH`, `pOH`, `cH3O` and `cOH`, from the
+  fourth.
+* The pH and the pOH add up to ⒸpKwH2O, 13.994 at 25 °C, and not to the rounded
+  14 of the textbooks.
+
+* To calculate: `[pH;pOH;cOH]` (pH; pOH; Concentration of the hydroxide ion) for a concentration of hydronium ions of 4.0·10⁻⁴ mol/l. With 14, the pOH would be 10.60:
+```rpl
+cH3O=4.0E-4_(mol/l)
+@ Expecting [ pH=3.39794 00086 7 pOH=10.59605 99913 cOH=2.53477 84643 4⁳⁻¹¹ mol/l ]
+'ROOT(ⒺpH & pOH;[pH;pOH;cOH];[7;7;1_(mol/l)])'
+```
+
+* To calculate: `[cH3O;pOH;cOH]` (Concentrations of the ions; pOH) for a blood plasma of pH 7.40:
+```rpl
+pH=7.4
+@ Expecting [ cH3O=3.98107 17055 3⁳⁻⁸ mol/l pOH=6.594 cOH=2.54683 02525 9⁳⁻⁷ mol/l ]
+'ROOT(ⒺpH & pOH;[cH3O;pOH;cOH];[1_(mol/l);7;1_(mol/l)])'
+```
+
+#### Weak Acid
+
+A weak acid HA in water, HA + H₂O ⇌ H₃O⁺ + A⁻: its ionization constant and the
+pH of its solution.
+
+* Main results: the concentration `cH3O` of the hydronium ion and the `pH`, from
+  the concentration `Ca` of the acid as prepared and its ionization constant
+  `Ka` or its `pKa`; or `Ka` and `pKa` from a measured pH.
+* The equilibrium is solved without the approximation √(Ka·Ca) of the textbooks,
+  which holds only for an acid ionized less than about 5 %.
+* The ions given by the water itself are neglected, which holds while `cH3O`
+  exceeds 10⁻⁶ mol/l. For a very dilute or very weak acid, the WeakAcid equation
+  of the Labs section of config/equations.csv makes the complete balance.
+
+* To calculate: `[pKa;cH3O;pH]` (pKa; Concentration of the hydronium ion; pH) of a solution of formic acid at 0.534 mol/l, of Ka 1.8·10⁻⁴. The source gives 2.01 [1]:
+```rpl
+Ca=0.534_(mol/l) Ka=1.8E-4
+@ Expecting [ pKa=3.74472 74949 cH3O=9.71449 38676 1⁳⁻³ mol/l pH=2.01257 98215 4 ]
+'ROOT(ⒺWeak Acid;[pKa;cH3O;pH];[4;0.01_(mol/l);2])'
+```
+
+* To calculate: `[pKa;cH3O;pH]` of a solution of hydrogen sulfate HSO₄⁻ at 0.50 mol/l, of Ka 1.2·10⁻². The source gives 1.14; the approximation would give 1.11 [1]:
+```rpl
+Ca=0.5_(mol/l) Ka=1.2E-2
+@ Expecting [ pKa=1.92081 87539 5 cH3O=7.16916 98398 2⁳⁻² mol/l pH=1.14453 11309 2 ]
+'ROOT(ⒺWeak Acid;[pKa;cH3O;pH];[2;0.01_(mol/l);2])'
+```
+
+#### Weak Base
+
+A weak base B in water, B + H₂O ⇌ BH⁺ + OH⁻: its ionization constant, and the
+pOH and the pH of its solution.
+
+* Main results: the concentration `cOH` of the hydroxide ion, the `pOH` and the
+  `pH`, from the concentration `Cb` of the base as prepared and its ionization
+  constant `Kb` or its `pKb`.
+* As for a weak acid, the equilibrium is solved exactly and the ions given by
+  the water are neglected.
+* The pH is ⒸpKwH2O minus the pOH: 0.006 lower than with the 14 of the
+  textbooks.
+
+* To calculate: `[pKb;cOH;pOH;pH]` (pKb; Concentration of the hydroxide ion; pOH; pH) of a solution of trimethylamine at 0.25 mol/l, of Kb 6.3·10⁻⁵. The source gives 2.40 and 11.60, with 14 [1]:
+```rpl
+Cb=0.25_(mol/l) Kb=6.3E-5
+@ Expecting [ pKb=4.20065 94505 5 cOH=3.93725 19763 8⁳⁻³ mol/l pOH=2.40480 67903 3 pH=11.58919 32097 ]
+'ROOT(ⒺWeak Base;[pKb;cOH;pOH;pH];[4;0.01_(mol/l);2;12])'
+```
+
+* To calculate: `[Kb;cOH;pOH;pH]` of ammonia at 0.10 mol/l, of pKb 4.75:
+```rpl
+Cb=0.1_(mol/l) pKb=4.75
+@ Expecting [ Kb=1.77827 94100 4⁳⁻⁵ cOH=1.32465 96769 6⁳⁻³ mol/l pOH=2.87789 56835 4 pH=11.11610 43165 ]
+'ROOT(ⒺWeak Base;[Kb;cOH;pOH;pH];[1E-5;0.01_(mol/l);2;12])'
+```
+
+#### Percent Ionization
+
+The fraction of a weak acid that is ionized, from the pH of its solution.
+
+* Main results: the concentration `cH3O` of the hydronium ion and the percent
+  ionization `PIon`, from the `pH` and the concentration `Ca` of the acid as
+  prepared; or the pH from the percent ionization.
+* A weak acid ionizes more when it is more dilute.
+
+* To calculate: `[cH3O;PIon]` (Concentration of the hydronium ion; Percent ionization) of a solution of nitrous acid at 0.125 mol/l, of pH 2.09. The source gives 6.5 % [1]:
+```rpl
+Ca=0.125_(mol/l) pH=2.09
+@ Expecting [ cH3O=8.12830 51616 4⁳⁻³ mol/l PIon=6.50264 41293 1 ]
+'ROOT(ⒺPercent Ionization;[cH3O;PIon];[0.01_(mol/l);5])'
+```
+
+* To calculate: `[cH3O;pH]` (Concentration of the hydronium ion; pH) of an acid at 0.050 mol/l that is 3.0 % ionized:
+```rpl
+Ca=0.05_(mol/l) PIon=3
+@ Expecting [ cH3O=0.0015 mol/l pH=2.82390 87409 4 ]
+'ROOT(ⒺPercent Ionization;[cH3O;pH];[0.01_(mol/l);2])'
+```
+
+#### Conjugate Pair
+
+An acid and its conjugate base, such as HNO₂ and NO₂⁻: the product of their
+ionization constants is the ion product of water.
+
+* Main results: three of the values `Ka`, `pKa`, `Kb` and `pKb` of the pair,
+  from the fourth.
+* The product of `Ka` and `Kb` is 10^−13.994 = 1.014·10⁻¹⁴, not the 1.0·10⁻¹⁴ of
+  the textbooks: a constant computed from the other is 1.4 % higher.
+
+* To calculate: `[pKb;pKa;Ka]` (pKb; pKa; Ka) of nitrous acid, from the Kb of the nitrite ion, 2.17·10⁻¹¹. The source gives 4.6·10⁻⁴, with 1.0·10⁻¹⁴ [1]:
+```rpl
+Kb=2.17E-11
+@ Expecting [ pKb=10.66354 02662 pKa=3.33045 97338 5 Ka=4.67240 26992 5⁳⁻⁴ ]
+'ROOT(ⒺConjugate Pair;[pKb;pKa;Ka];[10;3;1E-3])'
+```
+
+* To calculate: `[pKb;Kb]` (pKb; Kb) of ammonia, from the pKa 9.25 of the ammonium ion:
+```rpl
+pKa=9.25
+@ Expecting [ pKb=4.744 Kb=1.80301 77408 6⁳⁻⁵ ]
+'ROOT(ⒺConjugate Pair;[pKb;Kb];[5;1E-5])'
+```
+
+#### Buffer
+
+A buffer, a weak acid and its conjugate base in comparable amounts: the equation
+of Henderson and Hasselbalch.
+
+* Main results: the `pH` of the buffer, from the `pKa` or the `Ka` of the acid
+  and the concentrations `Cacid` and `Cbase` of the acid and of its conjugate
+  base, or from their amounts `nacid` and `nbase` in the volume `Vsn` of the
+  buffer.
+* Only the ratio of the two concentrations matters, which is that of the
+  amounts.
+* The equation holds while this ratio stays between 0.1 and 10.
+* For acetic acid, the constant ⒸpKaAcetic gives 4.756 [3]; the textbooks take a
+  Ka of 1.8·10⁻⁵, or a pKa of 4.74.
+
+* To calculate: `[pH]` (pH) of the blood, buffered by hydrogen carbonate at 0.024 mol/l and carbonic acid at 0.0012 mol/l, with the pKa 6.4 of the source, which gives 7.7 [1]:
+```rpl
+pKa=6.4 Cbase=0.024_(mol/l) Cacid=0.0012_(mol/l)
+@ Expecting [ pH=7.70102 99956 6 ]
+'ROOT(ⒺBuffer;[pH];[7])'
+```
+
+* To calculate: `[pKa;pH]` (pKa; pH) of a buffer of acetic acid and sodium acetate, both at 0.10 mol/l, with a Ka of 1.8·10⁻⁵. The source gives 4.74 [1]:
+```rpl
+Ka=1.8E-5 Cbase=0.1_(mol/l) Cacid=0.1_(mol/l)
+@ Expecting [ pKa=4.74472 74949 pH=4.74472 74949 ]
+'ROOT(ⒺBuffer;[pKa;pH];[5;5])'
+```
+
+* To calculate: `[Cacid;Cbase;pKa;pH]` (Concentrations; pKa; pH) of 100 ml of this buffer after the addition of 1.0 ml of sodium hydroxide at 0.10 mol/l: 0.0099 mol of acid and 0.0101 mol of base in 101 ml. The source gives 4.75 [1]:
+```rpl
+Ka=1.8E-5 nacid=0.0099_mol nbase=0.0101_mol Vsn=101_ml
+@ Expecting [ Cacid=0.09801 98019 8 mol/l Cbase=0.1 mol/l pKa=4.74472 74949 pH=4.75341 36740 8 ]
+'ROOT(ⒺBuffer;[Cacid;Cbase;pKa;pH];[0.1_(mol/l);0.1_(mol/l);5;5])'
+```
+
+### Polyprotic Acids
+
+Acids that give up two or three protons, one after the other: the pH of their
+solutions and the fraction of each of their forms.
+
+Entries: [Diprotic Acid](#diprotic acid) and
+[Triprotic Acid](#triprotic acid).
+
+#### Diprotic Acid
+
+A diprotic acid H₂A, such as carbonic acid: the pH of its solution, and the
+fractions of H₂A, HA⁻ and A²⁻.
+
+* Main results: the `pH` of a solution of the acid at the concentration `Cpa`,
+  from its constants `Ka1` and `Ka2` or `pKa1` and `pKa2`; and the fractions
+  `fp0`, `fp1` and `fp2` of the acid that have lost 0, 1 and 2 protons, at that
+  pH or at a pH given.
+* The concentration of each form is its fraction times `Cpa`.
+* The equation is the balance of the charges, with the ions of the water, as for
+  the titrations.
+
+* To calculate: `[pKa1;pKa2;pH;fp0;fp1;fp2]` (pKa; pH; Fractions) of carbonic acid at 0.033 mol/l, of Ka1 4.3·10⁻⁷ and Ka2 4.7·10⁻¹¹. The source gives 1.2·10⁻⁴ mol/l of H₃O⁺ and of HCO₃⁻, and 4.7·10⁻¹¹ mol/l of CO₃²⁻ [1]:
+```rpl
+Cpa=0.033_(mol/l) Ka1=4.3E-7 Ka2=4.7E-11
+@ Expecting [ pKa1=6.36653 15444 2 pKa2=10.32790 21421 pH=3.92479 23216 8 fp0=0.99639 67594 58 fp1=3.60323 91177 8⁳⁻³ fp2=1.42424 0277⁳⁻⁹ ]
+'ROOT(ⒺDiprotic Acid;[pKa1;pKa2;pH;fp0;fp1;fp2];[6;10;4;0.5;0.5;0.5])'
+```
+
+* To calculate: `[fp0;fp1;fp2]` (Fractions) of the carbonate forms at pH 8.30:
+```rpl
+pH=8.3 Ka1=4.3E-7 Ka2=4.7E-11
+@ Expecting [ fp0=0.01141 54138 09 fp1=0.97940 00342 86 fp2=9.18455 19045 5⁳⁻³ ]
+'ROOT(ⒺDiprotic Acid;[fp0;fp1;fp2];[0.5;0.5;0.5])'
+```
+
+#### Triprotic Acid
+
+A triprotic acid H₃A, such as phosphoric acid: the pH of its solution, and the
+fractions of its four forms.
+
+* Main results: the `pH` of a solution of the acid at the concentration `Cpa`,
+  from its constants `Ka1`, `Ka2` and `Ka3` or their pK; and the fractions `fp0`
+  to `fp3` of the acid that have lost 0 to 3 protons, at that pH or at a pH
+  given.
+* Near pH 7, the phosphate forms H₂PO₄⁻ and HPO₄²⁻ make the buffer of the cells
+  and of many biochemical media.
+
+* To calculate: `[pKa1;pKa2;pKa3;pH;fp0;fp1]` (pKa; pH; Fractions) of phosphoric acid at 0.10 mol/l, of Ka 7.5·10⁻³, 6.2·10⁻⁸ and 4.2·10⁻¹³ [1]:
+```rpl
+Cpa=0.1_(mol/l) Ka1=7.5E-3 Ka2=6.2E-8 Ka3=4.2E-13
+@ Expecting [ pKa1=2.12493 87366 1 pKa2=7.20760 83105 pKa3=12.37675 07096 pH=1.62175 21749 2 fp0=0.76108 31951 57 fp1=0.23891 61848 46 ]
+'ROOT(ⒺTriprotic Acid;[pKa1;pKa2;pKa3;pH;fp0;fp1];[2;7;12;2;0.5;0.5])'
+```
+
+* To calculate: `[fp0;fp1;fp2;fp3]` (Fractions) of the phosphate forms at pH 7.40:
+```rpl
+pH=7.4 Ka1=7.5E-3 Ka2=6.2E-8 Ka3=4.2E-13
+@ Expecting [ fp0=2.07558 99005⁳⁻⁶ fp1=0.39102 34581 34 fp2=0.60896 80417 1 fp3=6.42456 59570 2⁳⁻⁶ ]
+'ROOT(ⒺTriprotic Acid;[fp0;fp1;fp2;fp3];[0.5;0.5;0.5;0.5])'
+```
+
+### Titrations
+
+The pH of an acid while it is titrated by a strong base, and the volume of base
+at the equivalence point.
+
+Entries: [Strong Acid Titration](#strong acid titration) and
+[Weak Acid Titration](#weak acid titration).
+
+#### Strong Acid Titration
+
+A strong acid, such as HCl, titrated by a strong base, such as NaOH.
+
+* Main results: the equivalence volume `Veq`, and the `pH` after a volume `Vtb`
+  of base, from the concentration `Cta` and the volume `Vta` of the acid and the
+  concentration `Ctb` of the base; or the volume of base that gives a chosen pH.
+* The equation is the balance of the charges, with the ions of the water: it
+  holds before, at and after the equivalence point, which is at pH 6.997, half
+  of ⒸpKwH2O. The volumes are taken to add up.
+
+* To calculate: `[Veq;pH]` (Equivalence volume; pH) of 25.00 ml of hydrochloric acid at 0.100 mol/l, after 12.50 ml of sodium hydroxide at 0.100 mol/l. The source gives 0.0333 mol/l of hydronium ions, pH 1.477 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) Vtb=12.5_ml
+@ Expecting [ Veq=25. ml pH=1.47712 12547 2 ]
+'ROOT(ⒺStrong Acid Titration;[Veq;pH];[1_ml;7])'
+```
+
+* To calculate: `[Veq;pH]` after 37.50 ml of base. The source gives 12.30 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) Vtb=37.5_ml
+@ Expecting [ Veq=25. ml pH=12.29502 99957 ]
+'ROOT(ⒺStrong Acid Titration;[Veq;pH];[1_ml;7])'
+```
+
+* To calculate: `[Vtb]` (Volume of base) that brings the pH to 3.00. The table of the source gives pH 3.00 for 24.5 ml [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) pH=3
+@ Expecting [ Vtb=24.50495 05 ml ]
+'ROOT(ⒺStrong Acid Titration;[Vtb];[20_ml])'
+```
+
+#### Weak Acid Titration
+
+A weak acid, such as acetic acid, titrated by a strong base.
+
+* Main results: the equivalence volume `Veq`, and the `pH` after a volume `Vtb`
+  of base, from the concentration `Cta` and the volume `Vta` of the acid, its
+  ionization constant `Ka` or its `pKa`, and the concentration `Ctb` of the
+  base.
+* One equation, the balance of the charges, holds over the whole titration: at
+  the start, in the buffer region, at the equivalence point and beyond. The
+  textbooks treat each region with its own approximation, and agree with it to
+  their rounding.
+* At half the equivalence volume, the pH is close to the pKa; at the equivalence
+  point it is above 7, the conjugate base being basic.
+
+* To calculate: `[pKa;Veq;pH]` (pKa; Equivalence volume; pH) of 25.00 ml of acetic acid at 0.100 mol/l, of Ka 1.8·10⁻⁵, before any sodium hydroxide at 0.100 mol/l. The source gives 2.87 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=0_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=2.87527 70603 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+* To calculate: `[pKa;Veq;pH]` after 12.50 ml of base, half the equivalence volume. The source gives 4.74, the pKa [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=12.5_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=4.74519 60125 6 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+* To calculate: `[pKa;Veq;pH]` at the equivalence point, after 25.00 ml of base. The source gives 8.72 [1]:
+```rpl
+Cta=0.1_(mol/l) Vta=25_ml Ka=1.8E-5 Ctb=0.1_(mol/l) Vtb=25_ml
+@ Expecting [ pKa=4.74472 74949 Veq=25. ml pH=8.71890 38730 1 ]
+'ROOT(ⒺWeak Acid Titration;[pKa;Veq;pH];[5;1_ml;7])'
+```
+
+### Solubility
+
+The solubility of a sparingly soluble salt: its solubility product, the effect
+of a common ion, and whether a mixture precipitates.
+
+Entries: [Molar Solubility](#molar solubility),
+[Common Ion Effect](#common ion effect) and
+[Precipitation](#precipitation).
+
+#### Molar Solubility
+
+The molar solubility of a salt MνM XνX in pure water, from its solubility
+product, or the reverse.
+
+* Main results: the molar solubility `ssol` and the solubility `Sg` in grams per
+  liter, from the solubility product `Ksp`, the numbers `νM` and `νX` of cations
+  and anions of one formula unit, and the molar mass `MMsl`; or `Ksp` from a
+  measured solubility.
+* The ions are taken as not reacting with water and as ideal.
+
+* To calculate: `[ssol]` (Molar solubility) of CuBr, of Ksp 6.3·10⁻⁹. The source gives 7.9·10⁻⁵ mol/l [1]:
+```rpl
+Ksp=6.3E-9 νM=1 νX=1
+@ Expecting [ ssol=7.93725 39331 9⁳⁻⁵ mol/l ]
+'ROOT(ⒺMolar Solubility;[ssol];[1E-5_(mol/l)])'
+```
+
+* To calculate: `[ssol;Sg]` (Molar and mass solubility) of Ca(OH)₂, of Ksp 1.3·10⁻⁶ and 74.09 g/mol. The source gives 6.9·10⁻³ mol/l [1]:
+```rpl
+Ksp=1.3E-6 νM=1 νX=2 MMsl=74.09_(g/mol)
+@ Expecting [ ssol=6.87534 43353 7⁳⁻³ mol/l Sg=0.50939 42618 08 g/l ]
+'ROOT(ⒺMolar Solubility;[ssol;Sg];[1E-3_(mol/l);1_(g/l)])'
+```
+
+* To calculate: `[ssol;Ksp]` (Molar solubility; Solubility product) of PbCrO₄, of 323.19 g/mol, from its solubility of 4.6·10⁻⁶ g/l. The source gives 2.0·10⁻¹⁶ [1]:
+```rpl
+Sg=4.6E-6_(g/l) MMsl=323.19_(g/mol) νM=1 νX=1
+@ Expecting [ ssol=1.42331 13648 3⁳⁻⁸ mol/l Ksp=2.02581 52412 6⁳⁻¹⁶ ]
+'ROOT(ⒺMolar Solubility;[ssol;Ksp];[1E-8_(mol/l);1E-16])'
+```
+
+#### Common Ion Effect
+
+The molar solubility of a salt in a solution that already holds one of its ions.
+
+* Main results: the molar solubility `ssol` from the solubility product `Ksp`,
+  the numbers `νM` and `νX` of ions of one formula unit, and the concentrations
+  `cM0` and `cX0` of the cation and of the anion already present; one of them is
+  usually 0.
+
+* To calculate: `[ssol]` (Molar solubility) of CdS, of Ksp 1.0·10⁻²⁸, in a solution of CdBr₂ at 0.010 mol/l. The source gives 1.0·10⁻²⁶ mol/l [1]:
+```rpl
+Ksp=1.0E-28 νM=1 νX=1 cM0=0.01_(mol/l) cX0=0_(mol/l)
+@ Expecting [ ssol=1.⁳⁻²⁶ mol/l ]
+'ROOT(ⒺCommon Ion Effect;[ssol];[1E-20_(mol/l)])'
+```
+
+* To calculate: `[ssol]` of AgCl, of Ksp 1.6·10⁻¹⁰, in a solution of NaCl at 0.10 mol/l; in pure water it would be 1.3·10⁻⁵ mol/l:
+```rpl
+Ksp=1.6E-10 νM=1 νX=1 cM0=0_(mol/l) cX0=0.1_(mol/l)
+@ Expecting [ ssol=1.59999 99744⁳⁻⁹ mol/l ]
+'ROOT(ⒺCommon Ion Effect;[ssol];[1E-8_(mol/l)])'
+```
+
+#### Precipitation
+
+Whether a salt precipitates, from the ionic product of a solution or of a
+mixture of two solutions.
+
+* Main results: the concentrations `cMi` and `cXi` of the ions after mixing,
+  from the concentrations `cMs`, `cXs` and the volumes `VMs`, `VXs` of the two
+  solutions; the ionic product `Qsp`, and the saturation index `SIp`, the
+  decimal logarithm of `Qsp` over `Ksp`: positive, the salt precipitates;
+  negative, it does not.
+* For a single solution, give `cMi` and `cXi` directly.
+
+* To calculate: `[cMi;cXi;Qsp;SIp]` (Concentrations after mixing; Ionic product; Saturation index) of 100 ml of AgNO₃ and 100 ml of NaCl, both at 2.0·10⁻⁴ mol/l, for AgCl of Ksp 1.6·10⁻¹⁰. The source gives 1.0·10⁻⁸: AgCl precipitates [1]:
+```rpl
+cMs=2E-4_(mol/l) VMs=100_ml cXs=2E-4_(mol/l) VXs=100_ml νM=1 νX=1 Ksp=1.6E-10
+@ Expecting [ cMi=0.0001 mol/l cXi=0.0001 mol/l Qsp=0.00000 001 SIp=1.79588 00173 4 ]
+'ROOT(ⒺPrecipitation;[cMi;cXi;Qsp;SIp];[1E-4_(mol/l);1E-4_(mol/l);1E-8;1])'
+```
+
+* To calculate: `[Qsp;SIp]` (Ionic product; Saturation index) of a solution with 0.0537 mol/l of Mg²⁺ and 0.0010 mol/l of OH⁻, for Mg(OH)₂ of Ksp 8.9·10⁻¹². The source gives 5.4·10⁻⁸: Mg(OH)₂ precipitates [1]:
+```rpl
+cMi=0.0537_(mol/l) cXi=0.001_(mol/l) νM=1 νX=2 Ksp=8.9E-12
+@ Expecting [ Qsp=0.00000 00537 SIp=3.78058 42790 5 ]
+'ROOT(ⒺPrecipitation;[Qsp;SIp];[1E-8;1])'
+```
+
+### Spectrophotometry
+
+The absorption of light by a solution, the basis of the spectrophotometric
+assays.
+
+Entry: [Beer Lambert Law](#beer lambert law).
+
+#### Beer Lambert Law
+
+The absorbance of a solution at one wavelength is proportional to the
+concentration of the absorbing solute and to the path length of the light: the
+Beer-Lambert law.
+
+* Main results: the absorbance `Absb` and the transmittance `Tsm`, from the
+  molar absorption coefficient `εm` of the solute, the path length `lp` and the
+  concentration `Csl`; or the concentration from a measured absorbance.
+* The law holds for dilute solutions, usually for absorbances below about 1.
+* The coefficient `εm` depends on the wavelength. For NADH, it is 6 220
+  l/(mol·cm) at 340 nm [4], the wavelength of the enzymatic assays that follow
+  its appearance or its disappearance.
+
+* To calculate: `[Absb;Tsm]` (Absorbance; Transmittance) of a solution of NADH at 50 µmol/l in a cell of 1 cm, at 340 nm:
+```rpl
+εm=6220_(l/(mol*cm)) lp=1_cm Csl=50_(µmol/l)
+@ Expecting [ Absb=0.311 Tsm=0.48865 23593 43 ]
+'ROOT(ⒺBeer Lambert Law;[Absb;Tsm];[0.5;0.5])'
+```
+
+* To calculate: `[Csl;Tsm]` (Concentration; Transmittance) of NADH in a cell of 1 cm that absorbs 0.622 at 340 nm:
+```rpl
+εm=6220_(l/(mol*cm)) lp=1_cm Absb=0.622
+@ Expecting [ Csl=100. µmol/l Tsm=0.23878 11282 91 ]
+'ROOT(ⒺBeer Lambert Law;[Csl;Tsm];[1_(µmol/l);0.5])'
+```
+
+
 ## Finance
 
 The `Finance` section contains equations to compute time value of money (TVM).
