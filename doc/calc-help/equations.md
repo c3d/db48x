@@ -2877,9 +2877,10 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 ## Chemistry
 
 Solutions and their colligative properties, chemical equilibrium, kinetics
-and thermochemistry, acids and bases and their titration, solubility, and the
-absorption of light by a solution, at the level of a first course of general
-chemistry and of its laboratory, in ten submenus:
+and thermochemistry, acids and bases and their titration, solubility,
+electrochemistry, mixtures of gases, and the absorption of light by a
+solution, at the level of a first course of general chemistry and of its
+laboratory, in twelve submenus:
 [Solutions](#solutions),
 [Colligative Properties](#colligative properties),
 [Equilibria](#equilibria),
@@ -2888,7 +2889,9 @@ chemistry and of its laboratory, in ten submenus:
 [Acids & Bases](#acids & bases),
 [Polyprotic Acids](#polyprotic acids),
 [Titrations](#titrations),
-[Solubility](#solubility) and
+[Solubility](#solubility),
+[Electrochemistry](#electrochemistry),
+[Gas Mixtures](#gas mixtures) and
 [Spectrophotometry](#spectrophotometry).
 
 **Units.** The concentrations are amount concentrations, in mol/l: DB48x has
@@ -2915,7 +2918,7 @@ than here, and the examples give the difference.
 textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
 result of the book is given with each of them.
 
-The 143 variables in the Chemistry section are:
+The 178 variables in the Chemistry section are:
 
 * `msl`: Mass of the solute (dim.: mass, in SI: g)
 * `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
@@ -3029,6 +3032,39 @@ The 143 variables in the Chemistry section are:
   J/(mol·K))
 * `Tsp`: Temperature at which the Gibbs energy of reaction is zero (dim.:
   temperature)
+* `βbuf`: Buffer capacity (dim.: amount/volume, in SI: mol/l)
+* `Cbuf`: Total concentration of the acid and of its conjugate base in a buffer
+  (dim.: amount/volume)
+* `Ecat0`, `Eano0`: Standard reduction potentials of the cathode and of the
+  anode (dim.: voltage, in SI: V)
+* `Ecl0`, `Ecl`: Potential of the cell, standard and under the conditions given
+  (dim.: voltage, in SI: V)
+* `nel`: Number of electrons exchanged in the reaction as written
+* `Iel`: Current of the electrolysis (dim.: current, in SI: A)
+* `tel`: Duration of the electrolysis (dim.: time)
+* `Qel`: Charge passed (dim.: charge, in SI: C)
+* `nelm`: Amount of electrons passed (dim.: amount, in SI: mol)
+* `zel`: Number of electrons per ion deposited or released
+* `mdep`: Mass deposited or released at the electrode (dim.: mass)
+* `κel`: Conductivity of the solution (dim.: conductance/length, in SI: S/cm)
+* `Λmc`, `Λm0`: Molar conductivity, at the concentration given and at infinite
+  dilution (in SI: S·cm²/mol)
+* `Kkr`: Coefficient of Kohlrausch’s law, for the concentration in mol/l (in SI:
+  S·cm²/mol)
+* `ng1`, `ng2`, `ng3`: Amounts of the gases of a mixture (dim.: amount, in SI:
+  mol)
+* `ngt`: Total amount of gas (dim.: amount, in SI: mol)
+* `Ptot`: Total pressure of the mixture (dim.: pressure)
+* `Vg`, `Tg`: Volume and temperature of the mixture
+* `xg1`, `xg2`: Mole fractions of the first two gases
+* `Pg1`, `Pg2`: Partial pressures of the first two gases (dim.: pressure)
+* `rg1`, `rg2`: Rates of effusion of two gases, as numbers in the same unit
+* `MMg1`, `MMg2`: Molar masses of the two gases (dim.: mass/amount, in SI:
+  g/mol)
+* `Cg`: Concentration of a dissolved gas (dim.: amount/volume)
+* `Pg`: Partial pressure of the gas above the solution (dim.: pressure)
+* `kHen`: Henry constant of the gas in the solvent, at one temperature (in SI:
+  mol/(l·kPa))
 * `Cpa`: Concentration of a polyprotic acid as prepared (dim.: amount/volume)
 * `Ka1`, `Ka2`, `Ka3`: Successive ionization constants of the polyprotic acid
 * `pKa1`, `pKa2`, `pKa3`: Their decimal logarithms, with a minus sign
@@ -3062,9 +3098,10 @@ The 143 variables in the Chemistry section are:
 * References:
   [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
   OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 5.11, 5.13
-  to 5.15, 11.3, 11.6 to 11.13, 12.6 and 12.8 to 12.13, 13.2 to 13.5, 14.7,
-  14.8, 14.12, 14.13, 14.14, 14.19 to 14.22, 15.3 to 15.5, 15.7, 15.8, 15.13,
-  16.7, 16.8 and 16.11 to 16.13, table 11.2, the titration
+  to 5.15, 9.14, 9.15, 9.20, 9.22, 11.1, 11.3, 11.6 to 11.13, 12.6 and 12.8
+  to 12.13, 13.2 to 13.5, 14.7, 14.8, 14.12, 14.13, 14.14, 14.19 to 14.22,
+  15.3 to 15.5, 15.7, 15.8, 15.13, 16.7, 16.8, 16.11 to 16.13, 17.4 and 17.6
+  to 17.10, table 11.2, the titration
   table of section 14.7, the buffer of the blood in section 14.6 and the
   ionization constants of phosphoric acid in section 14.5: numbers only, under
   the license CC BY-NC-SA 4.0 ;
@@ -3722,8 +3759,9 @@ Entries: [pH & pOH](#ph & poh),
 [Weak Acid](#weak acid),
 [Weak Base](#weak base),
 [Percent Ionization](#percent ionization),
-[Conjugate Pair](#conjugate pair) and
-[Buffer](#buffer).
+[Conjugate Pair](#conjugate pair),
+[Buffer](#buffer) and
+[Buffer Capacity](#buffer capacity).
 
 #### pH & pOH
 
@@ -3885,6 +3923,33 @@ Ka=1.8E-5 Cbase=0.1_(mol/l) Cacid=0.1_(mol/l)
 Ka=1.8E-5 nacid=0.0099_mol nbase=0.0101_mol Vsn=101_ml
 @ Expecting [ Cacid=0.09801 98019 8 mol/l Cbase=0.1 mol/l pKa=4.74472 74949 pH=4.75341 36740 8 ]
 'ROOT(ⒺBuffer;[Cacid;Cbase;pKa;pH];[0.1_(mol/l);0.1_(mol/l);5;5])'
+```
+
+#### Buffer Capacity
+
+The buffer capacity of a solution of a weak acid and its conjugate base: the
+amount of strong base, per liter, that would raise its pH by one unit, taken at
+the pH considered.
+
+* Main results: the buffer capacity `βbuf` at a `pH`, from the total
+  concentration `Cbuf` of the acid and of its conjugate base and the `Ka` or the
+  `pKa` of the acid.
+* A small addition `Δc` of strong base changes the pH by about `Δc` over `βbuf`.
+  The capacity is largest at a pH equal to the pKa, where it is 0.576 times
+  `Cbuf`.
+
+* To calculate: `[pKa;βbuf]` (pKa; Buffer capacity) of the buffer of acetic acid and acetate, both at 0.10 mol/l, at its pH of 4.7447, with a Ka of 1.8·10⁻⁵. Adding 0.00099 mol/l of base, as in the third example of Buffer, then raises the pH by 0.0086:
+```rpl
+Cbuf=0.2_(mol/l) Ka=1.8E-5 pH=4.7447
+@ Expecting [ pKa=4.74472 74949 βbuf=0.11517 07049 87 mol/l ]
+'ROOT(ⒺBuffer Capacity;[pKa;βbuf];[5;0.1_(mol/l)])'
+```
+
+* To calculate: `[pKa;βbuf]` of the same buffer at pH 5.74, one unit above its pKa:
+```rpl
+Cbuf=0.2_(mol/l) Ka=1.8E-5 pH=5.74
+@ Expecting [ pKa=4.74472 74949 βbuf=3.84035 63971 5⁳⁻² mol/l ]
+'ROOT(ⒺBuffer Capacity;[pKa;βbuf];[5;0.1_(mol/l)])'
 ```
 
 ### Polyprotic Acids
@@ -4112,6 +4177,192 @@ cMs=2E-4_(mol/l) VMs=100_ml cXs=2E-4_(mol/l) VXs=100_ml νM=1 νX=1 Ksp=1.6E-10
 cMi=0.0537_(mol/l) cXi=0.001_(mol/l) νM=1 νX=2 Ksp=8.9E-12
 @ Expecting [ Qsp=0.00000 00537 SIp=3.78058 42790 5 ]
 'ROOT(ⒺPrecipitation;[Qsp;SIp];[1E-8;1])'
+```
+
+### Electrochemistry
+
+Galvanic cells and electrolysis: the potential of a cell, its Gibbs energy and
+its equilibrium constant, the Nernst equation, Faraday’s laws and the
+conductivity of a solution.
+
+Entries: [Cell Potential](#cell potential),
+[Nernst Equation](#nernst equation),
+[Electrolysis](#electrolysis) and
+[Molar Conductivity](#molar conductivity).
+
+#### Cell Potential
+
+The standard potential of a galvanic cell from the standard reduction potentials
+of its two electrodes, with the Gibbs energy and the equilibrium constant of its
+reaction.
+
+* Main results: the standard cell potential `Ecl0` from the reduction potentials
+  `Ecat0` of the cathode and `Eano0` of the anode; the standard Gibbs energy
+  `ΔG0` and the equilibrium constant `Keq` of the reaction, for `nel` electrons
+  exchanged, at the temperature `Teq`.
+* A positive cell potential means a spontaneous reaction. The Faraday constant
+  is ⒸF.
+
+* To calculate: `[Ecl0;ΔG0;Keq]` (Cell potential; Gibbs energy; Equilibrium constant) of 2 Ag⁺ + Fe ⇌ 2 Ag + Fe²⁺ at 25 °C, with +0.7996 V for silver and −0.447 V for iron. The source gives +1.247 V, −240.6 kJ/mol and 1.3·10⁴² [1]:
+```rpl
+Ecat0=0.7996_V Eano0=-0.447_V nel=2 Teq=25_°C
+@ Expecting [ Ecl0=1.2466 V ΔG0=-240.55723 005 kJ/mol Keq=1.39252 61505 9⁳⁴² ]
+'ROOT(ⒺCell Potential;[Ecl0;ΔG0;Keq];[1_V;1_(kJ/mol);1E40])'
+```
+
+* To calculate: `[Ecl0;ΔG0]` of Cu + 2 Ag⁺ → Cu²⁺ + 2 Ag, with +0.34 V for copper. The source gives +0.46 V [1]:
+```rpl
+Ecat0=0.7996_V Eano0=0.34_V nel=2
+@ Expecting [ Ecl0=0.4596 V ΔG0=-88.68931 72877 kJ/mol ]
+'ROOT(ⒺCell Potential;[Ecl0;ΔG0];[1_V;1_(kJ/mol)])'
+```
+
+#### Nernst Equation
+
+The potential of a cell away from the standard conditions, from the reaction
+quotient.
+
+* Main results: the cell potential `Ecl` from the standard potential `Ecl0`, the
+  reaction quotient `Qr`, the number `nel` of electrons and the temperature
+  `Teq`; or the quotient from a measured potential.
+* The equation is E = E° − (RT/nF)·ln Q, written with the exponential, for the
+  same reason as the pH.
+* In a concentration cell, `Ecl0` is 0.
+
+* To calculate: `[Ecl]` (Cell potential) of Co + Fe²⁺ → Co²⁺ + Fe at 298 K, of standard potential −0.167 V, with 1.94 mol/l of Fe²⁺ and 0.15 mol/l of Co²⁺: Q = 0.15/1.94. The source gives −0.14 V [1]:
+```rpl
+Ecl0=-0.167_V Qr=0.0773196 nel=2 Teq=298_K
+@ Expecting [ Ecl=-0.13413 25118 46 V ]
+'ROOT(ⒺNernst Equation;[Ecl];[0.1_V])'
+```
+
+* To calculate: `[Ecl]` of a zinc concentration cell, 0.10 and 0.50 mol/l, at 298 K. The source gives +0.021 V [1]:
+```rpl
+Ecl0=0_V Qr=0.2 nel=2 Teq=298_K
+@ Expecting [ Ecl=2.06649 03655 7⁳⁻² V ]
+'ROOT(ⒺNernst Equation;[Ecl];[0.1_V])'
+```
+
+#### Electrolysis
+
+The mass of a substance deposited or released at an electrode, by Faraday’s
+laws.
+
+* Main results: the charge `Qel`, the amount of electrons `nelm` and the mass
+  `mdep` deposited, from the current `Iel`, the time `tel`, the molar mass
+  `MMsl` and the number `zel` of electrons per ion; or the time needed for a
+  mass.
+
+* To calculate: `[Qel;nelm;mdep]` (Charge; Amount of electrons; Mass) of silver, of 107.9 g/mol, plated in one hour by a current of 10.23 A. The source gives 0.3817 mol and 41.19 g [1]:
+```rpl
+Iel=10.23_A tel=1_h zel=1 MMsl=107.9_(g/mol)
+@ Expecting [ Qel=36 828. C nelm=0.38169 53229 01 mol mdep=41.18492 5341 g ]
+'ROOT(ⒺElectrolysis;[Qel;nelm;mdep];[1_C;1_mol;1_g])'
+```
+
+* To calculate: `[nelm;Qel;tel]` (Amount of electrons; Charge; Time) to plate 237 g of chromium, of 52.00 g/mol, from Cr³⁺ with 33.46 A. The source gives 1.32·10⁶ C and 11.0 h [1]:
+```rpl
+mdep=237_g zel=3 MMsl=52_(g/mol) Iel=33.46_A
+@ Expecting [ nelm=13.67307 69231 mol Qel=1 319 251.36807 C tel=10.95214 32562 h ]
+'ROOT(ⒺElectrolysis;[nelm;Qel;tel];[1_mol;1_C;1_h])'
+```
+
+#### Molar Conductivity
+
+The molar conductivity of an electrolyte from the conductivity of its solution,
+and Kohlrausch’s law for a strong electrolyte.
+
+* Main results: the molar conductivity `Λmc` from the conductivity `κel` and the
+  concentration `Csl`; and by Kohlrausch’s law, the limiting molar conductivity
+  `Λm0` or the coefficient `Kkr`.
+* Kohlrausch’s law, Λm = Λm° − K·√c, holds for a dilute strong electrolyte.
+
+* To calculate: `[Λmc;Kkr]` (Molar conductivity; Kohlrausch coefficient) of potassium chloride at 0.0100 mol/l, of conductivity 1.413 mS/cm at 25 °C, with a limiting molar conductivity of 149.86 S·cm²/mol:
+```rpl
+κel=1.413_(mS/cm) Csl=0.01_(mol/l) Λm0=149.86_(S*cm^2/mol)
+@ Expecting [ Λmc=141.3 S·cm↑2/mol Kkr=85.6 S·cm↑2/mol ]
+'ROOT(ⒺMolar Conductivity;[Λmc;Kkr];[100_(S*cm^2/mol);100_(S*cm^2/mol)])'
+```
+
+### Gas Mixtures
+
+Mixtures of gases: partial pressures, effusion, and the solubility of a gas in a
+liquid.
+
+Entries: [Dalton’s Law](#dalton’s law),
+[Graham’s Law](#graham’s law) and
+[Henry’s Law](#henry’s law).
+
+#### Dalton’s Law
+
+A mixture of up to three ideal gases: its total pressure, and the mole fractions
+and partial pressures of the first two.
+
+* Main results: the total amount `ngt` and the total pressure `Ptot` in the
+  volume `Vg` at the temperature `Tg`; the mole fractions `xg1`, `xg2` and the
+  partial pressures `Pg1`, `Pg2`, from the amounts `ng1`, `ng2` and `ng3`.
+* For two gases, set `ng3` to 0. The partial pressure of the third gas is the
+  rest of the total pressure.
+
+* To calculate: `[ngt;xg1;xg2;Pg1;Pg2]` (Total amount; Mole fractions; Partial pressures) of 2.83 mol of O₂ and 8.41 mol of N₂O at 192 kPa. The source gives 0.252, 0.748, 48.4 kPa and 144 kPa [1]:
+```rpl
+ng1=2.83_mol ng2=8.41_mol ng3=0_mol Ptot=192_kPa
+@ Expecting [ ngt=11.24 mol xg1=0.25177 93594 31 xg2=0.74822 06405 69 Pg1=48.34163 70107 kPa Pg2=143.65836 2989 kPa ]
+'ROOT(ⒺDalton’s Law;[ngt;xg1;xg2;Pg1;Pg2];[1_mol;0.5;0.5;1_kPa;1_kPa])'
+```
+
+* To calculate: `[ngt;Ptot;xg1;Pg1]` for 2.50·10⁻³ mol of H₂, 1.00·10⁻³ mol of He and 3.00·10⁻⁴ mol of Ne in 10.0 l at 35 °C. The source gives 9.61·10⁻³ atm in all and 6.32·10⁻³ atm of H₂ [1]:
+```rpl
+ng1=2.5E-3_mol ng2=1E-3_mol ng3=3E-4_mol Vg=10_l Tg=35_°C
+@ Expecting [ ngt=0.0038 mol Ptot=9.60867 13959 8⁳⁻³ atm xg1=0.65789 47368 42 Pg1=6.32149 43394 6⁳⁻³ atm ]
+'ROOT(ⒺDalton’s Law;[ngt;Ptot;xg1;Pg1];[1_mol;1_atm;0.5;1_atm])'
+```
+
+#### Graham’s Law
+
+The rates of effusion of two gases through a small hole, in the inverse ratio of
+the square roots of their molar masses.
+
+* Main results: the rate of effusion `rg2` of a gas of molar mass `MMg2` from
+  the rate `rg1` of a gas of molar mass `MMg1`; or a molar mass from two rates.
+* The two rates are numbers in the same unit. The times of effusion of equal
+  amounts are in the inverse ratio of the rates.
+
+* To calculate: `[rg2]` (Rate of effusion) of SO₂, of 64.06 g/mol, when N₂, of 28.01 g/mol, effuses at 79 ml/s. The source gives 52 ml/s [1]:
+```rpl
+rg1=79 MMg1=28.01_(g/mol) MMg2=64.06_(g/mol)
+@ Expecting [ rg2=52.23843 75273 ]
+'ROOT(ⒺGraham’s Law;[rg2];[10])'
+```
+
+* To calculate: `[MMg1]` (Molar mass) of a gas that effuses 1.66 times faster than CO₂, of 44.0 g/mol. The source gives 16.0 g/mol [1]:
+```rpl
+rg1=1.66 rg2=1 MMg2=44_(g/mol)
+@ Expecting [ MMg1=15.96748 43954 g/mol ]
+'ROOT(ⒺGraham’s Law;[MMg1];[10_(g/mol)])'
+```
+
+#### Henry’s Law
+
+The solubility of a gas in a liquid, proportional to its partial pressure above
+the solution.
+
+* Main results: the concentration `Cg` of the dissolved gas from its partial
+  pressure `Pg` and its Henry constant `kHen` in that solvent, at one
+  temperature; or the constant from a measured solubility.
+
+* To calculate: `[kHen]` (Henry constant) of oxygen in water at 20 °C, of solubility 1.38·10⁻³ mol/l under 101.3 kPa. The source gives 1.36·10⁻⁵ mol/(l·kPa) [1]:
+```rpl
+Cg=1.38E-3_(mol/l) Pg=101.3_kPa
+@ Expecting [ kHen=1.36229 02270 5⁳⁻⁵ mol/(l·kPa) ]
+'ROOT(ⒺHenry’s Law;[kHen];[1E-5_(mol/(l*kPa))])'
+```
+
+* To calculate: `[Cg]` (Concentration) of oxygen under its partial pressure in air, 20.7 kPa. The source gives 2.82·10⁻⁴ mol/l [1]:
+```rpl
+kHen=1.36229E-5_(mol/(l*kPa)) Pg=20.7_kPa
+@ Expecting [ Cg=0.00028 19940 3 mol/l ]
+'ROOT(ⒺHenry’s Law;[Cg];[1E-4_(mol/l)])'
 ```
 
 ### Spectrophotometry

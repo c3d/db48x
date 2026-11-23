@@ -1540,6 +1540,10 @@ static const cstring basic_equations[] =
     "  '(Cbase_(mol/l))=(nbase_mol)/(Vsn_l)' "
     "  '(Cbase_(mol/l))=(Cacid_(mol/l))·10^(pH-pKa)' "
     "}",
+    "Buffer Capacity",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(βbuf_(mol/l))=LN(10)·((1_(mol/l))·10^(pH-ⒸpKwH2O)+(1_(mol/l))·10^(-pH)+(Cbuf_(mol/l))·Ka·10^(-pH)/(Ka+10^(-pH))^2)' "
+    "}",
     "Chemistry/Polyprotic Acids", nullptr,
     "Diprotic Acid",  "{ "
     "  'Ka1=10^(-pKa1)' "
@@ -1584,6 +1588,39 @@ static const cstring basic_equations[] =
     "  '(cXi_(mol/l))=(cXs_(mol/l))·(VXs_ml)/((VMs_ml)+(VXs_ml))' "
     "  'Qsp=((cMi_(mol/l))/(1_(mol/l)))^νM·((cXi_(mol/l))/(1_(mol/l)))^νX' "
     "  'SIp=LOG(Qsp/Ksp)' "
+    "}",
+    "Chemistry/Electrochemistry", nullptr,
+    "Cell Potential",  "{ "
+    "  '(Ecl0_V)=(Ecat0_V)-(Eano0_V)' "
+    "  '(ΔG0_(J/mol))=-nel·ⒸF·(Ecl0_V)' "
+    "  'Keq=EXP(nel·ⒸF·(Ecl0_V)/(ⒸR·(Teq_K)))' "
+    "}",
+    "Nernst Equation",  "{ "
+    "  'Qr=EXP(nel·ⒸF·((Ecl0_V)-(Ecl_V))/(ⒸR·(Teq_K)))' "
+    "}",
+    "Electrolysis",  "{ "
+    "  '(Qel_C)=(Iel_A)·(tel_s)' "
+    "  '(nelm_mol)=(Qel_C)/ⒸF' "
+    "  '(mdep_g)=(nelm_mol)/zel·(MMsl_(g/mol))' "
+    "}",
+    "Molar Conductivity",  "{ "
+    "  '(Λmc_(S*cm^2/mol))=(κel_(S/cm))/(Csl_(mol/l))' "
+    "  '(Λmc_(S*cm^2/mol))=(Λm0_(S*cm^2/mol))-(Kkr_(S*cm^2/mol))·√((Csl_(mol/l))/(1_(mol/l)))' "
+    "}",
+    "Chemistry/Gas Mixtures", nullptr,
+    "Dalton’s Law",  "{ "
+    "  '(ngt_mol)=(ng1_mol)+(ng2_mol)+(ng3_mol)' "
+    "  '(Ptot_kPa)·(Vg_l)=(ngt_mol)·ⒸR·(Tg_K)' "
+    "  'xg1=(ng1_mol)/(ngt_mol)' "
+    "  'xg2=(ng2_mol)/(ngt_mol)' "
+    "  '(Pg1_kPa)=xg1·(Ptot_kPa)' "
+    "  '(Pg2_kPa)=xg2·(Ptot_kPa)' "
+    "}",
+    "Graham’s Law",  "{ "
+    "  'rg1·√((MMg1_(g/mol))/(MMg2_(g/mol)))=rg2' "
+    "}",
+    "Henry’s Law",  "{ "
+    "  '(Cg_(mol/l))=(kHen_(mol/(l*kPa)))·(Pg_kPa)' "
     "}",
     "Chemistry/Spectrophotometry", nullptr,
     "Beer Lambert Law",  "{ "
