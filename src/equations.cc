@@ -1470,6 +1470,43 @@ static const cstring basic_equations[] =
     "Van ’t Hoff",  "{ "
     "  'Keq2=Keq1·EXP((ΔHr_(J/mol))/(ⒸR·(Teq1_K))-(ΔHr_(J/mol))/(ⒸR·(Teq2_K)))' "
     "}",
+    "Chemistry/Kinetics", nullptr,
+    "First Order Reaction",  "{ "
+    "  '(cAt_(mol/l))=(cA0_(mol/l))·EXP(-(kr1_(s^-1))·(trx_s))' "
+    "  '(thalf_s)=LN(2)/(kr1_(s^-1))' "
+    "}",
+    "Second Order Reaction",  "{ "
+    "  '(cA0_(mol/l))=(cAt_(mol/l))·(1+(kr2_(l/(mol*s)))·(cA0_(mol/l))·(trx_s))' "
+    "  '(thalf_s)=1/((kr2_(l/(mol*s)))·(cA0_(mol/l)))' "
+    "}",
+    "Zero Order Reaction",  "{ "
+    "  '(cAt_(mol/l))=(cA0_(mol/l))-(kr0_(mol/(l*s)))·(trx_s)' "
+    "  '(thalf_s)=(cA0_(mol/l))/(2·(kr0_(mol/(l*s))))' "
+    "}",
+    "Arrhenius",  "{ "
+    "  'kT2=kT1·EXP((Eact_(J/mol))/(ⒸR·(Teq1_K))-(Eact_(J/mol))/(ⒸR·(Teq2_K)))' "
+    "  'kT1=Afr·EXP(-(Eact_(J/mol))/(ⒸR·(Teq1_K)))' "
+    "}",
+    "Eyring",  "{ "
+    "  '(kEy_(s^-1))=Ⓒk·(Teq_K)/Ⓒh·EXP(-(ΔGa_(J/mol))/(ⒸR·(Teq_K)))' "
+    "}",
+    "Michaelis Menten",  "{ "
+    "  '(v0_(mol/(l*s)))=(Vmax_(mol/(l*s)))·(cS_(mol/l))/((KMm_(mol/l))+(cS_(mol/l)))' "
+    "}",
+    "Chemistry/Thermochemistry", nullptr,
+    "Hess’s Law",  "{ "
+    "  '(ΔHr_(J/mol))=nh1·(ΔH1_(J/mol))+nh2·(ΔH2_(J/mol))+nh3·(ΔH3_(J/mol))' "
+    "}",
+    "Formation Enthalpies",  "{ "
+    "  '(ΔHr_(J/mol))=νP1·(HfP1_(J/mol))+νP2·(HfP2_(J/mol))-νR1·(HfR1_(J/mol))-νR2·(HfR2_(J/mol))' "
+    "}",
+    "Kirchhoff’s Law",  "{ "
+    "  '(ΔHk2_(J/mol))=(ΔHk1_(J/mol))+(ΔCpr_(J/(mol*K)))·(Teq2_K)-(ΔCpr_(J/(mol*K)))·(Teq1_K)' "
+    "}",
+    "Gibbs Energy",  "{ "
+    "  '(ΔGr_(J/mol))=(ΔHr_(J/mol))-(ΔSr_(J/(mol*K)))·(Teq_K)' "
+    "  '(ΔHr_(J/mol))=(ΔSr_(J/(mol*K)))·(Tsp_K)' "
+    "}",
     "Chemistry/Acids & Bases", nullptr,
     "pH & pOH",  "{ "
     "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "

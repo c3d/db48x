@@ -2876,13 +2876,15 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 
 ## Chemistry
 
-Solutions and their colligative properties, chemical equilibrium, acids and
-bases and their titration, solubility, and the absorption of light by a
-solution, at the level of a first course of general chemistry and of its
-laboratory, in eight submenus:
+Solutions and their colligative properties, chemical equilibrium, kinetics
+and thermochemistry, acids and bases and their titration, solubility, and the
+absorption of light by a solution, at the level of a first course of general
+chemistry and of its laboratory, in ten submenus:
 [Solutions](#solutions),
 [Colligative Properties](#colligative properties),
 [Equilibria](#equilibria),
+[Kinetics](#kinetics),
+[Thermochemistry](#thermochemistry),
 [Acids & Bases](#acids & bases),
 [Polyprotic Acids](#polyprotic acids),
 [Titrations](#titrations),
@@ -2913,7 +2915,7 @@ than here, and the examples give the difference.
 textbook *Chemistry 2e* [1]. They are computed again here, and the rounded
 result of the book is given with each of them.
 
-The 111 variables in the Chemistry section are:
+The 143 variables in the Chemistry section are:
 
 * `msl`: Mass of the solute (dim.: mass, in SI: g)
 * `MMsl`: Molar mass of the solute (dim.: mass/amount, in SI: g/mol)
@@ -2994,6 +2996,39 @@ The 111 variables in the Chemistry section are:
   buffer
 * `nacid`, `nbase`: Amounts of the acid and of its conjugate base in a buffer
   (dim.: amount, in SI: mol)
+* `cA0`, `cAt`: Concentrations of a reactant at the start and at the time `trx`
+  (dim.: amount/volume)
+* `trx`: Time elapsed since the start of the reaction (dim.: time)
+* `thalf`: Half-life of the reactant (dim.: time)
+* `kr0`, `kr1`, `kr2`: Rate constants of a reaction of order 0, in mol/(l·s), of
+  order 1, in s⁻¹, and of order 2, in l/(mol·s)
+* `kT1`, `kT2`: Rate constants at the temperatures `Teq1` and `Teq2`, as numbers
+  in the same unit
+* `Eact`: Activation energy (dim.: energy/amount, in SI: kJ/mol)
+* `Afr`: Frequency factor of Arrhenius, in the unit of the rate constants
+* `kEy`: Rate constant of an elementary step by the equation of Eyring (dim.:
+  1/time)
+* `ΔGa`: Gibbs energy of activation (dim.: energy/amount, in SI: kJ/mol)
+* `v0`: Initial rate of an enzymatic reaction (dim.: amount/(volume·time))
+* `Vmax`: Maximum rate, at saturating substrate (dim.: amount/(volume·time))
+* `KMm`: Michaelis constant, the concentration of substrate at half the maximum
+  rate (dim.: amount/volume)
+* `cS`: Concentration of the substrate (dim.: amount/volume)
+* `ΔH1`, `ΔH2`, `ΔH3`: Enthalpies of the reactions that are combined (dim.:
+  energy/amount)
+* `nh1`, `nh2`, `nh3`: Number of times each of them is taken: negative in
+  reverse, 0 if unused
+* `HfP1`, `HfP2`, `HfR1`, `HfR2`: Standard enthalpies of formation of the
+  products and of the reactants, used with the coefficients `νP1`, `νP2`, `νR1`,
+  `νR2` (dim.: energy/amount)
+* `ΔHk1`, `ΔHk2`: Enthalpies of reaction at the temperatures `Teq1` and `Teq2`
+  (dim.: energy/amount)
+* `ΔCpr`: Molar heat capacity of the products less that of the reactants (dim.:
+  energy/(amount·temperature), in SI: J/(mol·K))
+* `ΔSr`: Entropy of reaction (dim.: energy/(amount·temperature), in SI:
+  J/(mol·K))
+* `Tsp`: Temperature at which the Gibbs energy of reaction is zero (dim.:
+  temperature)
 * `Cpa`: Concentration of a polyprotic acid as prepared (dim.: amount/volume)
 * `Ka1`, `Ka2`, `Ka3`: Successive ionization constants of the polyprotic acid
 * `pKa1`, `pKa2`, `pKa3`: Their decimal logarithms, with a minus sign
@@ -3026,9 +3061,10 @@ The 111 variables in the Chemistry section are:
 
 * References:
   [1] P. Flowers, K. Theopold, R. Langley and W. R. Robinson, *Chemistry 2e*,
-  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 11.3, 11.6
-  to 11.13, 13.2 to 13.5, 14.7, 14.8, 14.12, 14.13, 14.14, 14.19 to 14.22,
-  15.3 to 15.5, 15.7, 15.8, 15.13, 16.12 and 16.13, table 11.2, the titration
+  OpenStax, Rice University, 2019, examples 3.16, 3.19, 3.21, 3.23, 5.11, 5.13
+  to 5.15, 11.3, 11.6 to 11.13, 12.6 and 12.8 to 12.13, 13.2 to 13.5, 14.7,
+  14.8, 14.12, 14.13, 14.14, 14.19 to 14.22, 15.3 to 15.5, 15.7, 15.8, 15.13,
+  16.7, 16.8 and 16.11 to 16.13, table 11.2, the titration
   table of section 14.7, the buffer of the blood in section 14.6 and the
   ionization constants of phosphoric acid in section 14.5: numbers only, under
   the license CC BY-NC-SA 4.0 ;
@@ -3414,6 +3450,267 @@ Keq1=0.15 Teq1=25_°C Teq2=350_K ΔHr=57.2_(kJ/mol)
 Keq1=0.15 Teq1=25_°C Keq2=4 Teq2=350_K
 @ Expecting [ ΔHr=54.94320 30076 kJ/mol ]
 'ROOT(ⒺVan ’t Hoff;[ΔHr];[10_(kJ/mol)])'
+```
+
+### Kinetics
+
+The rate of a reaction: the integrated rate laws of order 0, 1 and 2 and their
+half-lives, the effect of temperature by Arrhenius and Eyring, and the kinetics
+of an enzyme.
+
+Entries: [First Order Reaction](#first order reaction),
+[Second Order Reaction](#second order reaction),
+[Zero Order Reaction](#zero order reaction),
+[Arrhenius](#arrhenius),
+[Eyring](#eyring) and
+[Michaelis Menten](#michaelis menten).
+
+#### First Order Reaction
+
+A reaction of first order: the concentration of the reactant decays
+exponentially, with a constant half-life.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr1`; the time to reach a
+  concentration; and the half-life `thalf` from the rate constant, or the
+  reverse.
+* Only the ratio of the two concentrations matters: for a reactant 80 %
+  decomposed, take 1 and 0.2 mol/l.
+
+* To calculate: `[trx;thalf]` (Time; Half-life) for cyclobutane, of rate constant 9.2·10⁻³ s⁻¹ at 500 °C, to be 80.0 % decomposed. The source gives 1.7·10² s [1]:
+```rpl
+kr1=9.2E-3_(s^-1) cA0=1_(mol/l) cAt=0.2_(mol/l)
+@ Expecting [ trx=174.93890 3525 s thalf=75.34208 48435 s ]
+'ROOT(ⒺFirst Order Reaction;[trx;thalf];[100_s;100_s])'
+```
+
+* To calculate: `[kr1]` (Rate constant) of the decomposition of hydrogen peroxide at 40 °C, of half-life 2.16·10⁴ s. The source gives 3.21·10⁻⁵ s⁻¹ [1]:
+```rpl
+thalf=2.16E4_s
+@ Expecting [ kr1=3.20901 47248 1⁳⁻⁵ s⁻¹ ]
+'ROOT(ⒺFirst Order Reaction;[kr1];[1E-5_(s^-1)])'
+```
+
+#### Second Order Reaction
+
+A reaction of second order in one reactant: the inverse of its concentration
+grows linearly with time.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr2`; and the half-life `thalf`,
+  which depends on the initial concentration.
+* The equation is 1/[A] = 1/[A]₀ + k·t, written without inverse.
+
+* To calculate: `[cAt;thalf]` (Concentration; Half-life) of butadiene after 10.0 min of dimerization, from 0.200 mol/l, with a rate constant of 5.76·10⁻² l/(mol·min). The source gives 0.179 mol/l and 86.8 min [1]:
+```rpl
+kr2=5.76E-2_(l/(mol*min)) cA0=0.2_(mol/l) trx=10_min
+@ Expecting [ cAt=0.17934 00286 94 mol/l thalf=86.80555 55556 min ]
+'ROOT(ⒺSecond Order Reaction;[cAt;thalf];[0.1_(mol/l);10_min])'
+```
+
+* To calculate: `[kr2]` (Rate constant) of butadiene, whose concentration falls from 1.00·10⁻² to 5.04·10⁻³ mol/l in 1600 s. The source gives 0.0614 l/(mol·s), from five points [1]:
+```rpl
+cA0=1E-2_(mol/l) cAt=5.04E-3_(mol/l) trx=1600_s
+@ Expecting [ kr2=0.06150 79365 08 l/(mol·s) ]
+'ROOT(ⒺSecond Order Reaction;[kr2];[0.01_(l/(mol*s))])'
+```
+
+#### Zero Order Reaction
+
+A reaction of zero order, such as a decomposition on a saturated surface: the
+concentration falls linearly with time.
+
+* Main results: the concentration `cAt` at the time `trx`, from the initial
+  concentration `cA0` and the rate constant `kr0`; the rate constant from two
+  concentrations; and the half-life `thalf`.
+
+* To calculate: `[kr0;thalf]` (Rate constant; Half-life) of the decomposition of ammonia on tungsten, from 0.0028 to 0.0015 mol/l in 1000 s. The source gives 1.3·10⁻⁶ mol/(l·s) [1]:
+```rpl
+cA0=0.0028_(mol/l) cAt=0.0015_(mol/l) trx=1000_s
+@ Expecting [ kr0=0.00000 13 mol/(l·s) thalf=1 076.92307 692 s ]
+'ROOT(ⒺZero Order Reaction;[kr0;thalf];[1E-6_(mol/(l*s));100_s])'
+```
+
+#### Arrhenius
+
+The rate constant of a reaction at two temperatures, its activation energy and
+its frequency factor, by the equation of Arrhenius.
+
+* Main results: the activation energy `Eact` from the rate constants `kT1` and
+  `kT2` at the temperatures `Teq1` and `Teq2`, or a rate constant at another
+  temperature; and the frequency factor `Afr`.
+* The rate constants and the frequency factor are numbers, all in the same unit,
+  whatever the order of the reaction.
+
+* To calculate: `[Eact;Afr]` (Activation energy; Frequency factor) of the decomposition of HI, whose rate constant is 3.52·10⁻⁷ l/(mol·s) at 555 K and 3.95·10⁻² at 781 K. The source gives 1.8·10⁵ J/mol [1]:
+```rpl
+kT1=3.52E-7 Teq1=555_K kT2=3.95E-2 Teq2=781_K
+@ Expecting [ Eact=185.43064 5792 kJ/mol Afr=9.96046 10165 6⁳¹⁰ ]
+'ROOT(ⒺArrhenius;[Eact;Afr];[100_(kJ/mol);1E10])'
+```
+
+* To calculate: `[Eact]` (Activation energy) of the decomposition of N₂O₅, of rate constants 1.66 at 650 K and 7.39 at 700 K. The source gives 1.1·10⁵ J/mol [1]:
+```rpl
+kT1=1.66 Teq1=650_K kT2=7.39 Teq2=700_K
+@ Expecting [ Eact=112.98624 86 kJ/mol ]
+'ROOT(ⒺArrhenius;[Eact];[100_(kJ/mol)])'
+```
+
+* To calculate: `[kT2]` (Rate constant) at 35 °C of a reaction of 50 kJ/mol whose rate constant is 1 at 25 °C: the rule of the doubling every 10 °C:
+```rpl
+kT1=1 Teq1=25_°C Teq2=35_°C Eact=50_(kJ/mol)
+@ Expecting [ kT2=1.92426 48158 3 ]
+'ROOT(ⒺArrhenius;[kT2];[2])'
+```
+
+#### Eyring
+
+The rate constant of an elementary step from its Gibbs energy of activation, by
+the equation of Eyring of transition state theory.
+
+* Main results: the rate constant `kEy` from the Gibbs energy of activation
+  `ΔGa` and the temperature `Teq`, or the reverse.
+* The transmission coefficient is taken as 1. The constants of Boltzmann and
+  Planck are Ⓒk and Ⓒh.
+
+* To calculate: `[kEy]` (Rate constant) at 25 °C of a step of 80 kJ/mol:
+```rpl
+ΔGa=80_(kJ/mol) Teq=25_°C
+@ Expecting [ kEy=0.05996 09411 24 s⁻¹ ]
+'ROOT(ⒺEyring;[kEy];[1_(s^-1)])'
+```
+
+* To calculate: `[ΔGa]` (Gibbs energy of activation) of a step of 1 s⁻¹ at 37 °C:
+```rpl
+kEy=1_(s^-1) Teq=37_°C
+@ Expecting [ ΔGa=76.06490 32691 kJ/mol ]
+'ROOT(ⒺEyring;[ΔGa];[50_(kJ/mol)])'
+```
+
+#### Michaelis Menten
+
+The initial rate of a reaction catalyzed by an enzyme, as a function of the
+concentration of the substrate.
+
+* Main results: the initial rate `v0` from the maximum rate `Vmax`, the
+  Michaelis constant `KMm` and the concentration `cS` of the substrate; or the
+  concentration that gives a chosen rate.
+* At a concentration equal to `KMm`, the rate is half of `Vmax`.
+
+* To calculate: `[v0]` (Initial rate) for a substrate at 0.50 mmol/l, with a maximum rate of 100 µmol/(l·min) and a Michaelis constant of 2.0 mmol/l:
+```rpl
+Vmax=100_(µmol/(l*min)) KMm=2_(mmol/l) cS=0.5_(mmol/l)
+@ Expecting [ v0=20. µmol/(l·min) ]
+'ROOT(ⒺMichaelis Menten;[v0];[1_(µmol/(l*min))])'
+```
+
+* To calculate: `[cS]` (Concentration of the substrate) that gives three quarters of the maximum rate:
+```rpl
+Vmax=100_(µmol/(l*min)) KMm=2_(mmol/l) v0=75_(µmol/(l*min))
+@ Expecting [ cS=6. mmol/l ]
+'ROOT(ⒺMichaelis Menten;[cS];[1_(mmol/l)])'
+```
+
+### Thermochemistry
+
+The heat of a reaction: Hess’s law, the enthalpies of formation, the change of
+an enthalpy with temperature, and the Gibbs energy that tells whether the
+reaction is spontaneous.
+
+Entries: [Hess’s Law](#hess’s law),
+[Formation Enthalpies](#formation enthalpies),
+[Kirchhoff’s Law](#kirchhoff’s law) and
+[Gibbs Energy](#gibbs energy).
+
+#### Hess’s Law
+
+The enthalpy of a reaction that is the sum of up to three others, each taken a
+number of times.
+
+* Main results: the enthalpy of reaction `ΔHr` from the enthalpies `ΔH1`, `ΔH2`,
+  `ΔH3` of the steps and their multipliers `nh1`, `nh2`, `nh3`: negative for a
+  step taken in reverse, 0 for a step that is not used.
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of formation of FeCl₃, from the steps Fe + Cl₂ → FeCl₂, of −341.8 kJ, and FeCl₂ + ½ Cl₂ → FeCl₃, of −57.7 kJ. The source gives −399.5 kJ/mol [1]:
+```rpl
+nh1=1 ΔH1=-341.8_(kJ/mol) nh2=1 ΔH2=-57.7_(kJ/mol) nh3=0 ΔH3=0_(kJ/mol)
+@ Expecting [ ΔHr=-399.5 kJ/mol ]
+'ROOT(ⒺHess’s Law;[ΔHr];[1_(kJ/mol)])'
+```
+
+* To calculate: `[ΔHr]` of ClF + F₂ → ClF₃, from three reactions of −49.4, +214.0 and +236.2 kJ taken −½, +½ and −1 times. The source gives −104.5 kJ [1]:
+```rpl
+nh1=-0.5 ΔH1=-49.4_(kJ/mol) nh2=0.5 ΔH2=214_(kJ/mol) nh3=-1 ΔH3=236.2_(kJ/mol)
+@ Expecting [ ΔHr=-104.5 kJ/mol ]
+'ROOT(ⒺHess’s Law;[ΔHr];[1_(kJ/mol)])'
+```
+
+#### Formation Enthalpies
+
+The enthalpy of a reaction from the standard enthalpies of formation of its
+products and of its reactants.
+
+* Main results: the enthalpy of reaction `ΔHr` from the enthalpies of formation
+  `HfP1`, `HfP2` of the products and `HfR1`, `HfR2` of the reactants, with their
+  coefficients `νP1`, `νP2`, `νR1`, `νR2`; or one enthalpy of formation from a
+  measured enthalpy of reaction.
+* The enthalpy of formation of an element in its standard state is 0.
+
+* To calculate: `[ΔHr]` (Enthalpy of reaction) of the combustion of ethanol, C₂H₅OH + 3 O₂ → 2 CO₂ + 3 H₂O, with −394, −286 and −278 kJ/mol for CO₂, H₂O and ethanol. The source gives −1368 kJ/mol [1]:
+```rpl
+νP1=2 HfP1=-394_(kJ/mol) νP2=3 HfP2=-286_(kJ/mol) νR1=1 HfR1=-278_(kJ/mol) νR2=3 HfR2=0_(kJ/mol)
+@ Expecting [ ΔHr=-1 368 kJ/mol ]
+'ROOT(ⒺFormation Enthalpies;[ΔHr];[1_(kJ/mol)])'
+```
+
+* To calculate: `[HfR1]` (Enthalpy of formation) of ozone, from 3 O₂ → 2 O₃, of +286 kJ: the ozone is the product, so the reaction is entered in reverse, with −286 kJ. The source gives +143 kJ/mol [1]:
+```rpl
+ΔHr=-286_(kJ/mol) νP1=3 HfP1=0_(kJ/mol) νP2=0 HfP2=0_(kJ/mol) νR1=2 νR2=0 HfR2=0_(kJ/mol)
+@ Expecting [ HfR1=143 kJ/mol ]
+'ROOT(ⒺFormation Enthalpies;[HfR1];[1_(kJ/mol)])'
+```
+
+#### Kirchhoff’s Law
+
+The change of an enthalpy of reaction with the temperature, from the difference
+of the heat capacities of the products and of the reactants.
+
+* Main results: the enthalpy `ΔHk2` at the temperature `Teq2`, from the enthalpy
+  `ΔHk1` at `Teq1` and the difference `ΔCpr` of the molar heat capacities, taken
+  as constant between the two.
+
+* To calculate: `[ΔHk2]` (Enthalpy at the second temperature) of vaporization of water at 100 °C, from 44.01 kJ/mol at 25 °C, with heat capacities of 33.6 J/(mol·K) for the vapor and 75.3 for the liquid, a difference of −41.7. The accepted value is 40.65 kJ/mol:
+```rpl
+ΔHk1=44.01_(kJ/mol) Teq1=25_°C Teq2=100_°C ΔCpr=-41.7_(J/(mol*K))
+@ Expecting [ ΔHk2=40.8825 kJ/mol ]
+'ROOT(ⒺKirchhoff’s Law;[ΔHk2];[1_(kJ/mol)])'
+```
+
+#### Gibbs Energy
+
+The Gibbs energy of a reaction from its enthalpy and its entropy, and the
+temperature at which it changes sign.
+
+* Main results: the Gibbs energy `ΔGr` at the temperature `Teq`, from the
+  enthalpy `ΔHr` and the entropy `ΔSr` of reaction: negative, the reaction is
+  spontaneous; and the temperature `Tsp` at which `ΔGr` is zero, where the
+  reaction turns.
+* For a change of state, `Tsp` is the temperature of the transition: the boiling
+  point for a vaporization.
+* The enthalpy and the entropy are taken as constant with the temperature.
+
+* To calculate: `[ΔGr;Tsp]` (Gibbs energy; Temperature of the turn) of the vaporization of water at 298 K, of enthalpy 44.01 kJ/mol and entropy 118.8 J/(mol·K). The source gives +8.6 kJ and a boiling point of 370.5 K [1]:
+```rpl
+ΔHr=44.01_(kJ/mol) ΔSr=118.8_(J/(mol*K)) Teq=298_K
+@ Expecting [ ΔGr=8.6076 kJ/mol Tsp=370.45454 5455 K ]
+'ROOT(ⒺGibbs Energy;[ΔGr;Tsp];[1_(kJ/mol);300_K])'
+```
+
+* To calculate: `[ΔGr;Tsp]` of the decomposition of HgO, of 90.46 kJ/mol and 107.4 J/(mol·K), at 25 °C. The source gives +58.4 kJ/mol [1]:
+```rpl
+ΔHr=90.46_(kJ/mol) ΔSr=107.4_(J/(mol*K)) Teq=298.15_K
+@ Expecting [ ΔGr=58.43869 kJ/mol Tsp=842.27188 0819 K ]
+'ROOT(ⒺGibbs Energy;[ΔGr;Tsp];[1_(kJ/mol);300_K])'
 ```
 
 ### Acids & Bases
