@@ -1398,6 +1398,236 @@ static const cstring basic_equations[] =
     "}",
 
 
+    // ------------------------------------------------------------------------
+    "Chemistry", nullptr,
+    // ------------------------------------------------------------------------
+    // Solutions and colligative properties, acids and bases and titrations,
+    // spectrophotometry. Concentrations are in
+    // mol/l, since DB48x has no unit M; molalities in mol/kg. A pH or a pK is
+    // the logarithm of a number: concentrations are divided by 1 mol/l, and
+    // Ka and Kb are numbers. Water: ⒸpKwH2O, 13.994 at 25 °C, not 14.
+    "Chemistry/Solutions", nullptr,
+    "Molar Concentration",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "}",
+    "Mass Percent",  "{ "
+    "  '(msn_g)=(ρsn_(g/ml))·(Vsn_ml)' "
+    "  'wsl=(msl_g)/(msn_g)' "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "}",
+    "Dilution",  "{ "
+    "  '(Csk_(mol/l))·(Vsk_l)=(Cdl_(mol/l))·(Vdl_l)' "
+    "}",
+    "Mixing",  "{ "
+    "  '(Cmix_(mol/l))·((Vm1_l)+(Vm2_l))=(Cm1_(mol/l))·(Vm1_l)+(Cm2_(mol/l))·(Vm2_l)' "
+    "  '(Vmix_l)=(Vm1_l)+(Vm2_l)' "
+    "}",
+    "Molality & Mole Fraction",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(nsv_mol)=(msv_g)/(MMsv_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  'xsl=(nsl_mol)/((nsl_mol)+(nsv_mol))' "
+    "}",
+    "Chemistry/Colligative Properties", nullptr,
+    "Raoult’s Law",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(nsv_mol)=(msv_g)/(MMsv_(g/mol))' "
+    "  'xsv=(nsv_mol)/((nsl_mol)+(nsv_mol))' "
+    "  '(Psn_atm)=xsv·(Psv0_atm)' "
+    "  '(ΔPv_atm)=(Psv0_atm)-(Psn_atm)' "
+    "}",
+    "Boiling Point Elevation",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  '(ΔTb_K)=ivh·(Keb_(K*kg/mol))·(bm_(mol/kg))' "
+    "  '(Tbs_K)=(Tb0_K)+(ΔTb_K)' "
+    "}",
+    "Freezing Point Depression",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(bm_(mol/kg))=(nsl_mol)/(msv_kg)' "
+    "  '(ΔTf_K)=ivh·(Kcr_(K*kg/mol))·(bm_(mol/kg))' "
+    "  '(Tfs_K)=(Tf0_K)-(ΔTf_K)' "
+    "}",
+    "Osmotic Pressure",  "{ "
+    "  '(nsl_mol)=(msl_g)/(MMsl_(g/mol))' "
+    "  '(Csl_(mol/l))=(nsl_mol)/(Vsn_l)' "
+    "  '(Posm_atm)=ivh·(Csl_(mol/l))·ⒸR·(Tos_K)' "
+    "}",
+    "Chemistry/Equilibria", nullptr,
+    "Reaction Quotient",  "{ "
+    "  'Qc=((cP1_(mol/l))/(1_(mol/l)))^νP1·((cP2_(mol/l))/(1_(mol/l)))^νP2/(((cR1_(mol/l))/(1_(mol/l)))^νR1·((cR2_(mol/l))/(1_(mol/l)))^νR2)' "
+    "  'lQK=LOG(Qc/Kcq)' "
+    "}",
+    "Kp & Kc",  "{ "
+    "  'Kp=Kcq·((ⒸR·(Teq_K))/(1_(atm*l/mol)))^Δng' "
+    "}",
+    "Free Energy & K",  "{ "
+    "  'Keq=EXP(-(ΔG0_(J/mol))/(ⒸR·(Teq_K)))' "
+    "  '(ΔGr_(J/mol))=(ΔG0_(J/mol))+ⒸR·(Teq_K)·LN(Qr)' "
+    "}",
+    "Van ’t Hoff",  "{ "
+    "  'Keq2=Keq1·EXP((ΔHr_(J/mol))/(ⒸR·(Teq1_K))-(ΔHr_(J/mol))/(ⒸR·(Teq2_K)))' "
+    "}",
+    "Chemistry/Kinetics", nullptr,
+    "First Order Reaction",  "{ "
+    "  '(cAt_(mol/l))=(cA0_(mol/l))·EXP(-(kr1_(s^-1))·(trx_s))' "
+    "  '(thalf_s)=LN(2)/(kr1_(s^-1))' "
+    "}",
+    "Second Order Reaction",  "{ "
+    "  '(cA0_(mol/l))=(cAt_(mol/l))·(1+(kr2_(l/(mol*s)))·(cA0_(mol/l))·(trx_s))' "
+    "  '(thalf_s)=1/((kr2_(l/(mol*s)))·(cA0_(mol/l)))' "
+    "}",
+    "Zero Order Reaction",  "{ "
+    "  '(cAt_(mol/l))=(cA0_(mol/l))-(kr0_(mol/(l*s)))·(trx_s)' "
+    "  '(thalf_s)=(cA0_(mol/l))/(2·(kr0_(mol/(l*s))))' "
+    "}",
+    "Arrhenius",  "{ "
+    "  'kT2=kT1·EXP((Eact_(J/mol))/(ⒸR·(Teq1_K))-(Eact_(J/mol))/(ⒸR·(Teq2_K)))' "
+    "  'kT1=Afr·EXP(-(Eact_(J/mol))/(ⒸR·(Teq1_K)))' "
+    "}",
+    "Eyring",  "{ "
+    "  '(kEy_(s^-1))=Ⓒk·(Teq_K)/Ⓒh·EXP(-(ΔGa_(J/mol))/(ⒸR·(Teq_K)))' "
+    "}",
+    "Michaelis Menten",  "{ "
+    "  '(v0_(mol/(l*s)))=(Vmax_(mol/(l*s)))·(cS_(mol/l))/((KMm_(mol/l))+(cS_(mol/l)))' "
+    "}",
+    "Chemistry/Thermochemistry", nullptr,
+    "Hess’s Law",  "{ "
+    "  '(ΔHr_(J/mol))=nh1·(ΔH1_(J/mol))+nh2·(ΔH2_(J/mol))+nh3·(ΔH3_(J/mol))' "
+    "}",
+    "Formation Enthalpies",  "{ "
+    "  '(ΔHr_(J/mol))=νP1·(HfP1_(J/mol))+νP2·(HfP2_(J/mol))-νR1·(HfR1_(J/mol))-νR2·(HfR2_(J/mol))' "
+    "}",
+    "Kirchhoff’s Law",  "{ "
+    "  '(ΔHk2_(J/mol))=(ΔHk1_(J/mol))+(ΔCpr_(J/(mol*K)))·(Teq2_K)-(ΔCpr_(J/(mol*K)))·(Teq1_K)' "
+    "}",
+    "Gibbs Energy",  "{ "
+    "  '(ΔGr_(J/mol))=(ΔHr_(J/mol))-(ΔSr_(J/(mol*K)))·(Teq_K)' "
+    "  '(ΔHr_(J/mol))=(ΔSr_(J/(mol*K)))·(Tsp_K)' "
+    "}",
+    "Chemistry/Acids & Bases", nullptr,
+    "pH & pOH",  "{ "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "  '(cOH_(mol/l))=(1_(mol/l))·10^(-pOH)' "
+    "  'pH+pOH=ⒸpKwH2O' "
+    "}",
+    // Ka·(Ca-h)=h², the quadratic form; the water is neglected
+    "Weak Acid",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  'Ka·(1_(mol/l))·((Ca_(mol/l))-(cH3O_(mol/l)))=(cH3O_(mol/l))²' "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "}",
+    "Weak Base",  "{ "
+    "  'Kb=10^(-pKb)' "
+    "  'Kb·(1_(mol/l))·((Cb_(mol/l))-(cOH_(mol/l)))=(cOH_(mol/l))²' "
+    "  '(cOH_(mol/l))=(1_(mol/l))·10^(-pOH)' "
+    "  'pH=ⒸpKwH2O-pOH' "
+    "}",
+    "Percent Ionization",  "{ "
+    "  '(cH3O_(mol/l))=(1_(mol/l))·10^(-pH)' "
+    "  'PIon=100·(cH3O_(mol/l))/(Ca_(mol/l))' "
+    "}",
+    "Conjugate Pair",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  'Kb=10^(-pKb)' "
+    "  'pKa+pKb=ⒸpKwH2O' "
+    "}",
+    "Buffer",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(Cacid_(mol/l))=(nacid_mol)/(Vsn_l)' "
+    "  '(Cbase_(mol/l))=(nbase_mol)/(Vsn_l)' "
+    "  '(Cbase_(mol/l))=(Cacid_(mol/l))·10^(pH-pKa)' "
+    "}",
+    "Buffer Capacity",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(βbuf_(mol/l))=LN(10)·((1_(mol/l))·10^(pH-ⒸpKwH2O)+(1_(mol/l))·10^(-pH)+(Cbuf_(mol/l))·Ka·10^(-pH)/(Ka+10^(-pH))^2)' "
+    "}",
+    "Chemistry/Polyprotic Acids", nullptr,
+    "Diprotic Acid",  "{ "
+    "  'Ka1=10^(-pKa1)' "
+    "  'Ka2=10^(-pKa2)' "
+    "  '(1_(mol/l))·10^(-pH)=(Cpa_(mol/l))·(Ka1·10^(-pH)+2·Ka1·Ka2)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "  'fp0=10^(-2·pH)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "  'fp1=Ka1·10^(-pH)/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "  'fp2=Ka1·Ka2/(10^(-2·pH)+Ka1·10^(-pH)+Ka1·Ka2)' "
+    "}",
+    "Triprotic Acid",  "{ "
+    "  'Ka1=10^(-pKa1)' "
+    "  'Ka2=10^(-pKa2)' "
+    "  'Ka3=10^(-pKa3)' "
+    "  '(1_(mol/l))·10^(-pH)=(Cpa_(mol/l))·(Ka1·10^(-2·pH)+2·Ka1·Ka2·10^(-pH)+3·Ka1·Ka2·Ka3)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "  'fp0=10^(-3·pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp1=Ka1·10^(-2·pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp2=Ka1·Ka2·10^(-pH)/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "  'fp3=Ka1·Ka2·Ka3/(10^(-3·pH)+Ka1·10^(-2·pH)+Ka1·Ka2·10^(-pH)+Ka1·Ka2·Ka3)' "
+    "}",
+    "Chemistry/Titrations", nullptr,
+    // Balance of the charges, with the ions of the water: one equation
+    // from the start of the titration to beyond the equivalence point
+    "Strong Acid Titration",  "{ "
+    "  '(Veq_ml)=(Cta_(mol/l))·(Vta_ml)/(Ctb_(mol/l))' "
+    "  '(1_(mol/l))·10^(-pH)+(Ctb_(mol/l))·(Vtb_ml)/((Vta_ml)+(Vtb_ml))=(Cta_(mol/l))·(Vta_ml)/((Vta_ml)+(Vtb_ml))+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "}",
+    "Weak Acid Titration",  "{ "
+    "  'Ka=10^(-pKa)' "
+    "  '(Veq_ml)=(Cta_(mol/l))·(Vta_ml)/(Ctb_(mol/l))' "
+    "  '(1_(mol/l))·10^(-pH)+(Ctb_(mol/l))·(Vtb_ml)/((Vta_ml)+(Vtb_ml))=(Cta_(mol/l))·(Vta_ml)/((Vta_ml)+(Vtb_ml))·Ka/(Ka+10^(-pH))+(1_(mol/l))·10^(pH-ⒸpKwH2O)' "
+    "}",
+    "Chemistry/Solubility", nullptr,
+    "Molar Solubility",  "{ "
+    "  'Ksp=(νM·(ssol_(mol/l))/(1_(mol/l)))^νM·(νX·(ssol_(mol/l))/(1_(mol/l)))^νX' "
+    "  '(Sg_(g/l))=(ssol_(mol/l))·(MMsl_(g/mol))' "
+    "}",
+    "Common Ion Effect",  "{ "
+    "  'Ksp=((νM·(ssol_(mol/l))+(cM0_(mol/l)))/(1_(mol/l)))^νM·((νX·(ssol_(mol/l))+(cX0_(mol/l)))/(1_(mol/l)))^νX' "
+    "}",
+    "Precipitation",  "{ "
+    "  '(cMi_(mol/l))=(cMs_(mol/l))·(VMs_ml)/((VMs_ml)+(VXs_ml))' "
+    "  '(cXi_(mol/l))=(cXs_(mol/l))·(VXs_ml)/((VMs_ml)+(VXs_ml))' "
+    "  'Qsp=((cMi_(mol/l))/(1_(mol/l)))^νM·((cXi_(mol/l))/(1_(mol/l)))^νX' "
+    "  'SIp=LOG(Qsp/Ksp)' "
+    "}",
+    "Chemistry/Electrochemistry", nullptr,
+    "Cell Potential",  "{ "
+    "  '(Ecl0_V)=(Ecat0_V)-(Eano0_V)' "
+    "  '(ΔG0_(J/mol))=-nel·ⒸF·(Ecl0_V)' "
+    "  'Keq=EXP(nel·ⒸF·(Ecl0_V)/(ⒸR·(Teq_K)))' "
+    "}",
+    "Nernst Equation",  "{ "
+    "  'Qr=EXP(nel·ⒸF·((Ecl0_V)-(Ecl_V))/(ⒸR·(Teq_K)))' "
+    "}",
+    "Electrolysis",  "{ "
+    "  '(Qel_C)=(Iel_A)·(tel_s)' "
+    "  '(nelm_mol)=(Qel_C)/ⒸF' "
+    "  '(mdep_g)=(nelm_mol)/zel·(MMsl_(g/mol))' "
+    "}",
+    "Molar Conductivity",  "{ "
+    "  '(Λmc_(S*cm^2/mol))=(κel_(S/cm))/(Csl_(mol/l))' "
+    "  '(Λmc_(S*cm^2/mol))=(Λm0_(S*cm^2/mol))-(Kkr_(S*cm^2/mol))·√((Csl_(mol/l))/(1_(mol/l)))' "
+    "}",
+    "Chemistry/Gas Mixtures", nullptr,
+    "Dalton’s Law",  "{ "
+    "  '(ngt_mol)=(ng1_mol)+(ng2_mol)+(ng3_mol)' "
+    "  '(Ptot_kPa)·(Vg_l)=(ngt_mol)·ⒸR·(Tg_K)' "
+    "  'xg1=(ng1_mol)/(ngt_mol)' "
+    "  'xg2=(ng2_mol)/(ngt_mol)' "
+    "  '(Pg1_kPa)=xg1·(Ptot_kPa)' "
+    "  '(Pg2_kPa)=xg2·(Ptot_kPa)' "
+    "}",
+    "Graham’s Law",  "{ "
+    "  'rg1·√((MMg1_(g/mol))/(MMg2_(g/mol)))=rg2' "
+    "}",
+    "Henry’s Law",  "{ "
+    "  '(Cg_(mol/l))=(kHen_(mol/(l*kPa)))·(Pg_kPa)' "
+    "}",
+    "Chemistry/Spectrophotometry", nullptr,
+    "Beer Lambert Law",  "{ "
+    "  'Absb=(εm_(l/(mol*cm)))·(lp_cm)·(Csl_(mol/l))' "
+    "  'Tsm=10^(-Absb)' "
+    "}",
+
     "Finance", nullptr,
     "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
@@ -2825,37 +3055,57 @@ const equation::config equation::equations =
 
 
 // ==========================================================================
-//   Equation Library - grand total of variables
+//   Equation Library - census
+//   As of 2026-11-23, with all the pull requests open on that day merged,
+//   up to the Chemistry section and its figures, Aeronautics/Design (#1862) and
+//   Celestial Navigation (#1875). The HP 50g has 315 equations and 397
+//   variables.
+// --------------------------------------------------------------------------
+//     Sections                             27
+//     Subsections                         450
+//     Equations                          1684   (5.35 x HP 50g)
+//     Variables                          1650   (4.16 x HP 50g)
+//     Simulations (ROOT examples)         531
+//     Figures of the help                 172
+// --------------------------------------------------------------------------
+//   Variables by section
 //   (from doc/calc-help/equations.md; each name is counted once per section
 //   that uses it - the same name recurring in another section is expected and
 //   counted again, since every section carries its own variable list.)
 // --------------------------------------------------------------------------
-//     Columns and Beams                    21
+//     Columns and Beams                    20
 //     Electricity                          78
 //     Fluids                               30
-//     Forces and Energy                    37
+//     Force and Energy                     37
 //     Gases                                38
-//     Heat transfer                        31
+//     Heat Transfer                        31
 //     Magnetism                            28
 //     Motion                               38
 //     Optics                               40
 //     Oscillations                         25
-//     Plane Geometry                       21
-//     Solid geometry                       12
-//     Solid State Devices                  54
-//     Stress Analysis                      28
+//     Plane Geometry                       21
+//     Solid Geometry                       12
+//     Solid State Devices                  54
+//     Stress Analysis                      28
 //     Waves                                40
 //     Relativity                          109
-//     Modern Physics                       43
-//     Nuclear Physics                      52
+//     Modern Physics                       42
+//     Nuclear Physics                      52
+//     Chemistry                           178
 //     Finance                               6
-//     Rocketry                             110
+//     Rocketry                            110
 //     Geocentric / Stationary              54
 //     Geocentric / Trajectory              80
 //     Heliocentric / Stationary            12
 //     Heliocentric / Trajectory           128
+//     Probability                          30
+//     Navigation                           41
+//     Celestial Navigation                 23
+//     Flight Management                    84
+//     Performance                          78
+//     Design                              103
 // --------------------------------------------------------------------------
-//     GRAND TOTAL                        1115
+//     GRAND TOTAL                        1650
 // ==========================================================================
 
 // ============================================================================
