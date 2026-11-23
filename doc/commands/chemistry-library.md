@@ -1,4 +1,4 @@
-# Chemistry
+# Chemistry library
 
 The chemistry section of the library. Its first part, [Elements](#elementslibrary),
 holds the periodic table and the data of the 118 elements.
