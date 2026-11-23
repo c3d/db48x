@@ -3573,6 +3573,8 @@ cA0=0.0028_(mol/l) cAt=0.0015_(mol/l) trx=1000_s
 The rate constant of a reaction at two temperatures, its activation energy and
 its frequency factor, by the equation of Arrhenius.
 
+![Energy profile and activation energy](img/ActivationEnergy.bmp)
+
 * Main results: the activation energy `Eact` from the rate constants `kT1` and
   `kT2` at the temperatures `Teq1` and `Teq2`, or a rate constant at another
   temperature; and the frequency factor `Afr`.
@@ -3628,6 +3630,8 @@ kEy=1_(s^-1) Teq=37_°C
 
 The initial rate of a reaction catalyzed by an enzyme, as a function of the
 concentration of the substrate.
+
+![Saturation curve of an enzyme](img/MichaelisMenten.bmp)
 
 * Main results: the initial rate `v0` from the maximum rate `Vmax`, the
   Michaelis constant `KMm` and the concentration `cS` of the substrate; or the
@@ -3992,6 +3996,8 @@ pH=8.3 Ka1=4.3E-7 Ka2=4.7E-11
 A triprotic acid H₃A, such as phosphoric acid: the pH of its solution, and the
 fractions of its four forms.
 
+![Distribution of the forms of a triprotic acid](img/TriproticDistribution.bmp)
+
 * Main results: the `pH` of a solution of the acid at the concentration `Cpa`,
   from its constants `Ka1`, `Ka2` and `Ka3` or their pK; and the fractions `fp0`
   to `fp3` of the acid that have lost 0 to 3 protons, at that pH or at a pH
@@ -4056,6 +4062,8 @@ Cta=0.1_(mol/l) Vta=25_ml Ctb=0.1_(mol/l) pH=3
 #### Weak Acid Titration
 
 A weak acid, such as acetic acid, titrated by a strong base.
+
+![Titration curve of a weak acid](img/WeakAcidTitration.bmp)
 
 * Main results: the equivalence volume `Veq`, and the `pH` after a volume `Vtb`
   of base, from the concentration `Cta` and the volume `Vta` of the acid, its
@@ -4195,6 +4203,8 @@ Entries: [Cell Potential](#cell potential),
 The standard potential of a galvanic cell from the standard reduction potentials
 of its two electrodes, with the Gibbs energy and the equilibrium constant of its
 reaction.
+
+![Galvanic cell](img/GalvanicCell.bmp)
 
 * Main results: the standard cell potential `Ecl0` from the reduction potentials
   `Ecat0` of the cathode and `Eano0` of the anode; the standard Gibbs energy
@@ -4377,6 +4387,8 @@ Entry: [Beer Lambert Law](#beer lambert law).
 The absorbance of a solution at one wavelength is proportional to the
 concentration of the absorbing solute and to the path length of the light: the
 Beer-Lambert law.
+
+![Light through a cell](img/BeerLambert.bmp)
 
 * Main results: the absorbance `Absb` and the transmittance `Tsm`, from the
   molar absorption coefficient `εm` of the solute, the path length `lp` and the
