@@ -3055,37 +3055,57 @@ const equation::config equation::equations =
 
 
 // ==========================================================================
-//   Equation Library - grand total of variables
+//   Equation Library - census
+//   As of 2026-11-23, with all the pull requests open on that day merged,
+//   up to the Chemistry section and its figures, Aeronautics/Design (#1862) and
+//   Celestial Navigation (#1875). The HP 50g has 315 equations and 397
+//   variables.
+// --------------------------------------------------------------------------
+//     Sections                             27
+//     Subsections                         450
+//     Equations                          1684   (5.35 x HP 50g)
+//     Variables                          1650   (4.16 x HP 50g)
+//     Simulations (ROOT examples)         531
+//     Figures of the help                 172
+// --------------------------------------------------------------------------
+//   Variables by section
 //   (from doc/calc-help/equations.md; each name is counted once per section
 //   that uses it - the same name recurring in another section is expected and
 //   counted again, since every section carries its own variable list.)
 // --------------------------------------------------------------------------
-//     Columns and Beams                    21
+//     Columns and Beams                    20
 //     Electricity                          78
 //     Fluids                               30
-//     Forces and Energy                    37
+//     Force and Energy                     37
 //     Gases                                38
-//     Heat transfer                        31
+//     Heat Transfer                        31
 //     Magnetism                            28
 //     Motion                               38
 //     Optics                               40
 //     Oscillations                         25
-//     Plane Geometry                       21
-//     Solid geometry                       12
-//     Solid State Devices                  54
-//     Stress Analysis                      28
+//     Plane Geometry                       21
+//     Solid Geometry                       12
+//     Solid State Devices                  54
+//     Stress Analysis                      28
 //     Waves                                40
 //     Relativity                          109
-//     Modern Physics                       43
-//     Nuclear Physics                      52
+//     Modern Physics                       42
+//     Nuclear Physics                      52
+//     Chemistry                           178
 //     Finance                               6
-//     Rocketry                             110
+//     Rocketry                            110
 //     Geocentric / Stationary              54
 //     Geocentric / Trajectory              80
 //     Heliocentric / Stationary            12
 //     Heliocentric / Trajectory           128
+//     Probability                          30
+//     Navigation                           41
+//     Celestial Navigation                 23
+//     Flight Management                    84
+//     Performance                          78
+//     Design                              103
 // --------------------------------------------------------------------------
-//     GRAND TOTAL                        1115
+//     GRAND TOTAL                        1650
 // ==========================================================================
 
 // ============================================================================
