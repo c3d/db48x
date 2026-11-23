@@ -3495,6 +3495,8 @@ The rate of a reaction: the integrated rate laws of order 0, 1 and 2 and their
 half-lives, the effect of temperature by Arrhenius and Eyring, and the kinetics
 of an enzyme.
 
+![Energy profile and activation energy](img/ActivationEnergy.bmp)
+
 Entries: [First Order Reaction](#first order reaction),
 [Second Order Reaction](#second order reaction),
 [Zero Order Reaction](#zero order reaction),
@@ -3961,6 +3963,8 @@ Cbuf=0.2_(mol/l) Ka=1.8E-5 pH=5.74
 Acids that give up two or three protons, one after the other: the pH of their
 solutions and the fraction of each of their forms.
 
+![Distribution of the forms of a triprotic acid](img/TriproticDistribution.bmp)
+
 Entries: [Diprotic Acid](#diprotic acid) and
 [Triprotic Acid](#triprotic acid).
 
@@ -4023,6 +4027,8 @@ pH=7.4 Ka1=7.5E-3 Ka2=6.2E-8 Ka3=4.2E-13
 
 The pH of an acid while it is titrated by a strong base, and the volume of base
 at the equivalence point.
+
+![Titration curve of a weak acid](img/WeakAcidTitration.bmp)
 
 Entries: [Strong Acid Titration](#strong acid titration) and
 [Weak Acid Titration](#weak acid titration).
@@ -4192,6 +4198,8 @@ cMi=0.0537_(mol/l) cXi=0.001_(mol/l) νM=1 νX=2 Ksp=8.9E-12
 Galvanic cells and electrolysis: the potential of a cell, its Gibbs energy and
 its equilibrium constant, the Nernst equation, Faraday’s laws and the
 conductivity of a solution.
+
+![Galvanic cell](img/GalvanicCell.bmp)
 
 Entries: [Cell Potential](#cell potential),
 [Nernst Equation](#nernst equation),
@@ -4379,6 +4387,8 @@ kHen=1.36229E-5_(mol/(l*kPa)) Pg=20.7_kPa
 
 The absorption of light by a solution, the basis of the spectrophotometric
 assays.
+
+![Light through a cell](img/BeerLambert.bmp)
 
 Entry: [Beer Lambert Law](#beer lambert law).
 
