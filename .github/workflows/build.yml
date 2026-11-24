@@ -1288,19 +1288,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
-    - name: Set up JDK 17
+    - name: Set up JDK
       uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '25'
 
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.3'
-        host: 'linux'
+        version: '6.12.0'
+        host: 'all_os'
         target: 'android'
         arch: 'android_arm64_v8a'
         modules: 'qtmultimedia'
@@ -1346,7 +1347,7 @@ jobs:
     - name: Verify generated AAB
       run: test -f android/db48x/db48x.aab
 
-    - name: Upload Android artifacts
+    - name: Upload Android .aab artifacts
       uses: actions/upload-artifact@v7
       with:
         name: db48x-android
@@ -1354,8 +1355,18 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          android/build/outputs/apk/**/*.apk
-          help/
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db48x/db48x-debug.apk db48x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db48x.apk
+        archive: false
         retention-days: 7
 
   build-color-android:
@@ -1368,19 +1379,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: recursive
 
-    - name: Set up JDK 17
+    - name: Set up JDK
       uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '25'
 
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.3'
-        host: 'linux'
+        version: '6.12.0'
+        host: 'all_os'
         target: 'android'
         arch: 'android_arm64_v8a'
         modules: 'qtmultimedia'
@@ -1426,7 +1438,7 @@ jobs:
     - name: Verify generated AAB
       run: test -f android/db50x/db50x.aab
 
-    - name: Upload Android artifacts
+    - name: Upload Android .aab artifacts
       uses: actions/upload-artifact@v7
       with:
         name: db50x-android
@@ -1434,8 +1446,18 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          android/build/outputs/apk/**/*.apk
-          help/
+        retention-days: 7
+
+    - name: Android .apk; single file; simple name
+      run: ln -s android/db50x/db50x-debug.apk db50x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db50x.apk
+        archive: false
         retention-days: 7
 
   build-dm42-firmware:
