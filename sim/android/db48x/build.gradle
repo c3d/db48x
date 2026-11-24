@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'com.android.tools.build:gradle:9.2.1'
     }
 }
 
@@ -22,6 +22,31 @@ dependencies {
     implementation 'androidx.core:core:1.13.1'
 }
 
+def rawVersion = project.findProperty("PACKAGE_VERSION")?.toString()?.trim()
+if (!rawVersion || rawVersion == "unknown") {
+    rawVersion = "v0.0.0"
+}
+
+// Matches "v0.10.0" as well as "v0.10.0-14-gabc1234"
+def matcher = (rawVersion =~ /^v?(\d+)\.(\d+)\.(\d+)(?:-(\d+)-g[0-9a-f]+)?/)
+
+int major = 0
+int minor = 0
+int patch = 0
+int commitOffset = 0
+
+if (matcher.find()) {
+    major = matcher.group(1).toInteger()
+    minor = matcher.group(2).toInteger()
+    patch = matcher.group(3).toInteger()
+    if (matcher.group(4) != null) {
+        commitOffset = matcher.group(4).toInteger()
+    }
+}
+
+// v0.10.0 -> 1000000; v0.10.0-1-g... -> 1000001; v0.10.1 -> 1001000
+int computedVersionCode = Math.max(1, (major * 10000000) + (minor * 100000) + (patch * 1000) + commitOffset)
+
 android {
     /*******************************************************
      * The following variables:
@@ -37,13 +62,17 @@ android {
      * Changing them manually might break the compilation!
      *******************************************************/
 
-    namespace androidPackageName
-    compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion androidBuildToolsVersion
-    ndkVersion androidNdkVersion
+    namespace = androidPackageName
+    compileSdkVersion = androidCompileSdkVersion
+    buildToolsVersion = androidBuildToolsVersion
+    ndkVersion = androidNdkVersion
 
     // Extract native libraries from the APK
-    packagingOptions.jniLibs.useLegacyPackaging true
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 
     sourceSets {
         main {
@@ -58,30 +87,32 @@ android {
        }
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.incremental = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
-    lintOptions {
-        abortOnError false
+    lint {
+        abortOnError = false
     }
 
     // Do not compress Qt binary resources file
-    aaptOptions {
-        noCompress 'rcc'
+    androidResources {
+        noCompress += 'rcc'
     }
 
     defaultConfig {
-        resConfig "en"
+        resourceConfigurations += ["en"]
         applicationId "org.db48x"
-        minSdkVersion qtMinSdkVersion
-        // Use Qt's target SDK, but ensure minimum of 35 for Google Play Store (Android 15)
-        targetSdkVersion Math.max(qtTargetSdkVersion as Integer, 35)
+        versionCode computedVersionCode
+        versionName rawVersion
+        minSdkVersion = qtMinSdkVersion
+        // Use Qt's target SDK, but ensure minimum for Google Play Store.
+        targetSdkVersion = Math.max(qtTargetSdkVersion as Integer, 36)
         ndk.abiFilters = qtTargetAbiList.split(",")
     }
 
@@ -104,8 +135,8 @@ android {
             if (file(keystorePath).exists()) {
                 signingConfig signingConfigs.release
             }
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
