@@ -1,0 +1,56 @@
+«
+@@ PendulumG — a laboratory exercise of mechanics: the acceleration of
+@@ gravity g, from a pendulum whose bob is a phone that records its own
+@@ swing with its gyroscope.
+@@ Level 2: the recording, as for SensorPeriod: an array of rows
+@@ [ t ωx ωy ωz ], the time in seconds and the rotation rates in rad/s, or
+@@ the name of a CSV file of that form in the data directory.
+@@ Level 1: the length L of the pendulum, with its unit, and with its
+@@ standard uncertainty if it has one.
+@@ SensorPeriod gives the period Treal with its uncertainty of type A. The
+@@ mean square of the rotation rate gives the amplitude: for a swing of
+@@ amplitude θmax and period T, the mean of ω² is θmax²·(2π/T)²/2. The
+@@ period for small amplitudes follows, as in the equation Simple Pendulum
+@@ of the Equation Library, T = Treal/(1 + θmax²/16 + 11·θmax⁴/3072), then
+@@ g = 4·π²·L/T². The uncertainties of Treal and L are combined; the
+@@ amplitude is taken as exact, its correction being small.
+@@ Returns Treal, θmax and g, tagged.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  → pgdat pglen
+  «
+    pgdat
+    If Dup TypeName "text" == Then Rcl End
+    If Dup 1 Get 1 Get TypeName "text" == Then Tail End
+    → pgtab
+    «
+      pgtab ⓁSensorPeriod
+      @ The mean square of the rotation rate, all axes together
+      pgtab →Col →List
+      → pgcols
+      «
+        0
+        2 pgcols Size For pgk
+          pgcols pgk Get Dup Dot +
+        Next
+        pgcols 1 Get Size 1 Get /
+      »
+      → pgper pgmsq
+      «
+        @ The amplitude in radians, from the central value of the period
+        pgmsq 2 * √ pgper UVAL Range→ Drop * 2 π →Num * /
+        → pgth
+        «
+          pgper "Treal" →Tag
+          pgth 180 * π →Num / 1_° * "θmax" →Tag
+          @ g, with the period for small amplitudes. The power is written
+          @ 2 ^, not Sq: on a value with a unit, Sq would count the
+          @ uncertainty of the period as that of two independent factors
+          4 π →Num 2 ^ * pglen *
+          pgper 1 pgth 2 ^ 16 / + 11 pgth 4 ^ * 3072 / + / 2 ^ /
+          1_m/s^2 Convert "g" →Tag
+        »
+      »
+    »
+  »
+»

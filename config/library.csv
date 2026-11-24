@@ -713,3 +713,9 @@
 	"MolarMass",	"=/library/Chemistry/MolarMass.48s"
 	"MolarMassσ",	"=/library/Chemistry/MolarMassSigma.48s"
 	"Formula",	"=/library/Chemistry/Formula.48s"
+
+"Phyphox"
+
+	"PendulumG",	"=/library/Phyphox/PendulumG.48s"
+	"SensorPeriod",	"=/library/Phyphox/SensorPeriod.48s"
+	"PendulumData",	"=/library/Phyphox/PendulumData.48s"

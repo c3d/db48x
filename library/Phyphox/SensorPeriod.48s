@@ -1,0 +1,96 @@
+«
+@@ SensorPeriod — the period of an oscillation recorded by a sensor, with
+@@ its standard uncertainty of type A.
+@@ Level 1: the recording, as an array of rows [ t x y … ], the time t in
+@@ seconds then one column per axis of the sensor, or the name of a CSV
+@@ file of that form in the data directory, with or without a line of
+@@ titles: the file exported by the application phyphox is read as it is.
+@@ The axis with the largest signal is kept. Its zero crossings are located
+@@ by linear interpolation, and confirmed once the signal has left the band
+@@ of ±0.3 times its rms value, so that noise near zero adds none. Two
+@@ straight lines of the same slope are then fitted to the times of the
+@@ crossings, one for the rising and one for the falling ones: a constant
+@@ offset of the sensor moves the two lines apart and leaves the slope, the
+@@ period, unchanged. The standard uncertainty comes from the scatter of
+@@ the crossings about these lines, with N − 3 degrees of freedom.
+@@ Returns the period as T±σu, in seconds.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  If Dup TypeName "text" == Then Rcl End
+  If Dup 1 Get 1 Get TypeName "text" == Then Tail End
+  →Col →List
+  → spcols
+  «
+    @ The times, then the axis with the largest sum of squares
+    spcols 1 Get 0 0
+    2 spcols Size For spk
+      spcols spk Get Dup Dot
+      → spss « If spss 3 Pick > Then Drop2 spss spk End »
+    Next
+    spcols Swap Get Swap
+    → sptv spyv spss
+    «
+      spyv Size 1 Get
+      → spnn
+      «
+        @ The threshold, the list of crossings, the side of the signal
+        @ (0 at first), and the latest crossing seen
+        spss spnn / √ 0.3 *
+        { } 0 0
+        → sphy sptc spst spcd
+        «
+          sptv 1 Get spyv 1 Get
+          2 spnn For spk
+            sptv spk Get spyv spk Get
+            → spt0 spy0 spt1 spy1
+            «
+              If spy0 0 < spy1 0 < Xor Then
+                spt0 spt1 spt0 - spy0 * spy0 spy1 - / + 'spcd' Sto
+              End
+              If spy1 Abs sphy > Then
+                spy1 Sign
+                → spsg
+                «
+                  If spsg spst ≠ Then
+                    If spst 0 ≠ Then sptc spcd + 'sptc' Sto End
+                    spsg 'spst' Sto
+                  End
+                »
+              End
+              spt1 spy1
+            »
+          Next
+          Drop2
+          If sptc Size 4 < Then "Too few oscillations" DoErr End
+          @ The two lines of same slope: sums of squares and products
+          0 0 0
+          → spsxx spsxy spstt
+          «
+            1 2 For spj
+              0 0 0 0
+              → spcn spsm spsq spsj
+              «
+                spj sptc Size For spk
+                  sptc spk Get
+                  → sptk
+                  «
+                    spsj spcn sptk * + 'spsj' Sto
+                    spsm sptk + 'spsm' Sto
+                    spsq sptk Sq + 'spsq' Sto
+                    spcn 1 + 'spcn' Sto
+                  »
+                2 Step
+                spsxx spcn spcn Sq 1 - * 12 / + 'spsxx' Sto
+                spsxy spsj spcn 1 - 2 / spsm * - + 'spsxy' Sto
+                spstt spsq spsm Sq spcn / - + 'spstt' Sto
+              »
+            Next
+            spsxy spsxx /
+            spstt spsxy Sq spsxx / - 0 Max sptc Size 3 - / spsxx / √
+            →σRange 1_s *
+          »
+        »
+      »
+    »
+  »
+»
